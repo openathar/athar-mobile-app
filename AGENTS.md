@@ -1,16 +1,24 @@
 # AGENTS.md — athar-mobile-app
 
-Mobile App (iOS/Android) der Athar-Plattform (openathar). Offline-first:
-embedded `athan-core-java` für Gebetszeiten, kein Server-Abruf im
-Normalbetrieb nötig. Optionaler Sync nur für Khatma-Fortschritt/Tasbeeh
-(kein Pflicht-Account).
+Mobile app (iOS/Android) of the Athar platform (openathar). Offline-first:
+embeds `athan-core-java` for prayer times, no server call needed in normal
+operation. Optional sync only for Khatma progress/Tasbeeh (no mandatory
+account).
 
-## Verknuepfungen
-- Architektur/Roadmap: `../../AGENTS.md` (Superproject `business/athar`)
-- Repo-Regeln: `~/Development/harness/agents/business-repo.md`
+## Links
 
-## Kritische Punkte
-- Adhan-Timing NIE auf Push verlassen (Doze/iOS-Background unzuverlässig) —
-  lokale Alarme/Notifications (siehe Superproject-AGENTS.md, Abschnitt
-  "Mobile-Herausforderungen").
-- Framework-Entscheidung (Flutter vs. KMP) noch offen, siehe Sprint-1-Plan.
+- Architecture/roadmap: `../../AGENTS.md` (superproject `business/athar`)
+- Repo conventions: `~/Development/harness/agents/business-repo.md`
+
+## Critical points
+
+- NEVER rely on push for Adhan timing (Doze/iOS background are unreliable)
+  — use local alarms/notifications (see the superproject AGENTS.md,
+  "Mobile constraints" section).
+- Framework decision (Flutter vs. Kotlin Multiplatform) still open — see
+  the "Next steps" section in `docs/architecture.md`.
+
+## Current state
+
+Scaffold only — no code yet, and deliberately last in the build order:
+this only makes sense once `athan-core-java` is embeddable as a library.
