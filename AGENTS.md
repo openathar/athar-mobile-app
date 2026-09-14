@@ -22,3 +22,10 @@ account).
 
 Scaffold only — no code yet, and deliberately last in the build order:
 this only makes sense once `athan-core-java` is embeddable as a library.
+
+## APM (Agent Package Manager)
+
+Projekt-lokale Skills/Agents/Commands werden über `apm.yaml` verwaltet
+(Registry-Quelle: `~/Development/harness/registry/`).
+- `apm install --local` — installiert die in `apm.yaml` gelisteten Packages
+- `apm status --local` — prüft Installations-Stand gegen die Registry
