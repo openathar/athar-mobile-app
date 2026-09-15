@@ -9,8 +9,10 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
 import AppTabs from '@/components/app-tabs';
+import { configureNotifications } from '@/lib/alarms';
 
 SplashScreen.preventAutoHideAsync();
+configureNotifications();
 
 export default function TabLayout() {
   const [loaded, error] = useFonts({
