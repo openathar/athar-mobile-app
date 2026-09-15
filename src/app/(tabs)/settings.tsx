@@ -1,6 +1,7 @@
 import { formatLocalTime } from '@openathar/athan-core-ts';
+import { Link } from 'expo-router';
 import { useMemo } from 'react';
-import { StyleSheet, Switch, Text, View, useColorScheme } from 'react-native';
+import { StyleSheet, Pressable, Switch, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors, Fonts, Spacing } from '@/constants/theme';
@@ -18,7 +19,6 @@ const PRAYER_NAMES: Record<(typeof PRAYER_ORDER)[number], { en: string; ar: stri
 };
 
 const SOON_ROWS = [
-  { label: 'Location', hint: 'Berlin — change to your city' },
   { label: 'Calculation method', hint: 'Muslim World League' },
   { label: 'Theme', hint: 'Follows your device' },
   { label: 'About', hint: 'Athar — openathar.org' },
@@ -81,12 +81,27 @@ export default function SettingsScreen() {
           MORE
         </Text>
         <View style={[styles.card, { backgroundColor: colors.backgroundElement }]}>
+          <Link href="/location" asChild>
+            <Pressable style={({ pressed }) => pressed && { opacity: 0.6 }}>
+              <View style={styles.row}>
+                <View style={styles.rowText}>
+                  <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
+                    Location
+                  </Text>
+                  <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+                    {location.label}
+                  </Text>
+                </View>
+                <Text style={[styles.soon, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>change</Text>
+              </View>
+            </Pressable>
+          </Link>
           {SOON_ROWS.map((row, i) => (
             <View
               key={row.label}
               style={[
                 styles.row,
-                i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.rule },
+                { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.rule },
               ]}>
               <View style={styles.rowText}>
                 <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
