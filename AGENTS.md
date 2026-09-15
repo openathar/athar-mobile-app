@@ -25,11 +25,23 @@ Optional sync only for Khatma progress/Tasbeeh (no mandatory account).
 
 ## Current state
 
-MVP in progress: prayer times screen (today's times via `Methods.MWL`,
-default location Berlin until expo-location is wired), Qibla bearing,
-Settings placeholder. Tabs: Prayer / Qibla / Settings. `expo-location` is
-installed but not yet used. Adhan alarms, location picking, and store
-submission are the next milestones.
+MVP with the openathar.org design language (web palette Layl/Mushaf,
+Newsreader/Plus Jakarta Sans/JetBrains Mono/Amiri, Khatam signet):
+
+- **Prayer screen**: day-phase hero (6 phases alternate between the dark
+  Layl and light Mushaf palettes, crossfade on change), Hijri date in Amiri,
+  countdown to the next prayer, today's times.
+- **Qibla**: compass with bearing needle + rotating Khatam center; the
+  needle tracks the device heading (magnetometer via `expo-location`
+  `watchHeadingAsync`) on native, static bearing on web.
+- **Settings**: per-prayer Adhan alarm toggles (`expo-notifications` daily
+  triggers, persisted via AsyncStorage, never push), location picker
+  (Nominatim city search, stored in a shared `LocationProvider`).
+- Location: manual city > auto-detect > Berlin fallback.
+- Tabs: Prayer / Qibla / Settings (native tabs bottom; web tab bar bottom).
+
+Next milestones: native builds to verify location + notifications on device,
+Adhan audio, store submission.
 
 ## APM (Agent Package Manager)
 

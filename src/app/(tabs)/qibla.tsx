@@ -1,5 +1,7 @@
 import { qiblaBearing } from '@openathar/athan-core-ts';
-import { StyleSheet, Text, View, useColorScheme } from 'react-native';
+import * as Location from 'expo-location';
+import { useEffect, useState } from 'react';
+import { Platform, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg';
 
@@ -14,6 +16,24 @@ export default function QiblaScreen() {
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
   const bearing = Math.round(qiblaBearing(location.lat, location.lng));
+
+  // Device heading (magnetometer) — native only; web shows the static bearing.
+  const [heading, setHeading] = useState<number | null>(null);
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    let sub: Location.LocationSubscription | null = null;
+    Location.watchHeadingAsync((h) => setHeading(h.magHeading)).then(
+      (s) => {
+        sub = s;
+      },
+      () => {}
+    );
+    return () => sub?.remove();
+  }, []);
+
+  // Nadel zeigt auf die Qibla relativ zur Geräteausrichtung: bei heading 0
+  // (Gerät gen Norden) auf bearing, sonst um die Differenz gedreht.
+  const needleRotation = bearing - (heading ?? 0);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -45,8 +65,7 @@ export default function QiblaScreen() {
                 </SvgText>
               </G>
             ))}
-            {/* Nadel: zeigt auf die Qibla-Richtung (vom Norden aus im Uhrzeigersinn) */}
-            <G rotation={bearing}>
+            <G rotation={needleRotation}>
               <Line x1={0} y1={-118} x2={0} y2={0} stroke={colors.accent} strokeWidth={3} strokeLinecap="round" />
               <Line x1={0} y1={0} x2={0} y2={28} stroke={colors.textSecondary} strokeWidth={2} strokeLinecap="round" />
             </G>
@@ -61,13 +80,17 @@ export default function QiblaScreen() {
             {bearing}°
           </Text>
           <Text style={[styles.caption, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-            from true north
+            {heading !== null
+              ? `Turn until the needle points to the Kaaba`
+              : 'from true north'}
           </Text>
         </View>
 
-        <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-          Compass (magnetometer) comes with the location feature.
-        </Text>
+        {heading !== null && (
+          <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+            heading {Math.round(heading)}°
+          </Text>
+        )}
       </SafeAreaView>
     </View>
   );
@@ -117,7 +140,6 @@ const styles = StyleSheet.create({
   },
   note: {
     marginTop: Spacing.four,
-    textAlign: 'center',
     fontSize: 13,
     opacity: 0.85,
   },
