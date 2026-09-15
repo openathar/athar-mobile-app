@@ -8,7 +8,7 @@
     "scheme": "athar",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "org.openathar.mobile"
     },
     "android": {
@@ -44,7 +44,7 @@
         {
           "backgroundColor": "#0b0f17",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 200
         }
       ]
     ],
