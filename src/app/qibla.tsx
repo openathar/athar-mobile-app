@@ -1,37 +1,75 @@
 import { qiblaBearing } from '@openathar/athan-core-ts';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg';
 
-import { DEFAULT_LOCATION } from '@/constants/location';
-import { Spacing } from '@/constants/theme';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Khatam } from '@/components/khatam';
+import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { useLocation } from '@/hooks/use-location';
+
+const COMPASS = 280;
 
 export default function QiblaScreen() {
-  const bearing = Math.round(qiblaBearing(DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng));
+  const { location } = useLocation();
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const bearing = Math.round(qiblaBearing(location.lat, location.lng));
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedText type="title" style={styles.title}>
-          Qibla
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          from {DEFAULT_LOCATION.label}
-        </ThemedText>
+        <Text style={[styles.title, { color: colors.text, fontFamily: Fonts.display }]}>Qibla</Text>
+        <Text style={[styles.sub, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+          from {location.label}
+        </Text>
 
-        <ThemedView type="backgroundElement" style={styles.bearingBox}>
-          <ThemedText type="subtitle">{bearing}°</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
+        <View style={styles.compassWrap}>
+          <Svg width={COMPASS} height={COMPASS} viewBox="-140 -140 280 280">
+            <Circle r={130} stroke={colors.rule} strokeWidth={1} fill="none" />
+            {[
+              { deg: 0, label: 'N' },
+              { deg: 90, label: 'E' },
+              { deg: 180, label: 'S' },
+              { deg: 270, label: 'W' },
+            ].map(({ deg, label }) => (
+              <G key={deg} rotation={deg}>
+                <Line x1={0} y1={-130} x2={0} y2={-120} stroke={colors.textSecondary} strokeWidth={2} />
+                <SvgText
+                  x={0}
+                  y={-104}
+                  textAnchor="middle"
+                  fill={colors.textSecondary}
+                  fontSize={13}
+                  fontFamily={Fonts.sansMedium}>
+                  {label}
+                </SvgText>
+              </G>
+            ))}
+            {/* Nadel: zeigt auf die Qibla-Richtung (vom Norden aus im Uhrzeigersinn) */}
+            <G rotation={bearing}>
+              <Line x1={0} y1={-118} x2={0} y2={0} stroke={colors.accent} strokeWidth={3} strokeLinecap="round" />
+              <Line x1={0} y1={0} x2={0} y2={28} stroke={colors.textSecondary} strokeWidth={2} strokeLinecap="round" />
+            </G>
+          </Svg>
+          <View style={styles.khatamCenter} pointerEvents="none">
+            <Khatam size={64} color={colors.accent} opacity={0.9} duration={120000} />
+          </View>
+        </View>
+
+        <View style={styles.bearingBox}>
+          <Text style={[styles.bearing, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
+            {bearing}°
+          </Text>
+          <Text style={[styles.caption, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
             from true north
-          </ThemedText>
-        </ThemedView>
+          </Text>
+        </View>
 
-        <ThemedText type="small" themeColor="textSecondary" style={styles.note}>
+        <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
           Compass (magnetometer) comes with the location feature.
-        </ThemedText>
+        </Text>
       </SafeAreaView>
-    </ThemedView>
+    </View>
   );
 }
 
@@ -43,21 +81,44 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.five,
-    gap: Spacing.two,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
     lineHeight: 40,
   },
-  bearingBox: {
+  sub: {
+    fontSize: 14,
+    marginTop: Spacing.one,
+  },
+  compassWrap: {
     marginTop: Spacing.five,
+    width: COMPASS,
+    height: COMPASS,
     alignItems: 'center',
-    paddingVertical: Spacing.six,
-    borderRadius: Spacing.three,
+    justifyContent: 'center',
+  },
+  khatamCenter: {
+    position: 'absolute',
+    width: 64,
+    height: 64,
+  },
+  bearingBox: {
+    marginTop: Spacing.four,
+    alignItems: 'center',
     gap: Spacing.one,
   },
+  bearing: {
+    fontSize: 56,
+    lineHeight: 64,
+  },
+  caption: {
+    fontSize: 14,
+  },
   note: {
-    marginTop: Spacing.three,
+    marginTop: Spacing.four,
     textAlign: 'center',
+    fontSize: 13,
+    opacity: 0.85,
   },
 });

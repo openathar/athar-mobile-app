@@ -1,22 +1,22 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs, TabList, TabTrigger, TabSlot, TabTriggerSlotProps, TabListProps } from 'expo-router/ui';
 import { Pressable, useColorScheme, View, StyleSheet } from 'react-native';
 
+import { Khatam } from './khatam';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
-import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Colors, Fonts, MaxContentWidth, Spacing } from '@/constants/theme';
 
 const TABS = [
-  { name: 'index', label: 'Prayer', icon: 'clock-outline' },
-  { name: 'qibla', label: 'Qibla', icon: 'compass-outline' },
-  { name: 'settings', label: 'Settings', icon: 'cog-outline' },
+  { name: 'index', label: 'Prayer' },
+  { name: 'qibla', label: 'Qibla' },
+  { name: 'settings', label: 'Settings' },
 ] as const;
 
 export default function AppTabs() {
   return (
     <Tabs>
-      <TabSlot style={{ height: '100%' }} />
+      <TabSlot style={{ flex: 1 }} />
       <TabList asChild>
         <CustomTabList>
           {TABS.map(({ name, label }) => (
@@ -36,7 +36,10 @@ export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps
       <ThemedView
         type={isFocused ? 'backgroundSelected' : 'backgroundElement'}
         style={styles.tabButtonView}>
-        <ThemedText type="small" themeColor={isFocused ? 'text' : 'textSecondary'}>
+        <ThemedText
+          type="small"
+          themeColor={isFocused ? 'text' : 'textSecondary'}
+          style={styles.tabLabel}>
           {children}
         </ThemedText>
       </ThemedView>
@@ -51,7 +54,7 @@ export function CustomTabList(props: TabListProps) {
   return (
     <View {...props} style={styles.tabListContainer}>
       <ThemedView type="backgroundElement" style={styles.innerContainer}>
-        <MaterialCommunityIcons name="mosque" size={18} color={colors.text} />
+        <Khatam size={22} color={colors.text} opacity={0.85} duration={60000} />
 
         {props.children}
       </ThemedView>
@@ -61,7 +64,6 @@ export function CustomTabList(props: TabListProps) {
 
 const styles = StyleSheet.create({
   tabListContainer: {
-    position: 'absolute',
     width: '100%',
     padding: Spacing.three,
     justifyContent: 'center',
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flexGrow: 1,
-    gap: Spacing.two,
+    gap: Spacing.three,
     maxWidth: MaxContentWidth,
   },
   pressed: {
@@ -85,5 +87,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.one,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
+  },
+  tabLabel: {
+    fontFamily: Fonts.sansMedium,
   },
 });
