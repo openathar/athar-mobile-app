@@ -38,9 +38,14 @@ jobs:
           cache: npm
 
       # package.json wires @openathar/athan-core-ts as file:../core-ts,
-      # so the package must sit one level above the workspace.
+      # so the package must sit one level above the workspace. The in-tree
+      # checkout copy is removed afterwards — tsc would otherwise pick up
+      # core-ts's test files (they need @types/node).
       - name: Place core-ts at ../core-ts
-        run: mkdir -p ../core-ts && cp -R core-ts-src/. ../core-ts/
+        run: |
+          mkdir -p ../core-ts
+          cp -R core-ts-src/. ../core-ts/
+          rm -rf core-ts-src
 
       - name: Build + test core-ts
         working-directory: ../core-ts
@@ -78,7 +83,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Place core-ts at ../core-ts
-        run: mkdir -p ../core-ts && cp -R core-ts-src/. ../core-ts/
+        run: |
+          mkdir -p ../core-ts
+          cp -R core-ts-src/. ../core-ts/
+          rm -rf core-ts-src
 
       - name: Build core-ts
         working-directory: ../core-ts
@@ -157,7 +165,10 @@ jobs:
           cache: npm
 
       - name: Place core-ts at ../core-ts
-        run: mkdir -p ../core-ts && cp -R core-ts-src/. ../core-ts/
+        run: |
+          mkdir -p ../core-ts
+          cp -R core-ts-src/. ../core-ts/
+          rm -rf core-ts-src
 
       - name: Build core-ts
         working-directory: ../core-ts
