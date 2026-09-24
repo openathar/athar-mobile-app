@@ -59,9 +59,10 @@ simctl install/launch, liveness assert, screenshot). Screenshots land as
 workflow artifacts.
 
 Requires the repo secret **`CORE_TS_TOKEN`**: a fine-grained PAT with
-read-only Contents access on `openathar/athan-core-ts`. Both repos are
-private, so the workflow's `GITHUB_TOKEN` cannot check the package repo out
-cross-repo.
+read-only Contents access on `openathar/athan-core-ts`. (Historically both
+repos were private and `GITHUB_TOKEN` could not check the package repo out
+cross-repo; the PAT is still used and keeps the checkout working regardless
+of visibility.)
 
 ## APM (Agent Package Manager)
 
