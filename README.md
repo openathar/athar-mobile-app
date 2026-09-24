@@ -1,6 +1,14 @@
 # athar-mobile-app
 
-> **Status: MVP in progress.** React Native / Expo (SDK 57) app with a
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.png" />
+    <img src="docs/logo-light.png" alt="Athar — the word أثر" width="360" />
+  </picture>
+</p>
+
+> **Status: MVP built — native store builds pending.** React Native / Expo
+> (SDK 57) app with a
 > prayer times screen (day-phase hero, real moon phase, star field), Qibla
 > bearing, adhan alarms, and location picker. See the
 > [architecture doc](https://github.com/openathar/athar/blob/main/docs/architecture.md).
