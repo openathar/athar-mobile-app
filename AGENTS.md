@@ -31,6 +31,12 @@ Newsreader/Plus Jakarta Sans/JetBrains Mono/Amiri, Khatam signet):
 - **Prayer screen**: day-phase hero (6 phases alternate between the dark
   Layl and light Mushaf palettes, crossfade on change), Hijri date in Amiri,
   countdown to the next prayer, today's times.
+- **Moon & stars** (from the openathar.org design language): the real moon
+  phase as an SVG (`Moon` — terminator computed, not painted, breathing
+  glow, slowly drifting maria) plus the hero twinkling star field
+  (`StarField`, 25% gold / 12% green / rest ink, static under reduced
+  motion). Phase math lives in the shared `@openathar/athan-core-ts`
+  (`moonPhaseAt`, `nextMoonEvents`), mirroring the web's `lib/moon-phase.ts`.
 - **Qibla**: compass with bearing needle + rotating Khatam center; the
   needle tracks the device heading (magnetometer via `expo-location`
   `watchHeadingAsync`) on native, static bearing on web.
@@ -42,6 +48,20 @@ Newsreader/Plus Jakarta Sans/JetBrains Mono/Amiri, Khatam signet):
 
 Next milestones: native builds to verify location + notifications on device,
 Adhan audio, store submission.
+
+## CI
+
+`.github/workflows/ci.yml` — three jobs on push/PR: typecheck (incl. build
++ tests of the embedded `athan-core-ts`), Android emulator smoke (API 34
+with KVM: assembleDebug, boot, install, launch, liveness assert, screenshot),
+iOS simulator smoke (macos-15: pod install, xcodebuild Debug-iphonesimulator,
+simctl install/launch, liveness assert, screenshot). Screenshots land as
+workflow artifacts.
+
+Requires the repo secret **`CORE_TS_TOKEN`**: a fine-grained PAT with
+read-only Contents access on `openathar/athan-core-ts`. Both repos are
+private, so the workflow's `GITHUB_TOKEN` cannot check the package repo out
+cross-repo.
 
 ## APM (Agent Package Manager)
 

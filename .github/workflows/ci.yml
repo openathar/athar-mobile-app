@@ -1,0 +1,225 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Both jobs embed @openathar/athan-core-ts (file:../core-ts). The package
+# lives in its own (private) repo, so checking it out needs a fine-grained
+# PAT with read-only Contents access on openathar/athan-core-ts, stored as
+# the CORE_TS_TOKEN secret. GITHUB_TOKEN cannot cross repos.
+env:
+  CORE_TS_REPO: openathar/athan-core-ts
+
+jobs:
+  typecheck:
+    name: Typecheck + core-ts tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout athan-core-ts
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CORE_TS_REPO }}
+          token: ${{ secrets.CORE_TS_TOKEN }}
+          path: core-ts-src
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # package.json wires @openathar/athan-core-ts as file:../core-ts,
+      # so the package must sit one level above the workspace.
+      - name: Place core-ts at ../core-ts
+        run: mkdir -p ../core-ts && cp -R core-ts-src/. ../core-ts/
+
+      - name: Build + test core-ts
+        working-directory: ../core-ts
+        run: npm ci && npm run build && npm test
+
+      - run: npm ci
+
+      - run: npm run typecheck
+
+  android:
+    name: Android emulator smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: typecheck
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout athan-core-ts
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CORE_TS_REPO }}
+          token: ${{ secrets.CORE_TS_TOKEN }}
+          path: core-ts-src
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Place core-ts at ../core-ts
+        run: mkdir -p ../core-ts && cp -R core-ts-src/. ../core-ts/
+
+      - name: Build core-ts
+        working-directory: ../core-ts
+        run: npm ci && npm run build
+
+      - run: npm ci
+
+      - name: Accept Android SDK licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      # Compile first, without a device — failure here is a build bug,
+      # not an emulator flake.
+      - name: Gradle assembleDebug
+        working-directory: android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Start Metro dev server
+        run: |
+          nohup ./node_modules/.bin/expo start --port 8081 > metro.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf http://localhost:8081/status | grep -q packager-status:running && break
+            sleep 2
+          done
+          curl -sf http://localhost:8081/status
+
+      - name: Boot emulator, install, launch, assert alive
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          script: |
+            adb reverse tcp:8081 tcp:8081
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell pm grant org.openathar.mobile android.permission.ACCESS_FINE_LOCATION || true
+            adb shell pm grant org.openathar.mobile android.permission.ACCESS_COARSE_LOCATION || true
+            adb shell am start -n org.openathar.mobile/.MainActivity
+            sleep 45
+            adb shell pidof org.openathar.mobile
+            adb exec-out screencap -p > android-smoke.png
+
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-smoke
+          path: |
+            android-smoke.png
+            metro.log
+          if-no-files-found: ignore
+
+  ios:
+    name: iOS simulator smoke
+    runs-on: macos-15
+    timeout-minutes: 60
+    needs: typecheck
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout athan-core-ts
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CORE_TS_REPO }}
+          token: ${{ secrets.CORE_TS_TOKEN }}
+          path: core-ts-src
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Place core-ts at ../core-ts
+        run: mkdir -p ../core-ts && cp -R core-ts-src/. ../core-ts/
+
+      - name: Build core-ts
+        working-directory: ../core-ts
+        run: npm ci && npm run build
+
+      - run: npm ci
+
+      - name: Restore CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile', 'ios/Podfile.properties.json') }}
+
+      - name: Pod install
+        run: pod install --project-directory=ios
+
+      - name: Resolve an available iPhone simulator
+        id: sim
+        run: |
+          UDID=$(xcrun simctl list devices available | grep -m1 'iPhone' | sed -E 's/.*\(([A-F0-9-]{36})\).*/\1/')
+          if [ -z "$UDID" ]; then
+            echo "::error::No available iPhone simulator found"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator $UDID"
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
+      # Simulator build needs no signing.
+      - name: Xcodebuild (Debug, iphonesimulator)
+        run: |
+          xcodebuild \
+            -workspace ios/Athar.xcworkspace \
+            -scheme Athar \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Metro dev server + boot + install + launch + assert alive
+        run: |
+          nohup ./node_modules/.bin/expo start --port 8081 > metro.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf http://localhost:8081/status | grep -q packager-status:running && break
+            sleep 2
+          done
+          curl -sf http://localhost:8081/status
+          xcrun simctl boot "${{ steps.sim.outputs.udid }}" || true
+          xcrun simctl install "${{ steps.sim.outputs.udid }}" ios/build/Build/Products/Debug-iphonesimulator/Athar.app
+          xcrun simctl launch "${{ steps.sim.outputs.udid }}" org.openathar.mobile
+          sleep 45
+          xcrun simctl spawn "${{ steps.sim.outputs.udid }}" launchctl list | grep org.openathar.mobile
+          xcrun simctl io "${{ steps.sim.outputs.udid }}" screenshot ios-smoke.png
+
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-smoke
+          path: |
+            ios-smoke.png
+            metro.log
+          if-no-files-found: ignore
