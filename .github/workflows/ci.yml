@@ -63,6 +63,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # RN gradle builds + SDK + emulator image overflow the default free
+      # disk on ubuntu runners — reclaim ~12 GB of preinstalled toolkits we
+      # don't use. Must run before setup-node/setup-java reinstall toolcache.
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost \
+            /usr/share/swift /var/lib/docker
+          df -h /
+
       - name: Checkout athan-core-ts
         uses: actions/checkout@v4
         with:
@@ -93,6 +103,11 @@ jobs:
         run: npm ci && npm run build
 
       - run: npm ci
+
+      # android/ + ios/ are gitignored (Expo CNG) — the native projects are
+      # generated from app.json, not committed.
+      - name: Expo prebuild (android)
+        run: ./node_modules/.bin/expo prebuild -p android --no-install
 
       - name: Accept Android SDK licenses
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
@@ -175,6 +190,18 @@ jobs:
         run: npm ci && npm run build
 
       - run: npm ci
+
+      # ios/ is gitignored (Expo CNG) — generated from app.json.
+      - name: Expo prebuild (ios)
+        run: ./node_modules/.bin/expo prebuild -p ios --no-install
+
+      # Expo SDK 57 needs Swift 6.2 (Xcode 26); the image default is older.
+      - name: Select newest installed Xcode
+        run: |
+          XCODE_APP=$(find /Applications -maxdepth 1 -name 'Xcode*.app' | sort -V | tail -1)
+          echo "Selecting $XCODE_APP"
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
 
       - name: Restore CocoaPods
         uses: actions/cache@v4
