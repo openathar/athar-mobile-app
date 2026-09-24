@@ -5,6 +5,8 @@ import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Khatam } from '@/components/khatam';
+import { Moon, moonCaption } from '@/components/moon';
+import { StarField } from '@/components/star-field';
 import { Fonts, PhaseColors, type DayPhase } from '@/constants/theme';
 import { useLocation } from '@/hooks/use-location';
 import { useNow } from '@/hooks/use-now';
@@ -50,6 +52,7 @@ export default function PrayerScreen() {
         month: 'long',
         year: 'numeric',
       }),
+      moon: moonCaption(now),
     };
   }, [now, location]);
 
@@ -77,12 +80,26 @@ export default function PrayerScreen() {
       <LinearGradient colors={PhaseColors[displayedPhase].gradient} style={StyleSheet.absoluteFill} />
       <Animated.View style={[styles.container, { opacity: fade }]}>
         <LinearGradient colors={palette.colors.gradient} style={styles.container}>
+          {/* Sternenhimmel wie der Web-Hero — flimmert hinter Khatam & Inhalt */}
+          <StarField colors={colors.stars} />
           {/* Khatam-Signet wie auf openathar.org — langsam rotierend hinter dem Hero */}
           <View style={styles.khatamWrap}>
             <Khatam size={460} color={colors.accent} opacity={0.12} />
           </View>
 
           <SafeAreaView style={styles.safeArea}>
+            {/* Heute am Himmel: der Mond in seiner echten Phase, atmender Glow */}
+            <View style={styles.moonWrap} pointerEvents="none">
+              <Moon
+                size={46}
+                now={now}
+                lit={colors.moon.lit}
+                dark={colors.moon.dark}
+                glow={colors.moon.glow}
+                maria={colors.moon.maria}
+              />
+            </View>
+
             {/* Header — Hijri date in Arabic calligraphy */}
             <View style={styles.header}>
               <Text style={[styles.hijri, { color: colors.accent, fontFamily: Fonts.arabicBold }]}>
@@ -138,6 +155,12 @@ export default function PrayerScreen() {
                   </View>
                 );
               })}
+              {/* "Heute am Himmel" — Phase + Beleuchtung, wie TodaySky auf der Website */}
+              <View style={[styles.moonRow, { borderTopColor: colors.rule }]}>
+                <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+                  {palette.moon}
+                </Text>
+              </View>
             </View>
           </SafeAreaView>
         </LinearGradient>
@@ -159,6 +182,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 16,
+  },
+  moonWrap: {
+    position: 'absolute',
+    top: 12,
+    right: 4,
   },
   header: {
     alignItems: 'center',
@@ -220,5 +248,15 @@ const styles = StyleSheet.create({
   },
   rowTime: {
     fontSize: 16,
+  },
+  moonRow: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  moonCaption: {
+    fontSize: 12,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 });

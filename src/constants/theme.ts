@@ -78,6 +78,12 @@ export type PhasePalette = {
   textSecondary: string;
   /** Two-stop gradient for the screen background. */
   gradient: readonly [string, string];
+  /** Hairline separator color inside the phase-tinted card. */
+  rule: string;
+  /** Moon rendering (lit disk, dark side, glow + maria tones). */
+  moon: { lit: string; dark: string; glow: string; maria: string };
+  /** Star-field colors: [gold, green, ink] like the web hero. */
+  stars: readonly [string, string, string];
 };
 
 export const PhaseColors: Record<DayPhase, PhasePalette> = {
@@ -88,6 +94,9 @@ export const PhaseColors: Record<DayPhase, PhasePalette> = {
     text: '#e9e3d4',
     textSecondary: '#939bab',
     gradient: ['#0b0f17', '#1a2133'],
+    rule: '#222b3a',
+    moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#d4a95f', maria: '#b8b09c' },
+    stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
   },
   sunrise: {
     background: '#faf5ea',
@@ -96,6 +105,9 @@ export const PhaseColors: Record<DayPhase, PhasePalette> = {
     text: '#23261f',
     textSecondary: '#5c6156',
     gradient: ['#faf5ea', '#f3e7c8'],
+    rule: '#d8d0bb',
+    moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
+    stars: ['#9a6f1f', '#0d7a55', '#23261f'],
   },
   dhuhr: {
     background: '#faf5ea',
@@ -104,6 +116,9 @@ export const PhaseColors: Record<DayPhase, PhasePalette> = {
     text: '#23261f',
     textSecondary: '#5c6156',
     gradient: ['#faf5ea', '#e6efe8'],
+    rule: '#d8d0bb',
+    moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
+    stars: ['#9a6f1f', '#0d7a55', '#23261f'],
   },
   asr: {
     background: '#faf5ea',
@@ -112,6 +127,9 @@ export const PhaseColors: Record<DayPhase, PhasePalette> = {
     text: '#23261f',
     textSecondary: '#5c6156',
     gradient: ['#faf5ea', '#f0e4c4'],
+    rule: '#d8d0bb',
+    moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
+    stars: ['#9a6f1f', '#0d7a55', '#23261f'],
   },
   maghrib: {
     background: '#0b0f17',
@@ -120,6 +138,9 @@ export const PhaseColors: Record<DayPhase, PhasePalette> = {
     text: '#e9e3d4',
     textSecondary: '#939bab',
     gradient: ['#0b0f17', '#2a1f18'],
+    rule: '#222b3a',
+    moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#d4a95f', maria: '#b8b09c' },
+    stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
   },
   isha: {
     background: '#0b0f17',
@@ -128,5 +149,8 @@ export const PhaseColors: Record<DayPhase, PhasePalette> = {
     text: '#e9e3d4',
     textSecondary: '#939bab',
     gradient: ['#0b0f17', '#101c2b'],
+    rule: '#222b3a',
+    moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#4aa583', maria: '#b8b09c' },
+    stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
   },
 };
