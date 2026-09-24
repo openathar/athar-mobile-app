@@ -1,7 +1,8 @@
 # athar-mobile-app
 
 > **Status: MVP in progress.** React Native / Expo (SDK 57) app with a
-> prayer times screen, Qibla bearing, and Settings placeholder. See the
+> prayer times screen (day-phase hero, real moon phase, star field), Qibla
+> bearing, adhan alarms, and location picker. See the
 > [architecture doc](https://github.com/openathar/athar/blob/main/docs/architecture.md).
 
 A free, ad-free, offline-first mobile app for prayer times, Qibla, Quran,
