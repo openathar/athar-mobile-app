@@ -58,6 +58,15 @@ iOS simulator smoke (macos-15: pod install, xcodebuild Debug-iphonesimulator,
 simctl install/launch, liveness assert, screenshot). Screenshots land as
 workflow artifacts.
 
+`expo-modules-jsi` is pinned to 57.1.1 (npm overrides) and carries a
+`patches/expo-modules-jsi+57.1.1.patch`: strips `SWIFT_RETURNS_RETAINED`
+from the `RuntimeScheduler` constructors and boxes raw-pointer captures in
+`JavaScriptRuntime` host closures — both hard-error under Xcode 26.2+
+(`weak let` needs 26.2+, but its stricter sending-region analysis rejects
+the upstream `nonisolated(unsafe)` pattern; Xcode 26.1 predates `weak let`).
+Applied automatically via `postinstall: patch-package`. Re-evaluate the
+patch when Expo ships an SDK 57.x release targeting Xcode 26.2+.
+
 Requires the repo secret **`CORE_TS_TOKEN`**: a fine-grained PAT with
 read-only Contents access on `openathar/athan-core-ts`. (Historically both
 repos were private and `GITHUB_TOKEN` could not check the package repo out
