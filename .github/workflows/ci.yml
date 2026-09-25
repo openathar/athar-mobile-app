@@ -195,12 +195,12 @@ jobs:
       - name: Expo prebuild (ios)
         run: ./node_modules/.bin/expo prebuild -p ios --no-install
 
-      # Expo SDK 57 needs Swift 6.2 (Xcode 26) but Xcode 26.3's clang got
-      # stricter and hard-errors on expo-modules-jsi's RuntimeScheduler
-      # annotations — prefer the 26.x versions the SDK was tested against.
-      - name: Select suitable Xcode (26.x, not 26.3)
+      # Expo SDK 57 needs Swift 6.2 (Xcode 26), but expo-modules-jsi's Swift
+      # sources only compile cleanly on the 26.0/26.1 toolchains it shipped
+      # with — 26.2+ flags upstream `sending` usages as data-race errors.
+      - name: Select suitable Xcode (prefer 26.1/26.0)
         run: |
-          for V in Xcode_26.2 Xcode_26.1 Xcode_26.0; do
+          for V in Xcode_26.1 Xcode_26.0 Xcode_26.2; do
             if [ -d "/Applications/$V.app" ]; then
               echo "Selecting /Applications/$V.app"
               sudo xcode-select -s "/Applications/$V.app"
