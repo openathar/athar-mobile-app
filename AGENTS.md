@@ -40,9 +40,12 @@ Newsreader/Plus Jakarta Sans/JetBrains Mono/Amiri, Khatam signet):
 - **Qibla**: compass with bearing needle + rotating Khatam center; the
   needle tracks the device heading (magnetometer via `expo-location`
   `watchHeadingAsync`) on native, static bearing on web.
-- **Settings**: per-prayer Adhan alarm toggles (`expo-notifications` daily
-  triggers, persisted via AsyncStorage, never push), location picker
+- **Settings**: per-prayer Adhan alarm toggles (one-shot DATE triggers
+  computed per day 7 days ahead via `schedulePrayerAlarms`, rescheduled on
+  settings/location change + app foreground, persisted via AsyncStorage,
+  never push), location picker
   (Nominatim city search, stored in a shared `LocationProvider`).
+  Android declares `SCHEDULE_EXACT_ALARM` for exact delivery.
 - Location: manual city > auto-detect > Berlin fallback.
 - Tabs: Prayer / Qibla / Settings (native tabs bottom; web tab bar bottom).
 

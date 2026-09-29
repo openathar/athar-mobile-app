@@ -13,6 +13,7 @@
     },
     "android": {
       "package": "org.openathar.mobile",
+      "permissions": ["SCHEDULE_EXACT_ALARM"],
       "adaptiveIcon": {
         "backgroundColor": "#0b0f17",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 
 import {
   ALL_ALARMS_ON,
@@ -8,7 +9,7 @@ import {
   schedulePrayerAlarms,
   type AlarmSettings,
 } from '@/lib/alarms';
-import { PRAYER_ORDER, type PrayerKey } from '@/hooks/use-prayer';
+import type { PrayerKey } from '@/hooks/use-prayer';
 
 const STORAGE_KEY = 'athar.alarms.v1';
 
@@ -16,12 +17,16 @@ export type AlarmPermission = 'unknown' | 'granted' | 'denied';
 
 /**
  * Adhan alarm state: persisted per-prayer toggles, permission handling, and
- * rescheduling whenever settings or prayer times (location/day) change.
+ * rescheduling whenever settings or location change. Times are computed
+ * inside (7 days ahead), so only the location — never a times snapshot —
+ * is an input. Rescheduling also runs on every app foreground, which keeps
+ * the 7-day window fresh without any timer.
  * Web is a no-op — notifications are native-only.
  */
-export function useAlarms(times: Record<PrayerKey, number>) {
+export function useAlarms(location: { lat: number; lng: number }) {
   const [enabled, setEnabled] = useState<AlarmSettings>(ALL_ALARMS_ON);
   const [permission, setPermission] = useState<AlarmPermission>('unknown');
+  const [foregroundCount, setForegroundCount] = useState(0);
 
   // Load persisted settings + current permission once.
   useEffect(() => {
@@ -39,15 +44,22 @@ export function useAlarms(times: Record<PrayerKey, number>) {
     };
   }, []);
 
-  // Persist + reschedule when settings or times change (times are stable
-  // per location/day, so this only fires on real changes).
-  const timesKey = useMemo(() => PRAYER_ORDER.map((k) => times[k]).join(','), [times]);
+  // Reschedule on every foreground — refreshes the 7-day window.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') setForegroundCount((n) => n + 1);
+    });
+    return () => subscription.remove();
+  }, []);
+
+  // Persist + reschedule when settings, location, or foreground change.
+  const locationKey = `${location.lat.toFixed(4)},${location.lng.toFixed(4)}`;
   useEffect(() => {
     if (permission !== 'granted') return;
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(enabled)).catch(() => {});
-    schedulePrayerAlarms(times, enabled);
+    schedulePrayerAlarms(location.lat, location.lng, enabled).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, timesKey, permission]);
+  }, [enabled, locationKey, foregroundCount, permission]);
 
   const toggle = useCallback(
     async (key: PrayerKey) => {
