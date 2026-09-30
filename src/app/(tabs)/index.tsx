@@ -1,9 +1,10 @@
 import { gregorianToHijri, formatLocalTime } from '@openathar/athan-core-ts';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Falak } from '@/components/falak';
 import { Khatam } from '@/components/khatam';
 import { Moon, moonCaption } from '@/components/moon';
 import { StarField } from '@/components/star-field';
@@ -33,6 +34,10 @@ const toArabicDigits = (value: number) => String(value).replace(/\d/g, (d) => AR
 export default function PrayerScreen() {
   const now = useNow(1000);
   const { location } = useLocation();
+  const { width } = useWindowDimensions();
+  // The orbit frames the countdown, so it must not outgrow the text block.
+  // Clamped at 0 because the first layout pass reports width 0 on web.
+  const falakSize = Math.max(0, Math.min(width - 40, 360));
   const palette = useMemo(() => {
     const times = getTodayTimes(now, location.lat, location.lng);
     const offsetHours = -now.getTimezoneOffset() / 60;
@@ -113,8 +118,17 @@ export default function PrayerScreen() {
               </Text>
             </View>
 
-            {/* Hero — next prayer + countdown */}
+            {/* Hero — next prayer + countdown, framed by today's orbit */}
             <View style={styles.hero}>
+              <View style={styles.falakWrap} pointerEvents="none">
+                <Falak
+                  size={falakSize}
+                  now={now}
+                  times={palette.times}
+                  nextKey={palette.next.key}
+                  colors={colors}
+                />
+              </View>
               <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>
                 NEXT PRAYER
               </Text>
@@ -208,6 +222,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  falakWrap: {
+    ...StyleSheet.absoluteFill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // Lifted off the exact hero centre so the orbit crowns the prayer name
+    // instead of running straight through the countdown digits.
+    transform: [{ translateY: -30 }],
   },
   eyebrow: {
     fontSize: 13,
