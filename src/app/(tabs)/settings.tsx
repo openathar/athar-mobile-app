@@ -33,7 +33,7 @@ export default function SettingsScreen() {
     () => getTodayTimes(new Date(), location.lat, location.lng),
     [location]
   );
-  const { enabled, toggle, permission } = useAlarms(location);
+  const { enabled, toggle, permission } = useAlarms();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

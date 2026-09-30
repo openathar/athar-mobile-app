@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { AppState } from 'react-native';
 
 import { DEFAULT_LOCATION } from '@/constants/location';
+import { hasDrifted } from '@/lib/geo';
 
 export type GeoLocation = { lat: number; lng: number; label: string };
 export type LocationStatus = 'loading' | 'ready' | 'denied';
@@ -22,11 +24,23 @@ const LocationContext = createContext<LocationContextValue | null>(null);
  * Single source of truth for the app's location: a manually chosen city
  * (Settings → Location) wins; otherwise auto-detected; otherwise Berlin.
  * Persisted across restarts.
+ *
+ * The auto-detected position is re-read on every app foreground (travel
+ * without restarting the app), but only replaced when it moved more than
+ * LOCATION_DRIFT_KM — GPS jitter must not reschedule every alarm.
  */
 export function LocationProvider({ children }: { children: ReactNode }) {
   const [custom, setCustomState] = useState<GeoLocation | null>(null);
   const [auto, setAuto] = useState<GeoLocation | null>(null);
   const [status, setStatus] = useState<LocationStatus>('loading');
+  const [foregroundCount, setForegroundCount] = useState(0);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') setForegroundCount((n) => n + 1);
+    });
+    return () => subscription.remove();
+  }, []);
 
   // Load a persisted custom location once.
   useEffect(() => {
@@ -51,24 +65,31 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const { status: perm } = await Location.requestForegroundPermissionsAsync();
+        // Prompt only on the first attempt; on later foregrounds just read the
+        // current grant so a returning user is never nagged again.
+        const { status: perm } =
+          foregroundCount === 0
+            ? await Location.requestForegroundPermissionsAsync()
+            : await Location.getForegroundPermissionsAsync();
         if (perm !== 'granted') {
           if (!cancelled) setStatus('denied');
           return;
         }
         const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-        if (!cancelled) {
-          setAuto({ lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'Current location' });
-          setStatus('ready');
-        }
+        if (cancelled) return;
+        const next = { lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'Current location' };
+        setAuto((prev) => (hasDrifted(prev, next) ? next : prev));
+        setStatus('ready');
       } catch {
-        if (!cancelled) setStatus('denied');
+        // Keep a previously detected position rather than dropping to the
+        // Berlin fallback because one refresh failed (e.g. no GPS fix indoors).
+        if (!cancelled) setStatus((prev) => (prev === 'ready' ? prev : 'denied'));
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [custom]);
+  }, [custom, foregroundCount]);
 
   const setCustom = useCallback((loc: GeoLocation | null) => {
     setCustomState(loc);

@@ -9,6 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { AlarmsProvider } from '@/context/alarms';
 import { LocationProvider } from '@/context/location';
 import { configureNotifications } from '@/lib/alarms';
 
@@ -38,10 +39,12 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <LocationProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="location" options={{ presentation: 'modal' }} />
-        </Stack>
+        <AlarmsProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="location" options={{ presentation: 'modal' }} />
+          </Stack>
+        </AlarmsProvider>
       </LocationProvider>
     </ThemeProvider>
   );
