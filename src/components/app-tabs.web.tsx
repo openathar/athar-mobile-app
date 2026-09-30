@@ -1,11 +1,11 @@
-import { Tabs, TabList, TabTrigger, TabSlot, TabTriggerSlotProps, TabListProps } from 'expo-router/ui';
-import { Pressable, useColorScheme, View, StyleSheet } from 'react-native';
+import { Tabs, TabList, TabTrigger, TabSlot, type TabTriggerSlotProps, type TabListProps } from 'expo-router/ui';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Khatam } from './khatam';
-import { ThemedText } from './themed-text';
-import { ThemedView } from './themed-view';
 
-import { Colors, Fonts, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Fonts, MaxContentWidth } from '@/constants/theme';
+import { usePhase } from '@/context/phase';
+import { withAlpha } from '@/lib/color';
 
 const TABS = [
   { name: 'index', label: 'Prayer' },
@@ -13,6 +13,10 @@ const TABS = [
   { name: 'settings', label: 'Settings' },
 ] as const;
 
+/**
+ * Web tab bar: a frosted capsule floating over the sky (screens leave room
+ * for it at the bottom), in the same day-phase palette as everything else.
+ */
 export default function AppTabs() {
   return (
     <Tabs>
@@ -31,64 +35,67 @@ export default function AppTabs() {
 }
 
 export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
+  const { colors } = usePhase();
   return (
     <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
-      <ThemedView
-        type={isFocused ? 'backgroundSelected' : 'backgroundElement'}
-        style={styles.tabButtonView}>
-        <ThemedText
-          type="small"
-          themeColor={isFocused ? 'text' : 'textSecondary'}
-          style={styles.tabLabel}>
+      <View style={[styles.tabButton, isFocused && { backgroundColor: withAlpha(colors.accent, 0.16) }]}>
+        <Text
+          style={[
+            styles.tabLabel,
+            { color: isFocused ? colors.accent : colors.textSecondary, fontFamily: isFocused ? Fonts.sansSemiBold : Fonts.sansMedium },
+          ]}>
           {children}
-        </ThemedText>
-      </ThemedView>
+        </Text>
+      </View>
     </Pressable>
   );
 }
 
 export function CustomTabList(props: TabListProps) {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
-
+  const { colors } = usePhase();
   return (
-    <View {...props} style={styles.tabListContainer}>
-      <ThemedView type="backgroundElement" style={styles.innerContainer}>
-        <Khatam size={22} color={colors.text} opacity={0.85} duration={60000} />
-
+    <View {...props} style={styles.tabListContainer} pointerEvents="box-none">
+      <View
+        style={[
+          styles.capsule,
+          { backgroundColor: withAlpha(colors.surface, 0.9), borderColor: withAlpha(colors.rule, 0.95) },
+        ]}>
+        <Khatam size={20} color={colors.stars[0]} opacity={0.9} duration={60000} />
         {props.children}
-      </ThemedView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   tabListContainer: {
-    width: '100%',
-    padding: Spacing.three,
-    justifyContent: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 16,
     alignItems: 'center',
-    flexDirection: 'row',
   },
-  innerContainer: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.five,
-    borderRadius: Spacing.five,
+  capsule: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexGrow: 1,
-    gap: Spacing.three,
+    gap: 6,
+    paddingVertical: 6,
+    paddingLeft: 16,
+    paddingRight: 6,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
     maxWidth: MaxContentWidth,
   },
   pressed: {
     opacity: 0.7,
   },
-  tabButtonView: {
-    paddingVertical: Spacing.one,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
+  tabButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 999,
   },
   tabLabel: {
-    fontFamily: Fonts.sansMedium,
+    fontSize: 14,
   },
 });

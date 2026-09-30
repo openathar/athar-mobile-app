@@ -1,22 +1,14 @@
-import { gregorianToHijri, formatLocalTime } from '@openathar/athan-core-ts';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { gregorianToHijri, formatLocalTime, moonPhaseAt } from '@openathar/athan-core-ts';
+import { useMemo } from 'react';
+import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { Falak } from '@/components/falak';
-import { Moon, moonCaption } from '@/components/moon';
-import { StarField } from '@/components/star-field';
-import { Fonts, PhaseColors, type DayPhase } from '@/constants/theme';
+import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
+import { Fonts } from '@/constants/theme';
+import { usePhase } from '@/context/phase';
 import { useLocation } from '@/hooks/use-location';
 import { useNow } from '@/hooks/use-now';
-import {
-  PRAYER_ORDER,
-  formatCountdown,
-  getDayPhase,
-  getNextPrayer,
-  getTodayTimes,
-} from '@/hooks/use-prayer';
+import { PRAYER_ORDER, formatCountdown, getNextPrayer } from '@/hooks/use-prayer';
 
 const PRAYER_NAMES: Record<(typeof PRAYER_ORDER)[number], { en: string; ar: string }> = {
   fajr: { en: 'Fajr', ar: 'الفجر' },
@@ -27,228 +19,141 @@ const PRAYER_NAMES: Record<(typeof PRAYER_ORDER)[number], { en: string; ar: stri
   isha: { en: 'Isha', ar: 'العشاء' },
 };
 
+const MOON_NAMES: Record<string, string> = {
+  new: 'New moon',
+  'waxing-crescent': 'Waxing crescent',
+  'first-quarter': 'First quarter',
+  'waxing-gibbous': 'Waxing gibbous',
+  full: 'Full moon',
+  'waning-gibbous': 'Waning gibbous',
+  'last-quarter': 'Last quarter',
+  'waning-crescent': 'Waning crescent',
+};
+
 const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 const toArabicDigits = (value: number) => String(value).replace(/\d/g, (d) => ARABIC_DIGITS[Number(d)]);
 
 export default function PrayerScreen() {
   const now = useNow(1000);
   const { location } = useLocation();
+  const { colors, times } = usePhase();
   const { width } = useWindowDimensions();
   // Clamped at 0 because the first layout pass reports width 0 on web.
   const sphereSize = Math.max(0, Math.min(width - 24, 420));
-
-  // Prayer times only change with the day or the place — recomputing them
-  // every second would also hand the sphere a new object every tick and
-  // defeat its memoisation.
-  const dayKey = now.toDateString();
-  const times = useMemo(
-    () => getTodayTimes(now, location.lat, location.lng),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dayKey, location.lat, location.lng]
-  );
   const minuteMs = Math.floor(now.getTime() / 60000) * 60000;
+  const offsetHours = -now.getTimezoneOffset() / 60;
+  const next = getNextPrayer(now, times);
+  const nextName = PRAYER_NAMES[next.key];
 
-  const palette = useMemo(() => {
-    const offsetHours = -now.getTimezoneOffset() / 60;
-    const phase = getDayPhase(now, times);
-    const next = getNextPrayer(now, times);
+  const dayKey = now.toDateString();
+  const header = useMemo(() => {
     const hijri = gregorianToHijri(now, 'ar');
+    const gregorian = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+    const moon = moonPhaseAt(now);
     return {
-      phase,
-      colors: PhaseColors[phase],
-      offsetHours,
-      next,
       hijri: `${toArabicDigits(hijri.day)} ${hijri.monthName} ${toArabicDigits(hijri.year)}`,
-      gregorian: now.toLocaleDateString(undefined, {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      }),
-      moon: moonCaption(now),
+      gregorian,
+      moon: `${MOON_NAMES[moon.key] ?? moon.key} · ${Math.round(moon.illumination * 100)}%`,
     };
-  }, [now, times]);
-
-  // Crossfade beim Phasenwechsel: die alte Phase bleibt als Basis liegen,
-  // die neue blendet darüber ein (wie ein Atemzug im Tagesrhythmus).
-  const [displayedPhase, setDisplayedPhase] = useState<DayPhase>(palette.phase);
-  const fade = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    if (palette.phase === displayedPhase) return;
-    fade.setValue(0);
-    Animated.timing(fade, {
-      toValue: 1,
-      duration: 900,
-      easing: Easing.inOut(Easing.quad),
-      useNativeDriver: true,
-    }).start(() => setDisplayedPhase(palette.phase));
-  }, [palette.phase, displayedPhase, fade]);
-
-  const { colors } = palette;
-  const countdown = formatCountdown(palette.next.at - now.getTime());
-  const nextName = PRAYER_NAMES[palette.next.key];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dayKey]);
 
   return (
-    <View style={styles.container}>
-      <LinearGradient colors={PhaseColors[displayedPhase].gradient} style={StyleSheet.absoluteFill} />
-      <Animated.View style={[styles.container, { opacity: fade }]}>
-        <LinearGradient colors={palette.colors.gradient} style={styles.container}>
-          <StarField colors={colors.stars} />
+    <Screen>
+      <ScreenHeader titleAr={header.hijri} subtitle={`${header.gregorian} · ${location.label}`} />
 
-          <SafeAreaView style={styles.container} edges={['top']}>
-            <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-              {/* Header — Hijri date leads, Gregorian and place follow quietly */}
-              <View style={styles.header}>
-                <View style={styles.headerText}>
-                  <Text style={[styles.hijri, { color: colors.accent, fontFamily: Fonts.arabicBold }]}>
-                    {palette.hijri}
+      {/* The sky itself — today's sun path over this place */}
+      <View style={styles.stage}>
+        <Falak
+          size={sphereSize}
+          minuteMs={minuteMs}
+          times={times}
+          lat={location.lat}
+          lng={location.lng}
+          nextKey={next.key}
+          colors={colors}
+        />
+      </View>
+
+      <View style={styles.next}>
+        <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+          next prayer
+        </Text>
+        <View style={styles.nameRow}>
+          <Text style={[styles.prayerName, { color: colors.text, fontFamily: Fonts.display }]}>{nextName.en}</Text>
+          <Text style={[styles.prayerNameAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>{nextName.ar}</Text>
+        </View>
+        <Text style={[styles.countdown, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
+          {formatCountdown(next.at - now.getTime())}
+        </Text>
+        <Text style={[styles.at, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+          at {formatLocalTime(next.at, offsetHours)}
+        </Text>
+      </View>
+
+      <SectionLabel>today</SectionLabel>
+      <Card>
+        {PRAYER_ORDER.map((key, i) => {
+          const isNext = key === next.key;
+          const passed = times[key] <= now.getTime();
+          return (
+            <View key={key}>
+              {i > 0 && <Divider />}
+              <View style={styles.row}>
+                <View style={styles.rowLead}>
+                  <View
+                    style={[
+                      styles.dot,
+                      { backgroundColor: isNext ? colors.accent : passed ? colors.rule : colors.textSecondary },
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.rowName,
+                      {
+                        color: isNext ? colors.accent : passed ? colors.textSecondary : colors.text,
+                        fontFamily: isNext ? Fonts.sansSemiBold : Fonts.sansMedium,
+                      },
+                    ]}>
+                    {PRAYER_NAMES[key].en}
                   </Text>
-                  <Text style={[styles.meta, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-                    {palette.gregorian} · {location.label}
+                  <Text style={[styles.rowNameAr, { color: colors.textSecondary, fontFamily: Fonts.arabic }]}>
+                    {PRAYER_NAMES[key].ar}
                   </Text>
                 </View>
-                <Moon
-                  size={34}
-                  now={now}
-                  lit={colors.moon.lit}
-                  dark={colors.moon.dark}
-                  glow={colors.moon.glow}
-                  maria={colors.moon.maria}
-                />
-              </View>
-
-              {/* The sky itself — today's sun path over this place */}
-              <View style={styles.stage}>
-                <Falak
-                  size={sphereSize}
-                  minuteMs={minuteMs}
-                  times={times}
-                  lat={location.lat}
-                  lng={location.lng}
-                  nextKey={palette.next.key}
-                  colors={colors}
-                />
-              </View>
-
-              {/* Next prayer */}
-              <View style={styles.next}>
-                <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>
-                  NEXT PRAYER
-                </Text>
-                <View style={styles.nameRow}>
-                  <Text style={[styles.prayerName, { color: colors.text, fontFamily: Fonts.display }]}>
-                    {nextName.en}
-                  </Text>
-                  <Text style={[styles.prayerNameAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>
-                    {nextName.ar}
-                  </Text>
-                </View>
-                <Text style={[styles.countdown, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
-                  {countdown}
-                </Text>
-                <Text style={[styles.at, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-                  at {formatLocalTime(palette.next.at, palette.offsetHours)}
+                <Text
+                  style={[styles.rowTime, { color: isNext ? colors.accent : colors.textSecondary, fontFamily: Fonts.mono }]}>
+                  {formatLocalTime(times[key], offsetHours)}
                 </Text>
               </View>
+            </View>
+          );
+        })}
+      </Card>
 
-              {/* Today's times */}
-              <View style={[styles.list, { backgroundColor: colors.surface }]}>
-                {PRAYER_ORDER.map((key, i) => {
-                  const isNext = key === palette.next.key;
-                  const passed = times[key] <= now.getTime();
-                  return (
-                    <View
-                      key={key}
-                      style={[
-                        styles.row,
-                        i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.rule },
-                      ]}>
-                      <View style={styles.rowLead}>
-                        <View
-                          style={[
-                            styles.dot,
-                            { backgroundColor: isNext ? colors.accent : passed ? colors.rule : colors.textSecondary },
-                          ]}
-                        />
-                        <Text
-                          style={[
-                            styles.rowName,
-                            {
-                              color: isNext ? colors.accent : passed ? colors.textSecondary : colors.text,
-                              fontFamily: isNext ? Fonts.sansSemiBold : Fonts.sansMedium,
-                            },
-                          ]}>
-                          {PRAYER_NAMES[key].en}
-                        </Text>
-                        <Text style={[styles.rowNameAr, { color: colors.textSecondary, fontFamily: Fonts.arabic }]}>
-                          {PRAYER_NAMES[key].ar}
-                        </Text>
-                      </View>
-                      <Text
-                        style={[
-                          styles.rowTime,
-                          { color: isNext ? colors.accent : colors.textSecondary, fontFamily: Fonts.mono },
-                        ]}>
-                        {formatLocalTime(times[key], palette.offsetHours)}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-
-              <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-                {palette.moon}
-              </Text>
-            </ScrollView>
-          </SafeAreaView>
-        </LinearGradient>
-      </Animated.View>
-    </View>
+      <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{header.moon}</Text>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scroll: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 120,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerText: {
-    gap: 2,
-  },
-  hijri: {
-    fontSize: 24,
-    lineHeight: 34,
-  },
-  meta: {
-    fontSize: 13,
-  },
   stage: {
     alignItems: 'center',
     marginHorizontal: -8,
-    marginTop: 4,
   },
   next: {
     alignItems: 'center',
-    marginTop: -4,
-    marginBottom: 24,
+    marginTop: -6,
   },
   eyebrow: {
     fontSize: 11,
-    letterSpacing: 3,
+    letterSpacing: 2,
   },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 12,
-    marginTop: 4,
+    marginTop: 2,
   },
   prayerName: {
     fontSize: 40,
@@ -266,11 +171,6 @@ const styles = StyleSheet.create({
   at: {
     fontSize: 13,
     letterSpacing: 1,
-  },
-  list: {
-    borderRadius: 22,
-    paddingHorizontal: 18,
-    paddingVertical: 4,
   },
   row: {
     flexDirection: 'row',

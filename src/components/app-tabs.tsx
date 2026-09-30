@@ -1,18 +1,19 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { useColorScheme } from 'react-native';
 
-import { Colors } from '@/constants/theme';
+import { usePhase } from '@/context/phase';
+import { withAlpha } from '@/lib/color';
 
+/** Native tab bar in the same day-phase palette as the screens above it. */
 export default function AppTabs() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
+  const { colors } = usePhase();
 
   return (
     <NativeTabs
       backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
+      indicatorColor={withAlpha(colors.accent, 0.18)}
+      iconColor={{ default: colors.textSecondary, selected: colors.accent }}
+      labelStyle={{ default: { color: colors.textSecondary }, selected: { color: colors.accent } }}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Prayer</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon

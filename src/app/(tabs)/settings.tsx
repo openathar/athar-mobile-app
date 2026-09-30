@@ -1,13 +1,13 @@
 import { formatLocalTime } from '@openathar/athan-core-ts';
 import { Link } from 'expo-router';
-import { useMemo } from 'react';
-import { StyleSheet, Pressable, Switch, Text, View, useColorScheme } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
+import { Fonts } from '@/constants/theme';
+import { usePhase } from '@/context/phase';
 import { useAlarms } from '@/hooks/use-alarms';
 import { useLocation } from '@/hooks/use-location';
-import { PRAYER_ORDER, getTodayTimes } from '@/hooks/use-prayer';
+import { PRAYER_ORDER } from '@/hooks/use-prayer';
 
 const PRAYER_NAMES: Record<(typeof PRAYER_ORDER)[number], { en: string; ar: string }> = {
   fajr: { en: 'Fajr', ar: 'الفجر' },
@@ -20,44 +20,34 @@ const PRAYER_NAMES: Record<(typeof PRAYER_ORDER)[number], { en: string; ar: stri
 
 const SOON_ROWS = [
   { label: 'Calculation method', hint: 'Muslim World League' },
-  { label: 'Theme', hint: 'Follows your device' },
-  { label: 'About', hint: 'Athar — openathar.org' },
+  { label: 'Theme', hint: 'Follows the day — dawn, noon, dusk, night' },
 ];
 
 export default function SettingsScreen() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { colors, times, now } = usePhase();
   const { location } = useLocation();
-  const offsetHours = -new Date().getTimezoneOffset() / 60;
-  const times = useMemo(
-    () => getTodayTimes(new Date(), location.lat, location.lng),
-    [location]
-  );
   const { enabled, toggle, permission } = useAlarms();
+  const offsetHours = -now.getTimezoneOffset() / 60;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SafeAreaView style={styles.safeArea}>
-        <Text style={[styles.title, { color: colors.text, fontFamily: Fonts.display }]}>Settings</Text>
-        <Text style={[styles.sub, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-          Coming with the next milestones.
-        </Text>
+    <Screen>
+      <ScreenHeader title="Settings" titleAr="الإعدادات" subtitle="Your alarms, your place" />
 
-        <Text style={[styles.section, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>
-          ADHAN ALARMS
-        </Text>
-        <View style={[styles.card, { backgroundColor: colors.backgroundElement }]}>
-          {PRAYER_ORDER.map((key, i) => (
-            <View
-              key={key}
-              style={[
-                styles.row,
-                i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.rule },
-              ]}>
+      <SectionLabel>adhan alarms</SectionLabel>
+      <Card>
+        {PRAYER_ORDER.map((key, i) => (
+          <View key={key}>
+            {i > 0 && <Divider />}
+            <View style={styles.row}>
               <View style={styles.rowText}>
-                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
-                  {PRAYER_NAMES[key].en} <Text style={{ color: colors.accent, fontFamily: Fonts.arabic }}>{PRAYER_NAMES[key].ar}</Text>
-                </Text>
+                <View style={styles.nameRow}>
+                  <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
+                    {PRAYER_NAMES[key].en}
+                  </Text>
+                  <Text style={[styles.rowLabelAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>
+                    {PRAYER_NAMES[key].ar}
+                  </Text>
+                </View>
                 <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
                   {formatLocalTime(times[key], offsetHours)}
                 </Text>
@@ -67,112 +57,120 @@ export default function SettingsScreen() {
                 onValueChange={() => toggle(key)}
                 trackColor={{ true: colors.accent, false: colors.rule }}
                 thumbColor="#ffffff"
+                accessibilityLabel={`${PRAYER_NAMES[key].en} alarm`}
               />
             </View>
-          ))}
-          {permission === 'denied' && (
-            <Text style={[styles.permissionNote, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-              Notifications are disabled — enable them in your system settings to receive adhan alarms.
+          </View>
+        ))}
+        {permission === 'denied' && (
+          <>
+            <Divider />
+            <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+              Notifications are off — enable them in your system settings to receive adhan alarms.
             </Text>
-          )}
-        </View>
+          </>
+        )}
+      </Card>
 
-        <Text style={[styles.section, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>
-          MORE
-        </Text>
-        <View style={[styles.card, { backgroundColor: colors.backgroundElement }]}>
-          <Link href="/location" asChild>
-            <Pressable style={({ pressed }) => pressed && { opacity: 0.6 }}>
-              <View style={styles.row}>
-                <View style={styles.rowText}>
-                  <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
-                    Location
-                  </Text>
-                  <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-                    {location.label}
-                  </Text>
-                </View>
-                <Text style={[styles.soon, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>change</Text>
-              </View>
-            </Pressable>
-          </Link>
-          {SOON_ROWS.map((row, i) => (
-            <View
-              key={row.label}
-              style={[
-                styles.row,
-                { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.rule },
-              ]}>
+      <SectionLabel>place</SectionLabel>
+      <Card>
+        <Link href="/location" asChild>
+          <Pressable style={({ pressed }) => pressed && styles.pressed}>
+            <View style={styles.row}>
               <View style={styles.rowText}>
-                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
-                  {row.label}
-                </Text>
+                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>Location</Text>
                 <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-                  {row.hint}
+                  {location.label}
                 </Text>
               </View>
-              <Text style={[styles.soon, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>soon</Text>
+              <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.mono }]}>change →</Text>
             </View>
-          ))}
+          </Pressable>
+        </Link>
+      </Card>
+
+      <SectionLabel>coming next</SectionLabel>
+      <Card>
+        {SOON_ROWS.map((row, i) => (
+          <View key={row.label}>
+            {i > 0 && <Divider />}
+            <View style={styles.row}>
+              <View style={styles.rowText}>
+                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{row.label}</Text>
+                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{row.hint}</Text>
+              </View>
+              <Text style={[styles.action, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>soon</Text>
+            </View>
+          </View>
+        ))}
+      </Card>
+
+      <SectionLabel>about</SectionLabel>
+      <Card>
+        <View style={styles.about}>
+          <Text style={[styles.aboutAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>
+            وَنَكْتُبُ مَا قَدَّمُوا وَآثَارَهُمْ
+          </Text>
+          <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+            Athar — free, ad-free, no tracking. Built as Sadaqah Jariyah · openathar.org
+          </Text>
+          <Text style={[styles.credit, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+            sun & moon textures: Solar System Scope, NASA data, CC BY 4.0
+          </Text>
         </View>
-      </SafeAreaView>
-    </View>
+      </Card>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.five,
-  },
-  title: {
-    fontSize: 32,
-    lineHeight: 40,
-  },
-  sub: {
-    fontSize: 14,
-    marginTop: Spacing.one,
-  },
-  section: {
-    marginTop: Spacing.four,
-    marginBottom: Spacing.two,
-    fontSize: 12,
-    letterSpacing: 2,
-  },
-  card: {
-    borderRadius: Spacing.three,
-    paddingHorizontal: Spacing.three,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.three,
-    gap: Spacing.three,
+    paddingVertical: 14,
+    gap: 16,
   },
   rowText: {
     flex: 1,
-    gap: 2,
+    gap: 3,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
   },
   rowLabel: {
     fontSize: 16,
   },
+  rowLabelAr: {
+    fontSize: 15,
+  },
   rowHint: {
     fontSize: 13,
-    opacity: 0.85,
   },
-  soon: {
-    fontSize: 13,
-    textTransform: 'uppercase',
+  action: {
+    fontSize: 12,
     letterSpacing: 1,
   },
-  permissionNote: {
+  note: {
     fontSize: 12,
-    paddingBottom: Spacing.three,
-    opacity: 0.85,
+    paddingVertical: 12,
+  },
+  pressed: {
+    opacity: 0.6,
+  },
+  about: {
+    paddingVertical: 16,
+    gap: 8,
+  },
+  aboutAr: {
+    fontSize: 20,
+    lineHeight: 34,
+  },
+  credit: {
+    fontSize: 10,
+    letterSpacing: 0.5,
+    opacity: 0.8,
   },
 });

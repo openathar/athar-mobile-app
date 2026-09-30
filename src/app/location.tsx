@@ -1,27 +1,19 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  useColorScheme,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { Card, Divider, Screen, SectionLabel } from '@/components/screen';
+import { Fonts } from '@/constants/theme';
 import { useLocationContext } from '@/context/location';
+import { usePhase } from '@/context/phase';
+import { withAlpha } from '@/lib/color';
 
 type SearchResult = { lat: string; lon: string; display_name: string };
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&q=';
 
 export default function LocationScreen() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { colors } = usePhase();
   const { location, setCustom } = useLocationContext();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -62,110 +54,144 @@ export default function LocationScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text, fontFamily: Fonts.display }]}>
-            Choose location
+    <Screen>
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <View style={styles.titleRow}>
+            <Text style={[styles.title, { color: colors.text, fontFamily: Fonts.display }]}>Location</Text>
+            <Text style={[styles.titleAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>الموقع</Text>
+          </View>
+          <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+            Currently {location.label}
           </Text>
-          <Pressable onPress={() => router.back()} hitSlop={12}>
-            <Text style={[styles.close, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>✕</Text>
-          </Pressable>
         </View>
-
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search for a city…"
-          placeholderTextColor={colors.textSecondary}
-          autoFocus
-          autoCorrect={false}
-          style={[
-            styles.input,
-            { backgroundColor: colors.backgroundElement, color: colors.text, fontFamily: Fonts.sans },
-          ]}
-        />
-
-        <Pressable onPress={useCurrent} style={({ pressed }) => pressed && { opacity: 0.6 }}>
-          <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>
-            Use my current location
-          </Text>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          style={({ pressed }) => [styles.close, { borderColor: colors.rule }, pressed && styles.pressed]}>
+          <Text style={[styles.closeText, { color: colors.textSecondary }]}>✕</Text>
         </Pressable>
+      </View>
 
-        {searching && <ActivityIndicator color={colors.accent} style={styles.spinner} />}
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search for a city…"
+        placeholderTextColor={colors.textSecondary}
+        autoFocus
+        autoCorrect={false}
+        style={[
+          styles.input,
+          {
+            backgroundColor: withAlpha(colors.surface, 0.86),
+            borderColor: colors.rule,
+            color: colors.text,
+            fontFamily: Fonts.sans,
+          },
+        ]}
+      />
 
-        <ScrollView style={styles.results} keyboardShouldPersistTaps="handled">
-          {results.map((r) => (
-            <Pressable
-              key={r.display_name}
-              onPress={() => pick(r)}
-              style={({ pressed }) => pressed && { opacity: 0.6 }}>
-              <View style={[styles.resultRow, { borderBottomColor: colors.rule }]}>
-                <Text style={[styles.resultText, { color: colors.text, fontFamily: Fonts.sans }]}>
-                  {r.display_name}
-                </Text>
+      <Pressable onPress={useCurrent} style={({ pressed }) => pressed && styles.pressed}>
+        <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.mono }]}>◎ use my current location</Text>
+      </Pressable>
+
+      {searching && <ActivityIndicator color={colors.accent} style={styles.spinner} />}
+
+      {results.length > 0 && (
+        <>
+          <SectionLabel>results</SectionLabel>
+          <Card>
+            {results.map((r, i) => (
+              <View key={r.display_name}>
+                {i > 0 && <Divider />}
+                <Pressable onPress={() => pick(r)} style={({ pressed }) => pressed && styles.pressed}>
+                  <View style={styles.resultRow}>
+                    <Text style={[styles.resultName, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
+                      {r.display_name.split(',')[0]}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={[styles.resultHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+                      {r.display_name.split(',').slice(1).join(',').trim()}
+                    </Text>
+                  </View>
+                </Pressable>
               </View>
-            </Pressable>
-          ))}
-        </ScrollView>
-
-        <Text style={[styles.currentLabel, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-          Currently: {location.label}
-        </Text>
-      </SafeAreaView>
-    </View>
+            ))}
+          </Card>
+        </>
+      )}
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.five,
-  },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: Spacing.four,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  headerText: {
+    flex: 1,
+    gap: 2,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 10,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
+    lineHeight: 40,
+  },
+  titleAr: {
+    fontSize: 24,
     lineHeight: 36,
   },
+  subtitle: {
+    fontSize: 13,
+  },
   close: {
-    fontSize: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeText: {
+    fontSize: 15,
   },
   input: {
-    borderRadius: Spacing.three,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.three,
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
   },
   current: {
-    marginTop: Spacing.three,
-    fontSize: 15,
+    fontSize: 13,
+    letterSpacing: 0.5,
+    marginTop: 16,
   },
   spinner: {
-    marginTop: Spacing.three,
-  },
-  results: {
-    marginTop: Spacing.three,
-    flex: 1,
+    marginTop: 20,
   },
   resultRow: {
-    paddingVertical: Spacing.three,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 13,
+    gap: 2,
   },
-  resultText: {
-    fontSize: 15,
+  resultName: {
+    fontSize: 16,
   },
-  currentLabel: {
-    paddingVertical: Spacing.three,
-    fontSize: 13,
-    opacity: 0.85,
+  resultHint: {
+    fontSize: 12,
+  },
+  pressed: {
+    opacity: 0.6,
   },
 });
