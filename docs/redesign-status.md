@@ -24,28 +24,28 @@ continuing the redesign work.
   rotation, tight bloom, redder when low.
 - **Armillary sphere** on the prayer screen (`src/components/falak.tsx`),
   UI-thread 3D via Reanimated worklets.
+- **Kaaba**: a native 3D box (`src/components/kaaba3d.tsx`), not a sprite —
+  4 wall `View`s + a roof, each wearing a flat unlit face texture
+  (`scripts/render-kaaba-faces.mjs`), placed with a 4×4 matrix (RN has no
+  `translateZ`) and spun by a Reanimated shared value on the UI thread.
+  Per-face shading is a black overlay whose opacity follows face-normal ·
+  light, recomputed every frame since the light is fixed in the world while
+  the box turns. Gotcha: react-native-web maps the `matrix` transform key
+  to the 2D 6-argument CSS `matrix()` regardless of array length, silently
+  dropping a 16-element 4×4 as invalid — use `matrix3d` on web instead (see
+  `MATRIX_KEY` in the component). It stands on the **Mataf**: a
+  foreshortened marble ellipse (`Mataf` in `qibla.tsx`) with a faint ring
+  and small gold dots orbiting counter-clockwise (tawaf).
+- **Sky depth**: `Screen` blends a third, warm haze stop near the horizon
+  (not just a flat zenith→horizon gradient) and a soft SVG radial vignette
+  over the whole frame.
 - **Qibla**: minimalist dial, arc = remaining turn, true-north heading fix,
-  distance to the Kaaba; Kaaba sprite (`scripts/render-kaaba.mjs`).
+  distance to the Kaaba.
 - Dev preview on web: `?at=HH:MM` pins the clock (`src/lib/clock.ts`).
 
 ## Open — in this order
 
-1. **Kaaba: smooth real 3D instead of sprites.** 40 crossfaded frames look
-   choppy (double image on a hard-edged box); more frames exceed the safe
-   texture size. Replace with native 3D: 4 wall Views + roof, each with its
-   face texture as an `Image`, positioned via a 4×4 `matrix` transform
-   (RN has no `translateZ`) + `perspective`, `backfaceVisibility: 'hidden'`,
-   rotation driven by a Reanimated shared value (60 fps, UI thread). Per-face
-   shading: a black overlay whose opacity follows the face normal · light.
-   Face textures: export flat, unlit PNGs from the existing `wall()`/`roof()`
-   functions in `scripts/render-kaaba.mjs` (door on one wall, Black Stone
-   corner). Keep: no imitated calligraphy on the belt.
-2. **Compass ground/background**: the Kaaba stands on the white marble
-   *Mataf* (ellipse under it) with faint concentric rings; a few small dots
-   circling **counter-clockwise** (the direction of tawaf). Give the day sky
-   more depth (horizon haze, subtle vignette) — the flat blue gradient was
-   called "not nice".
-3. **Home screen — like the website**, two new sections below today's times:
+1. **Home screen — like the website**, two new sections below today's times:
    - *Anywhere*: pick any city (search, reuse the Nominatim logic from
      `src/app/location.tsx`) or position and see its prayer times, computed
      locally with `@openathar/athan-core-ts`. Check `web/lib/cities.ts` and

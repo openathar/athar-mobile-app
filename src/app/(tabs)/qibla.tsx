@@ -13,8 +13,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
 
+import { Kaaba3D } from '@/components/kaaba3d';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
-import { SpriteView, useLoop, useReducedMotion, type Sprite } from '@/components/sprite';
+import { useLoop, useReducedMotion } from '@/components/sprite';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import { useLocation } from '@/hooks/use-location';
@@ -26,13 +27,6 @@ const ALIGNED_DEG = 4;
 /** viewBox half-size; the dial ring sits at RING. */
 const V = 170;
 const RING = 150;
-
-const KAABA_SPRITE: Sprite = {
-  source: require('../../../assets/images/qibla/kaaba-turn.png'),
-  frames: 40,
-  cols: 8,
-  rows: 5,
-};
 
 const WINDS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 const CARDINALS = [
@@ -89,6 +83,55 @@ function useHeading() {
 }
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+/** Marble tone for the Mataf floor — matches the Kaaba's own shadhirwan base. */
+const MARBLE = '#d6d1c6';
+
+function TawafDot({
+  base,
+  turn,
+  rx,
+  ry,
+  gold,
+}: {
+  base: number;
+  turn: import('react-native-reanimated').SharedValue<number>;
+  rx: number;
+  ry: number;
+  gold: string;
+}) {
+  const props = useAnimatedProps(() => {
+    // Counter-clockwise: angle decreases as the loop progresses.
+    const a = ((base - turn.value * 360) * Math.PI) / 180;
+    return { cx: Math.cos(a) * rx * 0.86, cy: Math.sin(a) * ry * 0.86 };
+  });
+  return <AnimatedCircle r={2.2} fill={gold} fillOpacity={0.75} animatedProps={props} />;
+}
+
+/**
+ * The white marble floor around the Kaaba (the Mataf), foreshortened to an
+ * ellipse as if seen from slightly above — faint concentric rings, and a
+ * few pilgrims' dots circling counter-clockwise (the direction of tawaf).
+ */
+function Mataf({ kaabaSize, gold }: { kaabaSize: number; gold: string }) {
+  const reduced = useReducedMotion();
+  const rx = kaabaSize * 0.72;
+  const ry = rx * 0.4;
+  const turn = useLoop(18_000, 1, reduced);
+  const squash = (ry / rx).toFixed(3);
+
+  if (kaabaSize <= 0) return null;
+  return (
+    <Svg width={rx * 2.4} height={ry * 2.4} viewBox={`${-rx * 1.2} ${-ry * 1.2} ${rx * 2.4} ${ry * 2.4}`} style={StyleSheet.absoluteFill}>
+      <Circle cx={0} cy={0} r={rx} fill={MARBLE} fillOpacity={0.92} transform={`scale(1 ${squash})`} />
+      <Circle cx={0} cy={0} r={rx * 0.72} fill="none" stroke="#fff" strokeOpacity={0.35} strokeWidth={rx * 0.015} transform={`scale(1 ${squash})`} />
+      <Circle cx={0} cy={0} r={rx} fill="none" stroke={gold} strokeOpacity={0.35} strokeWidth={1} transform={`scale(1 ${squash})`} />
+      {[0, 60, 120, 180, 240, 300].map((base) => (
+        <TawafDot key={base} base={base} turn={turn} rx={rx} ry={ry} gold={gold} />
+      ))}
+    </Svg>
+  );
+}
 
 /**
  * A quiet dial around the Kaaba. The dial turns against the phone like a
@@ -100,7 +143,6 @@ const AnimatedPath = Animated.createAnimatedComponent(Path);
 function Compass({ size, bearing, heading }: { size: number; bearing: number; heading: number | null }) {
   const { colors } = usePhase();
   const gold = colors.stars[0];
-  const reduced = useReducedMotion();
 
   const dial = useSharedValue(0);
   const lastTarget = useRef(0);
@@ -145,7 +187,6 @@ function Compass({ size, bearing, heading }: { size: number; bearing: number; he
 
   const [qx, qy] = polar(RING, bearing);
   const kaabaSize = Math.round(size * 0.5);
-  const turn = useLoop(26_000, KAABA_SPRITE.frames, reduced);
   const box = `${-V} ${-V} ${2 * V} ${2 * V}`;
 
   return (
@@ -192,9 +233,12 @@ function Compass({ size, bearing, heading }: { size: number; bearing: number; he
         <Path d={`M0 ${-RING - 16} L0 ${-RING + 6}`} stroke={aligned ? colors.accent : colors.text} strokeWidth={2.5} strokeLinecap="round" />
       </Svg>
 
-      {/* The Kaaba at the centre, upright, turning on its own axis */}
+      {/* The Mataf floor, then the Kaaba upright at the centre, turning */}
+      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.center, { marginTop: kaabaSize * 0.38 }]}>
+        <Mataf kaabaSize={kaabaSize} gold={gold} />
+      </View>
       <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.center]}>
-        <SpriteView sprite={KAABA_SPRITE} width={kaabaSize} frame={turn} />
+        <Kaaba3D size={kaabaSize} />
       </View>
     </View>
   );

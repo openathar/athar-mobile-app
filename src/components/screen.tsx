@@ -10,12 +10,13 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Defs, Rect, RadialGradient as SvgRadialGradient, Stop } from 'react-native-svg';
 
 import { Celestial, SkyLight } from '@/components/celestial';
 import { StarField } from '@/components/star-field';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
-import { withAlpha } from '@/lib/color';
+import { mixHex, withAlpha } from '@/lib/color';
 
 /**
  * Every screen's frame: the real sky for this moment (computed from the
@@ -34,11 +35,30 @@ export function Screen({
   contentStyle?: StyleProp<ViewStyle>;
 }) {
   const { colors, sky, starOpacity } = usePhase();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+
+  // A little atmospheric depth: a warm haze band low over the horizon (real
+  // skies aren't a flat two-stop blend near the ground), plus a soft
+  // vignette so the frame doesn't read as a flat rectangle of colour.
+  const [zenith, horizon] = sky;
+  const haze = mixHex(horizon, '#fff3d6', 0.14);
 
   return (
     <View style={styles.fill}>
-      <LinearGradient colors={sky} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={[zenith, horizon, haze]}
+        locations={[0, 0.72, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+      <Svg width={width} height={height} style={StyleSheet.absoluteFill} pointerEvents="none">
+        <Defs>
+          <SvgRadialGradient id="vignette" cx="50%" cy="38%" r="75%">
+            <Stop offset="55%" stopColor="#000" stopOpacity={0} />
+            <Stop offset="100%" stopColor="#000" stopOpacity={0.22} />
+          </SvgRadialGradient>
+        </Defs>
+        <Rect x={0} y={0} width={width} height={height} fill="url(#vignette)" />
+      </Svg>
       <SkyLight width={width} />
       {starOpacity > 0 && (
         <View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: starOpacity }]}>
