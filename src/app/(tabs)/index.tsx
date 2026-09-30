@@ -1,11 +1,10 @@
 import { gregorianToHijri, formatLocalTime } from '@openathar/athan-core-ts';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Easing, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Falak } from '@/components/falak';
-import { Khatam } from '@/components/khatam';
 import { Moon, moonCaption } from '@/components/moon';
 import { StarField } from '@/components/star-field';
 import { Fonts, PhaseColors, type DayPhase } from '@/constants/theme';
@@ -35,11 +34,21 @@ export default function PrayerScreen() {
   const now = useNow(1000);
   const { location } = useLocation();
   const { width } = useWindowDimensions();
-  // The orbit frames the countdown, so it must not outgrow the text block.
   // Clamped at 0 because the first layout pass reports width 0 on web.
-  const falakSize = Math.max(0, Math.min(width - 40, 360));
+  const sphereSize = Math.max(0, Math.min(width - 24, 420));
+
+  // Prayer times only change with the day or the place — recomputing them
+  // every second would also hand the sphere a new object every tick and
+  // defeat its memoisation.
+  const dayKey = now.toDateString();
+  const times = useMemo(
+    () => getTodayTimes(now, location.lat, location.lng),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dayKey, location.lat, location.lng]
+  );
+  const minuteMs = Math.floor(now.getTime() / 60000) * 60000;
+
   const palette = useMemo(() => {
-    const times = getTodayTimes(now, location.lat, location.lng);
     const offsetHours = -now.getTimezoneOffset() / 60;
     const phase = getDayPhase(now, times);
     const next = getNextPrayer(now, times);
@@ -47,7 +56,6 @@ export default function PrayerScreen() {
     return {
       phase,
       colors: PhaseColors[phase],
-      times,
       offsetHours,
       next,
       hijri: `${toArabicDigits(hijri.day)} ${hijri.monthName} ${toArabicDigits(hijri.year)}`,
@@ -55,11 +63,10 @@ export default function PrayerScreen() {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
-        year: 'numeric',
       }),
       moon: moonCaption(now),
     };
-  }, [now, location]);
+  }, [now, times]);
 
   // Crossfade beim Phasenwechsel: die alte Phase bleibt als Basis liegen,
   // die neue blendet darüber ein (wie ein Atemzug im Tagesrhythmus).
@@ -85,97 +92,113 @@ export default function PrayerScreen() {
       <LinearGradient colors={PhaseColors[displayedPhase].gradient} style={StyleSheet.absoluteFill} />
       <Animated.View style={[styles.container, { opacity: fade }]}>
         <LinearGradient colors={palette.colors.gradient} style={styles.container}>
-          {/* Sternenhimmel wie der Web-Hero — flimmert hinter Khatam & Inhalt */}
           <StarField colors={colors.stars} />
-          {/* Khatam-Signet wie auf openathar.org — langsam rotierend hinter dem Hero */}
-          <View style={styles.khatamWrap}>
-            <Khatam size={460} color={colors.accent} opacity={0.12} />
-          </View>
 
-          <SafeAreaView style={styles.safeArea}>
-            {/* Heute am Himmel: der Mond in seiner echten Phase, atmender Glow */}
-            <View style={styles.moonWrap} pointerEvents="none">
-              <Moon
-                size={46}
-                now={now}
-                lit={colors.moon.lit}
-                dark={colors.moon.dark}
-                glow={colors.moon.glow}
-                maria={colors.moon.maria}
-              />
-            </View>
-
-            {/* Header — Hijri date in Arabic calligraphy */}
-            <View style={styles.header}>
-              <Text style={[styles.hijri, { color: colors.accent, fontFamily: Fonts.arabicBold }]}>
-                {palette.hijri}
-              </Text>
-              <Text style={[styles.gregorian, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-                {palette.gregorian}
-              </Text>
-              <Text style={[styles.location, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-                {location.label}
-              </Text>
-            </View>
-
-            {/* Hero — next prayer + countdown, framed by today's orbit */}
-            <View style={styles.hero}>
-              <View style={styles.falakWrap} pointerEvents="none">
-                <Falak
-                  size={falakSize}
+          <SafeAreaView style={styles.container} edges={['top']}>
+            <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+              {/* Header — Hijri date leads, Gregorian and place follow quietly */}
+              <View style={styles.header}>
+                <View style={styles.headerText}>
+                  <Text style={[styles.hijri, { color: colors.accent, fontFamily: Fonts.arabicBold }]}>
+                    {palette.hijri}
+                  </Text>
+                  <Text style={[styles.meta, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+                    {palette.gregorian} · {location.label}
+                  </Text>
+                </View>
+                <Moon
+                  size={34}
                   now={now}
-                  times={palette.times}
+                  lit={colors.moon.lit}
+                  dark={colors.moon.dark}
+                  glow={colors.moon.glow}
+                  maria={colors.moon.maria}
+                />
+              </View>
+
+              {/* The sky itself — today's sun path over this place */}
+              <View style={styles.stage}>
+                <Falak
+                  size={sphereSize}
+                  minuteMs={minuteMs}
+                  times={times}
+                  lat={location.lat}
+                  lng={location.lng}
                   nextKey={palette.next.key}
                   colors={colors}
                 />
               </View>
-              <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>
-                NEXT PRAYER
-              </Text>
-              <Text style={[styles.prayerName, { color: colors.text, fontFamily: Fonts.display }]}>
-                {nextName.en}
-              </Text>
-              <Text style={[styles.prayerNameAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>
-                {nextName.ar}
-              </Text>
-              <Text style={[styles.countdown, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
-                {countdown}
-              </Text>
-              <Text style={[styles.at, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-                at {formatLocalTime(palette.next.at, palette.offsetHours)}
-              </Text>
-            </View>
 
-            {/* Today's times */}
-            <View style={[styles.list, { backgroundColor: colors.surface }]}>
-              {PRAYER_ORDER.map((key) => {
-                const isNext = key === palette.next.key;
-                return (
-                  <View key={key} style={styles.row}>
-                    <Text
-                      style={[
-                        styles.rowName,
-                        { color: isNext ? colors.accent : colors.text, fontFamily: Fonts.sansMedium },
-                      ]}>
-                      {PRAYER_NAMES[key].en}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.rowTime,
-                        { color: isNext ? colors.accent : colors.textSecondary, fontFamily: Fonts.mono },
-                      ]}>
-                      {formatLocalTime(palette.times[key], palette.offsetHours)}
-                    </Text>
-                  </View>
-                );
-              })}
-              {/* "Heute am Himmel" — Phase + Beleuchtung, wie TodaySky auf der Website */}
-              <View style={[styles.moonRow, { borderTopColor: colors.rule }]}>
-                <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-                  {palette.moon}
+              {/* Next prayer */}
+              <View style={styles.next}>
+                <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>
+                  NEXT PRAYER
+                </Text>
+                <View style={styles.nameRow}>
+                  <Text style={[styles.prayerName, { color: colors.text, fontFamily: Fonts.display }]}>
+                    {nextName.en}
+                  </Text>
+                  <Text style={[styles.prayerNameAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>
+                    {nextName.ar}
+                  </Text>
+                </View>
+                <Text style={[styles.countdown, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
+                  {countdown}
+                </Text>
+                <Text style={[styles.at, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+                  at {formatLocalTime(palette.next.at, palette.offsetHours)}
                 </Text>
               </View>
-            </View>
+
+              {/* Today's times */}
+              <View style={[styles.list, { backgroundColor: colors.surface }]}>
+                {PRAYER_ORDER.map((key, i) => {
+                  const isNext = key === palette.next.key;
+                  const passed = times[key] <= now.getTime();
+                  return (
+                    <View
+                      key={key}
+                      style={[
+                        styles.row,
+                        i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.rule },
+                      ]}>
+                      <View style={styles.rowLead}>
+                        <View
+                          style={[
+                            styles.dot,
+                            { backgroundColor: isNext ? colors.accent : passed ? colors.rule : colors.textSecondary },
+                          ]}
+                        />
+                        <Text
+                          style={[
+                            styles.rowName,
+                            {
+                              color: isNext ? colors.accent : passed ? colors.textSecondary : colors.text,
+                              fontFamily: isNext ? Fonts.sansSemiBold : Fonts.sansMedium,
+                            },
+                          ]}>
+                          {PRAYER_NAMES[key].en}
+                        </Text>
+                        <Text style={[styles.rowNameAr, { color: colors.textSecondary, fontFamily: Fonts.arabic }]}>
+                          {PRAYER_NAMES[key].ar}
+                        </Text>
+                      </View>
+                      <Text
+                        style={[
+                          styles.rowTime,
+                          { color: isNext ? colors.accent : colors.textSecondary, fontFamily: Fonts.mono },
+                        ]}>
+                        {formatLocalTime(times[key], palette.offsetHours)}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+
+              <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+                {palette.moon}
+              </Text>
+            </ScrollView>
           </SafeAreaView>
         </LinearGradient>
       </Animated.View>
@@ -187,98 +210,98 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  khatamWrap: {
-    ...StyleSheet.absoluteFill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-  },
-  moonWrap: {
-    position: 'absolute',
-    top: 12,
-    right: 4,
+  scroll: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 120,
   },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'space-between',
+  },
+  headerText: {
+    gap: 2,
   },
   hijri: {
-    fontSize: 26,
+    fontSize: 24,
     lineHeight: 34,
   },
-  gregorian: {
-    fontSize: 14,
-  },
-  location: {
+  meta: {
     fontSize: 13,
-    opacity: 0.8,
   },
-  hero: {
-    flex: 1,
+  stage: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    marginHorizontal: -8,
+    marginTop: 4,
   },
-  falakWrap: {
-    ...StyleSheet.absoluteFill,
+  next: {
     alignItems: 'center',
-    justifyContent: 'center',
-    // Lifted off the exact hero centre so the orbit crowns the prayer name
-    // instead of running straight through the countdown digits.
-    transform: [{ translateY: -30 }],
+    marginTop: -4,
+    marginBottom: 24,
   },
   eyebrow: {
-    fontSize: 13,
+    fontSize: 11,
     letterSpacing: 3,
-    textTransform: 'uppercase',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 12,
+    marginTop: 4,
   },
   prayerName: {
-    fontSize: 44,
-    lineHeight: 52,
+    fontSize: 40,
+    lineHeight: 48,
   },
   prayerNameAr: {
-    fontSize: 34,
+    fontSize: 30,
     lineHeight: 44,
   },
   countdown: {
-    fontSize: 64,
-    lineHeight: 76,
+    fontSize: 50,
+    lineHeight: 60,
     letterSpacing: 2,
-    marginTop: 12,
   },
   at: {
-    fontSize: 16,
+    fontSize: 13,
+    letterSpacing: 1,
   },
   list: {
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    marginBottom: 12,
+    borderRadius: 22,
+    paddingHorizontal: 18,
+    paddingVertical: 4,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 11,
+    paddingVertical: 13,
+  },
+  rowLead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   rowName: {
     fontSize: 16,
   },
+  rowNameAr: {
+    fontSize: 15,
+  },
   rowTime: {
     fontSize: 16,
   },
-  moonRow: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
   moonCaption: {
-    fontSize: 12,
-    letterSpacing: 1,
+    fontSize: 11,
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
+    textAlign: 'center',
+    marginTop: 14,
   },
 });
