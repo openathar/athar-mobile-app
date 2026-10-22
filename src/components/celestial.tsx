@@ -92,16 +92,19 @@ function Moon({
   lit,
   dark,
   reduced,
+  fraction,
 }: {
   size: number;
   now: Date;
   lit: string;
   dark: string;
   reduced: boolean;
+  /** Lunation fraction 0..1 (0 new, 0.5 full) — overrides `now`, for the orbiting moon. */
+  fraction?: number;
 }) {
   const phase = useMemo(() => moonPhaseAt(now), [now]);
-  const k = phase.illumination;
-  const waxing = phase.phaseAngle < 180;
+  const k = fraction === undefined ? phase.illumination : (1 - Math.cos(2 * Math.PI * fraction)) / 2;
+  const waxing = fraction === undefined ? phase.phaseAngle < 180 : fraction < 0.5;
   const diameter = Math.round(size * 0.6);
   const R = 50;
 
@@ -140,13 +143,13 @@ function Moon({
 }
 
 /** The moon at any time of day (the Sky screen), tonight's phase laid over the real surface. */
-export function BigMoon({ size = 300 }: { size?: number }) {
+export function BigMoon({ size = 300, fraction }: { size?: number; fraction?: number }) {
   const { colors, now } = usePhase();
   const reduced = useReducedMotion();
   const minuteNow = useMemo(() => new Date(Math.floor(now.getTime() / 60000) * 60000), [now]);
   return (
     <View accessible accessibilityRole="image" accessibilityLabel="The moon" pointerEvents="none">
-      <Moon size={size} now={minuteNow} lit={colors.moon.lit} dark={colors.moon.dark} reduced={reduced} />
+      <Moon size={size} now={minuteNow} lit={colors.moon.lit} dark={colors.moon.dark} reduced={reduced} fraction={fraction} />
     </View>
   );
 }

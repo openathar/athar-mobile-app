@@ -61,7 +61,7 @@ page itself — the website's lists, not cards.
  │ ١١ جمادى الأولى ١٤٤٨   ◯ moon │  Hijri (Amiri, accent) · today's real moon/sun
  │ Thursday, October 22 · Berlin │
  │                              │
- │      ( armillary sphere )    │  the one memorable object; drag to turn
+ │      ( the real Earth )       │  day/night line, your pin; drag to turn
  │                              │
  │ Next prayer                  │
  │ Asr  العصر                   │  56 light + Amiri accent
@@ -76,7 +76,7 @@ page itself — the website's lists, not cards.
  └────────────────────────────┘     under the active label (no capsule)
 ```
 
-The sphere is the one bold moment (the user's own preference: a real, turnable
+The Earth is the one bold moment (round 3 replaced the armillary sphere; see below).
 3D object, not a flat vector). The tree stays a website motif; it comes to the
 app where growth is the content (Khatma, Tasbeeh — see plan).
 
@@ -132,3 +132,16 @@ No spinners, no offline banners, no "sync" UI — ever.
   matches with `api.openathar.org/v1/places` and shows the local ones first;
   recently looked-at cities are kept.
 - If a request fails the screen simply stays as it is.
+
+### Round 3 — the website's Earth and Moon replace the old animations
+The armillary sphere (Today), the 3D Kaaba on a marble floor (Qibla) and the
+bare moon (Sky) are gone. All three now use the website's planet:
+- **Today** — the real Earth with its day/night line and city lights; the
+  planet turns with the actual time of day, your place is a gold pin; drag to turn.
+- **Qibla** — the Earth turned so you and the Kaaba both face you, a dotted
+  great-circle arc between them, and a compass ring around it that turns with
+  the phone.
+- **Sky** — the website's Earth-and-Moon scene: the Moon on a slanted orbit,
+  lit by the same sun, starting at tonight's real phase and passing through
+  every phase in four minutes, in front of and behind the Earth.
+Pre-rendered sprites, no GL (`assets/images/earth/README.md`).

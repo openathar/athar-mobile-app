@@ -2,40 +2,22 @@ import { qiblaBearing } from '@openathar/athan-core-ts';
 import * as Location from 'expo-location';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import Animated, {
-  Easing,
-  useAnimatedProps,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
 import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
 
-import { Kaaba3D } from '@/components/kaaba3d';
+import { Earth } from '@/components/earth';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
-import { useLoop, useReducedMotion } from '@/components/sprite';
 import { Fonts } from '@/constants/theme';
-import { LOCALE, t } from '@/lib/i18n';
 import { usePhase } from '@/context/phase';
 import { useLocation } from '@/hooks/use-location';
+import { midLongitude } from '@/lib/globe';
 import { distanceKm } from '@/lib/geo';
+import { IS_RTL, LOCALE, t } from '@/lib/i18n';
 
 const KAABA = { lat: 21.4225241, lng: 39.8261818 };
 /** Within this many degrees the phone counts as facing the Qibla. */
 const ALIGNED_DEG = 4;
-/** viewBox half-size; the dial ring sits at RING. */
-const V = 170;
-const RING = 150;
 
 const WINDS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-const CARDINALS = [
-  { deg: 0, label: 'N' },
-  { deg: 90, label: 'E' },
-  { deg: 180, label: 'S' },
-  { deg: 270, label: 'W' },
-];
 
 /** Signed shortest turn from a to b, in −180..180. */
 function shortest(a: number, b: number): number {
@@ -83,165 +65,47 @@ function useHeading() {
   return heading;
 }
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-/** Marble tone for the Mataf floor — matches the Kaaba's own shadhirwan base. */
-const MARBLE = '#d6d1c6';
-
-function TawafDot({
-  base,
-  turn,
-  rx,
-  ry,
-  gold,
-}: {
-  base: number;
-  turn: import('react-native-reanimated').SharedValue<number>;
-  rx: number;
-  ry: number;
-  gold: string;
-}) {
-  const props = useAnimatedProps(() => {
-    // Counter-clockwise: angle decreases as the loop progresses.
-    const a = ((base - turn.value * 360) * Math.PI) / 180;
-    return { cx: Math.cos(a) * rx * 0.86, cy: Math.sin(a) * ry * 0.86 };
-  });
-  return <AnimatedCircle r={2.2} fill={gold} fillOpacity={0.75} animatedProps={props} />;
-}
-
 /**
- * The white marble floor around the Kaaba (the Mataf), foreshortened to an
- * ellipse as if seen from slightly above — faint concentric rings, and a
- * few pilgrims' dots circling counter-clockwise (the direction of tawaf).
+ * The compass ring around the Earth. The ring turns with the phone (north
+ * stays north); the gold arrow points to the Qibla and snaps to the top mark
+ * when you face it. On the web, with no sensor, the ring stands still.
  */
-function Mataf({ kaabaSize, gold }: { kaabaSize: number; gold: string }) {
-  const reduced = useReducedMotion();
-  const rx = kaabaSize * 0.72;
-  const ry = rx * 0.4;
-  const turn = useLoop(18_000, 1, reduced);
-  const squash = (ry / rx).toFixed(3);
-
-  if (kaabaSize <= 0) return null;
-  return (
-    <Svg width={rx * 2.4} height={ry * 2.4} viewBox={`${-rx * 1.2} ${-ry * 1.2} ${rx * 2.4} ${ry * 2.4}`} style={StyleSheet.absoluteFill}>
-      <Circle cx={0} cy={0} r={rx} fill={MARBLE} fillOpacity={0.92} transform={`scale(1 ${squash})`} />
-      <Circle cx={0} cy={0} r={rx * 0.72} fill="none" stroke="#fff" strokeOpacity={0.35} strokeWidth={rx * 0.015} transform={`scale(1 ${squash})`} />
-      <Circle cx={0} cy={0} r={rx} fill="none" stroke={gold} strokeOpacity={0.35} strokeWidth={1} transform={`scale(1 ${squash})`} />
-      {[0, 60, 120, 180, 240, 300].map((base) => (
-        <TawafDot key={base} base={base} turn={turn} rx={rx} ry={ry} gold={gold} />
-      ))}
-    </Svg>
-  );
-}
-
-/**
- * A quiet dial around the Kaaba. The dial turns against the phone like a
- * real compass card; the Kaaba stays upright at the centre and turns slowly
- * on its own axis. A gold arc runs from the fixed index at the top (where
- * the phone points) to the Qibla mark on the dial — its length is exactly
- * the turn still to make, and it disappears when you face the Qibla.
- */
-function Compass({ size, bearing, heading }: { size: number; bearing: number; heading: number | null }) {
+function Ring({ size, bearing, heading, aligned }: { size: number; bearing: number; heading: number | null; aligned: boolean }) {
   const { colors } = usePhase();
-  const gold = colors.stars[0];
-
-  const dial = useSharedValue(0);
-  const lastTarget = useRef(0);
-  useEffect(() => {
-    const target = heading === null ? 0 : -heading;
-    const next = lastTarget.current + shortest(lastTarget.current, target);
-    lastTarget.current = next;
-    dial.value = withTiming(next, { duration: 240, easing: Easing.out(Easing.quad) });
-  }, [heading, dial]);
-
-  const aligned = heading !== null && Math.abs(shortest(heading, bearing)) <= ALIGNED_DEG;
-  const glow = useSharedValue(0);
-  useEffect(() => {
-    glow.value = aligned
-      ? withRepeat(withSequence(withTiming(1, { duration: 900 }), withTiming(0.45, { duration: 900 })), -1, true)
-      : withTiming(0, { duration: 300 });
-  }, [aligned, glow]);
-
-  const dialStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${dial.value}deg` }] }));
-  const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value }));
-
-  // The remaining turn, drawn along the ring from the top index.
-  const arc = useAnimatedProps(() => {
-    const a = ((((bearing + dial.value) % 360) + 540) % 360) - 180;
-    if (Math.abs(a) <= ALIGNED_DEG) return { d: 'M0 0' };
-    const rad = ((a - 90) * Math.PI) / 180;
-    const ex = RING * Math.cos(rad);
-    const ey = RING * Math.sin(rad);
-    return { d: `M0 ${-RING} A ${RING} ${RING} 0 0 ${a > 0 ? 1 : 0} ${ex.toFixed(2)} ${ey.toFixed(2)}` };
-  });
-
+  const V = size / 2;
+  const R = V - 14;
+  const rot = heading === null ? 0 : -heading;
   const ticks = useMemo(() => {
     let d = '';
-    for (let deg = 0; deg < 360; deg += 5) {
-      const len = deg % 90 === 0 ? 12 : deg % 30 === 0 ? 8 : 4;
-      const [x1, y1] = polar(RING - 3, deg);
-      const [x2, y2] = polar(RING - 3 - len, deg);
-      d += `M${x1.toFixed(2)} ${y1.toFixed(2)}L${x2.toFixed(2)} ${y2.toFixed(2)}`;
+    for (let i = 0; i < 72; i++) {
+      const long = i % 6 === 0;
+      const [x1, y1] = polar(R, i * 5);
+      const [x2, y2] = polar(R - (long ? 9 : 4), i * 5);
+      d += `M${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}`;
     }
     return d;
-  }, []);
-
-  const [qx, qy] = polar(RING, bearing);
-  const kaabaSize = Math.round(size * 0.5);
-  const box = `${-V} ${-V} ${2 * V} ${2 * V}`;
-
+  }, [R]);
+  const arrowDeg = bearing + rot; // where the Qibla is, on the screen
+  const [ax, ay] = polar(R + 4, arrowDeg);
+  const [bx, by] = polar(R - 16, arrowDeg);
   return (
-    <View style={{ width: size, height: size }}>
-      {/* Aligned: the ring breathes in the accent colour */}
-      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, glowStyle]}>
-        <Svg width={size} height={size} viewBox={box}>
-          <Circle r={RING} fill="none" stroke={colors.accent} strokeWidth={10} strokeOpacity={0.35} />
-        </Svg>
-      </Animated.View>
-
-      {/* The dial — turns against the phone */}
-      <Animated.View style={[StyleSheet.absoluteFill, dialStyle]}>
-        <Svg width={size} height={size} viewBox={box}>
-          <Circle r={RING} fill="none" stroke={colors.textSecondary} strokeOpacity={0.45} strokeWidth={1} />
-          <Path d={ticks} stroke={colors.textSecondary} strokeOpacity={0.55} strokeWidth={1} strokeLinecap="round" />
-          {CARDINALS.map((c) => {
-            const [x, y] = polar(RING - 30, c.deg);
-            return (
-              <SvgText
-                key={c.label}
-                x={x}
-                y={y + 6}
-                textAnchor="middle"
-                fontSize={17}
-                fontFamily={Fonts.display}
-                fill={c.deg === 0 ? colors.accent : colors.textSecondary}
-                transform={`rotate(${c.deg} ${x.toFixed(2)} ${y.toFixed(2)})`}>
-                {c.label}
-              </SvgText>
-            );
-          })}
-          {/* Qibla mark on the ring */}
-          <G>
-            <Circle cx={qx} cy={qy} r={9} fill={gold} fillOpacity={0.2} />
-            <Circle cx={qx} cy={qy} r={4.5} fill={gold} />
-          </G>
-        </Svg>
-      </Animated.View>
-
-      {/* Remaining turn, and the fixed index where the phone points */}
-      <Svg width={size} height={size} viewBox={box} style={StyleSheet.absoluteFill} pointerEvents="none">
-        <AnimatedPath animatedProps={arc} fill="none" stroke={gold} strokeWidth={3} strokeLinecap="round" />
-        <Path d={`M0 ${-RING - 16} L0 ${-RING + 6}`} stroke={aligned ? colors.accent : colors.text} strokeWidth={2.5} strokeLinecap="round" />
-      </Svg>
-
-      {/* The Mataf floor, then the Kaaba upright at the centre, turning */}
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.center, { marginTop: kaabaSize * 0.38 }]}>
-        <Mataf kaabaSize={kaabaSize} gold={gold} />
-      </View>
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.center]}>
-        <Kaaba3D size={kaabaSize} />
-      </View>
-    </View>
+    <Svg width={size} height={size} viewBox={`${-V} ${-V} ${size} ${size}`} style={StyleSheet.absoluteFill} pointerEvents="none">
+      <G rotation={rot}>
+        <Circle r={R} fill="none" stroke={colors.rule} strokeWidth={1} />
+        <Path d={ticks} stroke={colors.textSecondary} strokeOpacity={0.55} strokeWidth={1} />
+        {[['N', 0], ['E', 90], ['S', 180], ['W', 270]].map(([l, d]) => {
+          const [x, y] = polar(R - 26, d as number);
+          return (
+            <SvgText key={l} x={x} y={y + 5} fontSize={14} fontFamily={Fonts.sansMedium} fill={l === 'N' ? colors.accent : colors.textSecondary} textAnchor="middle" transform={`rotate(${-rot} ${x} ${y})`}>
+              {l}
+            </SvgText>
+          );
+        })}
+      </G>
+      <Path d={`M${ax} ${ay}L${bx} ${by}`} stroke={colors.accent} strokeWidth={aligned ? 5 : 3} strokeLinecap="round" />
+      <Circle cx={ax} cy={ay} r={aligned ? 7 : 5} fill={colors.accent} />
+      <Path d={`M0 ${-R - 8}L0 ${-R + 10}`} stroke={aligned ? colors.accent : colors.text} strokeWidth={2.5} strokeLinecap="round" />
+    </Svg>
   );
 }
 
@@ -250,19 +114,20 @@ export default function QiblaScreen() {
   const { colors } = usePhase();
   const { width } = useWindowDimensions();
   const heading = useHeading();
+  const [spin, setSpin] = useState(0);
 
   const bearing = qiblaBearing(location.lat, location.lng);
   const km = distanceKm(location, KAABA);
   const wind = WINDS[Math.round(bearing / 22.5) % 16];
-  const size = Math.max(0, Math.min(width - 40, 340));
+  const ring = Math.max(0, Math.min(width - 24, 400));
+  const globe = Math.round(ring * 0.72);
   const aligned = heading !== null && Math.abs(shortest(heading.deg, bearing)) <= ALIGNED_DEG;
+  // Turn the Earth so that you and the Kaaba both face the viewer.
+  const centre = midLongitude(location.lng, KAABA.lng) + spin;
 
   let guidance: string;
   if (heading === null) {
-    guidance =
-      Platform.OS === 'web'
-        ? t.kaabaLies(Math.round(bearing))
-        : t.holdFlat;
+    guidance = Platform.OS === 'web' ? t.kaabaLies(Math.round(bearing)) : t.holdFlat;
   } else {
     const turn = shortest(heading.deg, bearing);
     guidance = aligned ? t.facing : turn > 0 ? t.turnRight(Math.round(Math.abs(turn))) : t.turnLeft(Math.round(Math.abs(turn)));
@@ -270,19 +135,28 @@ export default function QiblaScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={LOCALE === 'ar' ? undefined : t.qiblaTitle} titleAr="القبلة" subtitle={`${t.from} ${location.label}`} />
+      <ScreenHeader title={IS_RTL ? undefined : t.qiblaTitle} titleAr="القبلة" subtitle={`${t.from} ${location.label}`} />
 
-      <View style={styles.compassWrap}>
-        <Compass size={size} bearing={bearing} heading={heading?.deg ?? null} />
+      <View style={styles.stage}>
+        <View style={{ width: ring, height: ring, alignItems: 'center', justifyContent: 'center' }}>
+          <Ring size={ring} bearing={bearing} heading={heading?.deg ?? null} aligned={aligned} />
+          <Earth
+            size={globe}
+            centralLon={centre}
+            decl={0}
+            side="plain"
+            pins={[
+              { lat: location.lat, lon: location.lng, color: colors.accent, size: 4.5, ring: true },
+              { lat: KAABA.lat, lon: KAABA.lng, color: '#f4efe2', size: 5.5, ring: true },
+            ]}
+            arc={[{ lat: location.lat, lon: location.lng }, { lat: KAABA.lat, lon: KAABA.lng }]}
+            arcColor={colors.accent}
+            onSpin={(d) => setSpin((v) => v + d)}
+          />
+        </View>
       </View>
 
-      <Text
-        style={[
-          styles.guidance,
-          { color: aligned ? colors.accent : colors.text, fontFamily: aligned ? Fonts.sansSemiBold : Fonts.sansMedium },
-        ]}>
-        {guidance}
-      </Text>
+      <Text style={[styles.guidance, { color: aligned ? colors.accent : colors.text, fontFamily: aligned ? Fonts.sansSemiBold : Fonts.sansMedium }]}>{guidance}</Text>
 
       <SectionLabel>{t.direction}</SectionLabel>
       <Card>
@@ -294,9 +168,7 @@ export default function QiblaScreen() {
             </Text>
           </View>
           <View style={styles.readoutRight}>
-            <Text style={[styles.big, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
-              {Math.round(km).toLocaleString()}
-            </Text>
+            <Text style={[styles.big, { color: colors.text, fontFamily: Fonts.monoMedium }]}>{Math.round(km).toLocaleString()}</Text>
             <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.kmToKaaba}</Text>
           </View>
         </View>
@@ -307,9 +179,7 @@ export default function QiblaScreen() {
               <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
                 {t.heading} {Math.round(heading.deg)}°
               </Text>
-              <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-                {heading.source === 'true' ? t.trueNorth : t.magnetic}
-              </Text>
+              <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{heading.source === 'true' ? t.trueNorth : t.magnetic}</Text>
             </View>
           </>
         )}
@@ -319,39 +189,11 @@ export default function QiblaScreen() {
 }
 
 const styles = StyleSheet.create({
-  compassWrap: {
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  center: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  guidance: {
-    textAlign: 'center',
-    fontSize: 15,
-    lineHeight: 22,
-    marginTop: 20,
-    paddingHorizontal: 12,
-  },
-  readout: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-  },
-  readoutRight: {
-    alignItems: 'flex-end',
-  },
-  big: {
-    fontSize: 30,
-    lineHeight: 36,
-  },
-  small: {
-    fontSize: 12,
-  },
-  sensorRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-  },
+  stage: { alignItems: 'center', marginTop: 8 },
+  guidance: { textAlign: 'center', fontSize: 16, lineHeight: 23, marginTop: 14, paddingHorizontal: 12 },
+  readout: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16 },
+  readoutRight: { alignItems: 'flex-end' },
+  big: { fontSize: 30, lineHeight: 36 },
+  small: { fontSize: 12 },
+  sensorRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12 },
 });

@@ -36,7 +36,7 @@ MVP with the openathar.org design language (web palette Layl/Mushaf,
 Plus Jakarta Sans/JetBrains Mono/Amiri):
 
 - **Prayer screen**: flat night/day palette (the website's Layl/Mushaf, the
-  background colour follows the sun), Hijri date in Amiri, armillary sphere,
+  background colour follows the sun), Hijri date in Amiri, the website's Earth (day/night line, city lights),
   countdown to the next prayer, today's times.
 - **Moon & stars** (from the openathar.org design language): the real moon
   phase as an SVG (`Moon` — terminator computed, not painted, breathing

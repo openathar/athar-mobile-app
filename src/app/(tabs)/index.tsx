@@ -1,9 +1,9 @@
 import { gregorianToHijri, formatLocalTime, moonPhaseAt } from '@openathar/athan-core-ts';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { Anywhere } from '@/components/anywhere';
-import { Falak } from '@/components/falak';
+import { Earth } from '@/components/earth';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { TwoBooks } from '@/components/two-books';
 import { Fonts } from '@/constants/theme';
@@ -11,6 +11,7 @@ import { usePhase } from '@/context/phase';
 import { useLocation } from '@/hooks/use-location';
 import { useNow } from '@/hooks/use-now';
 import { PRAYER_ORDER, formatCountdown, getNextPrayer } from '@/hooks/use-prayer';
+import { centralMeridian, declinationDeg, sunSideFor } from '@/lib/globe';
 import { LOCALE, MOON_KEYS, PRAYER_KEYS, t } from '@/lib/i18n';
 
 const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
@@ -37,7 +38,9 @@ export default function PrayerScreen() {
   const { colors, times } = usePhase();
   const { width } = useWindowDimensions();
   // Clamped at 0 because the first layout pass reports width 0 on web.
-  const sphereSize = Math.max(0, Math.min(width - 24, 420));
+  const globeSize = Math.max(0, Math.min(width - 60, 330));
+  const [spin, setSpin] = useState(0);
+  const side = sunSideFor(location.lng, now);
   const minuteMs = Math.floor(now.getTime() / 60000) * 60000;
   const offsetHours = -now.getTimezoneOffset() / 60;
   const next = getNextPrayer(now, times);
@@ -62,14 +65,13 @@ export default function PrayerScreen() {
 
       {/* The sky itself — today's sun path over this place */}
       <View style={styles.stage}>
-        <Falak
-          size={sphereSize}
-          minuteMs={minuteMs}
-          times={times}
-          lat={location.lat}
-          lng={location.lng}
-          nextKey={next.key}
-          colors={colors}
+        <Earth
+          size={globeSize}
+          centralLon={centralMeridian(now, side) + spin}
+          decl={declinationDeg(now)}
+          side={side}
+          pins={[{ lat: location.lat, lon: location.lng, color: colors.accent, size: 4.5, ring: true }]}
+          onSpin={(d) => setSpin((v) => v + d)}
         />
       </View>
 

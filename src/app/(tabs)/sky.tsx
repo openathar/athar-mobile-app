@@ -2,7 +2,7 @@ import { moonPhaseAt, nextMoonEvents } from '@openathar/athan-core-ts';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
-import { BigMoon } from '@/components/celestial';
+import { EarthMoon } from '@/components/earth-moon';
 import { HijriCalendar } from '@/components/hijri-calendar';
 import { PhaseDisc } from '@/components/phase-disc';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
@@ -23,7 +23,6 @@ export default function SkyScreen() {
   const minute = useMemo(() => new Date(Math.floor(now.getTime() / 60000) * 60000), [now]);
   const moon = useMemo(() => moonPhaseAt(minute), [minute]);
   const events = useMemo(() => nextMoonEvents(minute), [minute]);
-  const size = Math.max(0, Math.min(width - 20, 440));
   const discs = Math.floor((width - 40) / 8);
 
   const rows: [string, string][] = [
@@ -38,7 +37,7 @@ export default function SkyScreen() {
       <ScreenHeader title={IS_RTL ? undefined : t.skyTitle} titleAr={IS_RTL ? t.skyTitle : 'السماء'} subtitle={t[MOON_KEYS[moon.key] ?? 'moonNew']} />
 
       <View style={styles.moon}>
-        <BigMoon size={size} />
+        <EarthMoon width={Math.min(width - 24, 460)} />
       </View>
 
       <Card>
@@ -72,7 +71,7 @@ export default function SkyScreen() {
 }
 
 const styles = StyleSheet.create({
-  moon: { alignItems: 'center', marginTop: -10, marginBottom: -30 },
+  moon: { alignItems: 'center', marginTop: 4, marginBottom: 6 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 14 },
   k: { fontSize: 16 },
   v: { fontSize: 17 },
