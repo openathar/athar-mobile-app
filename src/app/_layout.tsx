@@ -6,12 +6,20 @@ import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { I18nManager, Platform, useColorScheme } from 'react-native';
 
 import { AlarmsProvider } from '@/context/alarms';
 import { LocationProvider } from '@/context/location';
 import { PhaseProvider } from '@/context/phase';
 import { configureNotifications } from '@/lib/alarms';
+import { IS_RTL, LOCALE } from '@/lib/i18n';
+
+// Arabic mirrors the layout: native follows the system direction; web gets it from the document.
+I18nManager.allowRTL(true);
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  document.documentElement.dir = IS_RTL ? 'rtl' : 'ltr';
+  document.documentElement.lang = LOCALE;
+}
 
 SplashScreen.preventAutoHideAsync();
 configureNotifications();

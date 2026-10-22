@@ -1,0 +1,279 @@
+/**
+ * App strings in the website's three languages. Texts are handwritten per
+ * language (not machine-translated); the Arabic should be proofread by a
+ * native reader. The language follows the device; `en` is the fallback.
+ */
+export type Locale = 'en' | 'de' | 'ar';
+
+const en = {
+  tabPrayer: 'Prayer',
+  tabQibla: 'Qibla',
+  tabSettings: 'Settings',
+
+  nextPrayer: 'Next prayer',
+  at: 'at',
+  today: 'Today',
+  anywhere: 'Anywhere',
+  anywhereHint: 'Search a city',
+  anywhereNoResult: 'No city found. Check the spelling or try the English name.',
+  anywhereOffline: 'Needs a connection to search. Cities you looked at stay below.',
+  recent: 'Recently looked at',
+  forget: 'Remove',
+  books: 'Two books',
+  booksLead: 'The verse as it was revealed, the world as it is measured.',
+  revelation: 'Revelation',
+  creation: 'Observation',
+  anotherSign: 'Another sign',
+  provenance: 'Observation text drafted with AI, reviewed by an editor. The verse is quoted from the Qur’an.',
+  arabicPending: 'The Arabic text is still waiting for a native review.',
+
+  moonNew: 'New moon',
+  moonWaxingCrescent: 'Waxing crescent',
+  moonFirstQuarter: 'First quarter',
+  moonWaxingGibbous: 'Waxing gibbous',
+  moonFull: 'Full moon',
+  moonWaningGibbous: 'Waning gibbous',
+  moonLastQuarter: 'Last quarter',
+  moonWaningCrescent: 'Waning crescent',
+
+  prFajr: 'Fajr',
+  prSunrise: 'Sunrise',
+  prDhuhr: 'Dhuhr',
+  prAsr: 'Asr',
+  prMaghrib: 'Maghrib',
+  prIsha: 'Isha',
+
+  settingsTitle: 'Settings',
+  settingsSub: 'Your alarms, your place',
+  adhanAlarms: 'Adhan alarms',
+  alarmFor: 'alarm',
+  notificationsOff: 'Notifications are off — enable them in your system settings to receive adhan alarms.',
+  place: 'Place',
+  location: 'Location',
+  change: 'Change',
+  comingNext: 'Coming next',
+  soon: 'Soon',
+  calcMethod: 'Calculation method',
+  calcMethodHint: 'Muslim World League',
+  theme: 'Theme',
+  themeHint: 'Follows the sun: night and day',
+  about: 'About',
+  aboutText: 'Athar — free, ad-free, no tracking. Built as Sadaqah Jariyah · openathar.org',
+  credit: 'Sun and moon textures: Solar System Scope, NASA data, CC BY 4.0',
+
+  qiblaTitle: 'Qibla',
+  from: 'from',
+  direction: 'Direction',
+  fromNorth: 'from true north',
+  kmToKaaba: 'km to the Kaaba',
+  kaabaLies: (deg: number) => `The Kaaba lies ${deg}° clockwise from north — the live compass needs your phone’s sensor.`,
+  holdFlat: 'Hold your phone flat to wake the compass.',
+  facing: 'You are facing the Qibla.',
+  turnRight: (deg: number) => `Turn right ${deg}°`,
+  turnLeft: (deg: number) => `Turn left ${deg}°`,
+  heading: 'heading',
+  trueNorth: 'true north',
+  magnetic: 'magnetic — may be off a few °',
+
+  locationTitle: 'Location',
+  currently: 'Currently',
+  searchCity: 'Search for a city…',
+  useCurrent: 'Use my current location',
+  results: 'Results',
+  close: 'Close',
+};
+
+type Dict = { [K in keyof typeof en]: (typeof en)[K] };
+
+const de: Dict = {
+  tabPrayer: 'Gebet',
+  tabQibla: 'Qibla',
+  tabSettings: 'Einstellungen',
+
+  nextPrayer: 'Nächstes Gebet',
+  at: 'um',
+  today: 'Heute',
+  anywhere: 'Anderswo',
+  anywhereHint: 'Stadt suchen',
+  anywhereNoResult: 'Keine Stadt gefunden. Prüf die Schreibweise oder nimm den englischen Namen.',
+  anywhereOffline: 'Zum Suchen brauchst du eine Verbindung. Städte, die du angesehen hast, bleiben unten.',
+  recent: 'Zuletzt angesehen',
+  forget: 'Entfernen',
+  books: 'Zwei Bücher',
+  booksLead: 'Der Vers, wie er offenbart wurde, und die Welt, wie sie gemessen wird.',
+  revelation: 'Offenbarung',
+  creation: 'Beobachtung',
+  anotherSign: 'Ein weiteres Zeichen',
+  provenance: 'Der Beobachtungstext wurde mit KI entworfen und redaktionell geprüft. Der Vers ist aus dem Quran zitiert.',
+  arabicPending: 'Der arabische Text wartet noch auf eine muttersprachliche Prüfung.',
+
+  moonNew: 'Neumond',
+  moonWaxingCrescent: 'Zunehmende Sichel',
+  moonFirstQuarter: 'Erstes Viertel',
+  moonWaxingGibbous: 'Zunehmender Mond',
+  moonFull: 'Vollmond',
+  moonWaningGibbous: 'Abnehmender Mond',
+  moonLastQuarter: 'Letztes Viertel',
+  moonWaningCrescent: 'Abnehmende Sichel',
+
+  prFajr: 'Fadschr',
+  prSunrise: 'Sonnenaufgang',
+  prDhuhr: 'Dhuhr',
+  prAsr: 'Asr',
+  prMaghrib: 'Maghrib',
+  prIsha: 'Ischa',
+
+  settingsTitle: 'Einstellungen',
+  settingsSub: 'Deine Alarme, dein Ort',
+  adhanAlarms: 'Adhan-Alarme',
+  alarmFor: 'Alarm',
+  notificationsOff: 'Benachrichtigungen sind aus — schalte sie in den Systemeinstellungen ein, um Adhan-Alarme zu erhalten.',
+  place: 'Ort',
+  location: 'Standort',
+  change: 'Ändern',
+  comingNext: 'Kommt bald',
+  soon: 'Bald',
+  calcMethod: 'Berechnungsmethode',
+  calcMethodHint: 'Muslim World League',
+  theme: 'Darstellung',
+  themeHint: 'Folgt der Sonne: Nacht und Tag',
+  about: 'Über Athar',
+  aboutText: 'Athar — kostenlos, ohne Werbung, ohne Tracking. Gebaut als Sadaqah Jariyah · openathar.org',
+  credit: 'Sonnen- und Mondtexturen: Solar System Scope, NASA-Daten, CC BY 4.0',
+
+  qiblaTitle: 'Qibla',
+  from: 'von',
+  direction: 'Richtung',
+  fromNorth: 'von geografisch Nord',
+  kmToKaaba: 'km bis zur Kaaba',
+  kaabaLies: (deg) => `Die Kaaba liegt ${deg}° im Uhrzeigersinn von Norden — für den Live-Kompass braucht es den Sensor deines Handys.`,
+  holdFlat: 'Halte dein Handy flach, damit der Kompass startet.',
+  facing: 'Du schaust Richtung Qibla.',
+  turnRight: (deg) => `${deg}° nach rechts drehen`,
+  turnLeft: (deg) => `${deg}° nach links drehen`,
+  heading: 'Ausrichtung',
+  trueNorth: 'geografisch Nord',
+  magnetic: 'magnetisch — kann einige Grad abweichen',
+
+  locationTitle: 'Standort',
+  currently: 'Aktuell',
+  searchCity: 'Stadt suchen…',
+  useCurrent: 'Meinen aktuellen Standort nutzen',
+  results: 'Ergebnisse',
+  close: 'Schließen',
+};
+
+const ar: Dict = {
+  tabPrayer: 'الصلاة',
+  tabQibla: 'القبلة',
+  tabSettings: 'الإعدادات',
+
+  nextPrayer: 'الصلاة التالية',
+  at: 'عند',
+  today: 'اليوم',
+  anywhere: 'في أي مكان',
+  anywhereHint: 'ابحث عن مدينة',
+  anywhereNoResult: 'لم نجد المدينة. تحقّق من الكتابة أو جرّب الاسم بالإنجليزية.',
+  anywhereOffline: 'يحتاج البحث إلى اتصال. المدن التي شاهدتها تبقى أدناه.',
+  recent: 'شاهدتَها مؤخرًا',
+  forget: 'إزالة',
+  books: 'كتابان',
+  booksLead: 'الآية كما أُنزلت، والعالَم كما يُقاس.',
+  revelation: 'الوحي',
+  creation: 'المشاهدة',
+  anotherSign: 'آية أخرى',
+  provenance: 'نصّ المشاهدة صيغ بمساعدة الذكاء الاصطناعي وراجعه محرّر. أما الآية فمقتبسة من القرآن.',
+  arabicPending: 'النص العربي ما زال ينتظر مراجعة من متحدّث أصلي.',
+
+  moonNew: 'المحاق',
+  moonWaxingCrescent: 'هلال متزايد',
+  moonFirstQuarter: 'التربيع الأول',
+  moonWaxingGibbous: 'أحدب متزايد',
+  moonFull: 'بدر',
+  moonWaningGibbous: 'أحدب متناقص',
+  moonLastQuarter: 'التربيع الأخير',
+  moonWaningCrescent: 'هلال متناقص',
+
+  prFajr: 'الفجر',
+  prSunrise: 'الشروق',
+  prDhuhr: 'الظهر',
+  prAsr: 'العصر',
+  prMaghrib: 'المغرب',
+  prIsha: 'العشاء',
+
+  settingsTitle: 'الإعدادات',
+  settingsSub: 'تنبيهاتك ومكانك',
+  adhanAlarms: 'تنبيهات الأذان',
+  alarmFor: 'تنبيه',
+  notificationsOff: 'الإشعارات متوقفة — فعّلها من إعدادات النظام لتصلك تنبيهات الأذان.',
+  place: 'المكان',
+  location: 'الموقع',
+  change: 'تغيير',
+  comingNext: 'قريبًا',
+  soon: 'قريبًا',
+  calcMethod: 'طريقة الحساب',
+  calcMethodHint: 'رابطة العالم الإسلامي',
+  theme: 'المظهر',
+  themeHint: 'يتبع الشمس: ليل ونهار',
+  about: 'عن أثر',
+  aboutText: 'أثر — مجاني، بلا إعلانات ولا تتبّع. بُني صدقةً جارية · openathar.org',
+  credit: 'خامات الشمس والقمر: Solar System Scope، بيانات ناسا، CC BY 4.0',
+
+  qiblaTitle: 'القبلة',
+  from: 'من',
+  direction: 'الاتجاه',
+  fromNorth: 'من الشمال الحقيقي',
+  kmToKaaba: 'كم إلى الكعبة',
+  kaabaLies: (deg) => `تقع الكعبة على ${deg}° مع عقارب الساعة من الشمال — والبوصلة الحية تحتاج إلى حسّاس هاتفك.`,
+  holdFlat: 'أمسك هاتفك أفقيًا لتبدأ البوصلة.',
+  facing: 'أنت متجه إلى القبلة.',
+  turnRight: (deg) => `استدر يمينًا ${deg}°`,
+  turnLeft: (deg) => `استدر يسارًا ${deg}°`,
+  heading: 'الاتجاه الحالي',
+  trueNorth: 'الشمال الحقيقي',
+  magnetic: 'مغناطيسي — قد يخطئ بضع درجات',
+
+  locationTitle: 'الموقع',
+  currently: 'الحالي',
+  searchCity: 'ابحث عن مدينة…',
+  useCurrent: 'استخدم موقعي الحالي',
+  results: 'النتائج',
+  close: 'إغلاق',
+};
+
+const DICTS: Record<Locale, Dict> = { en, de, ar };
+
+export function deviceLocale(): Locale {
+  try {
+    const tag = Intl.DateTimeFormat().resolvedOptions().locale.slice(0, 2).toLowerCase();
+    return tag === 'de' || tag === 'ar' ? tag : 'en';
+  } catch {
+    return 'en';
+  }
+}
+
+export const LOCALE: Locale = deviceLocale();
+export const IS_RTL = LOCALE === 'ar';
+
+/** All strings for the device language. Static for the session. */
+export const t: Dict = DICTS[LOCALE];
+
+export const PRAYER_KEYS = {
+  fajr: 'prFajr',
+  sunrise: 'prSunrise',
+  dhuhr: 'prDhuhr',
+  asr: 'prAsr',
+  maghrib: 'prMaghrib',
+  isha: 'prIsha',
+} as const;
+
+export const MOON_KEYS: Record<string, keyof Dict> = {
+  new: 'moonNew',
+  'waxing-crescent': 'moonWaxingCrescent',
+  'first-quarter': 'moonFirstQuarter',
+  'waxing-gibbous': 'moonWaxingGibbous',
+  full: 'moonFull',
+  'waning-gibbous': 'moonWaningGibbous',
+  'last-quarter': 'moonLastQuarter',
+  'waning-crescent': 'moonWaningCrescent',
+};

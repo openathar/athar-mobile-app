@@ -2,33 +2,31 @@ import { gregorianToHijri, formatLocalTime, moonPhaseAt } from '@openathar/athan
 import { useMemo } from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
+import { Anywhere } from '@/components/anywhere';
 import { Falak } from '@/components/falak';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
+import { TwoBooks } from '@/components/two-books';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import { useLocation } from '@/hooks/use-location';
 import { useNow } from '@/hooks/use-now';
 import { PRAYER_ORDER, formatCountdown, getNextPrayer } from '@/hooks/use-prayer';
+import { LOCALE, MOON_KEYS, PRAYER_KEYS, t } from '@/lib/i18n';
 
-const PRAYER_NAMES: Record<(typeof PRAYER_ORDER)[number], { en: string; ar: string }> = {
-  fajr: { en: 'Fajr', ar: 'الفجر' },
-  sunrise: { en: 'Sunrise', ar: 'الشروق' },
-  dhuhr: { en: 'Dhuhr', ar: 'الظهر' },
-  asr: { en: 'Asr', ar: 'العصر' },
-  maghrib: { en: 'Maghrib', ar: 'المغرب' },
-  isha: { en: 'Isha', ar: 'العشاء' },
+const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
+  fajr: 'الفجر',
+  sunrise: 'الشروق',
+  dhuhr: 'الظهر',
+  asr: 'العصر',
+  maghrib: 'المغرب',
+  isha: 'العشاء',
 };
 
-const MOON_NAMES: Record<string, string> = {
-  new: 'New moon',
-  'waxing-crescent': 'Waxing crescent',
-  'first-quarter': 'First quarter',
-  'waxing-gibbous': 'Waxing gibbous',
-  full: 'Full moon',
-  'waning-gibbous': 'Waning gibbous',
-  'last-quarter': 'Last quarter',
-  'waning-crescent': 'Waning crescent',
-};
+/** Latin name in the device language plus its Arabic twin (the Arabic UI shows the Arabic name once). */
+const prayerName = (key: (typeof PRAYER_ORDER)[number]) => ({
+  primary: t[PRAYER_KEYS[key]],
+  twin: LOCALE === 'ar' ? null : ARABIC_NAMES[key],
+});
 
 const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 const toArabicDigits = (value: number) => String(value).replace(/\d/g, (d) => ARABIC_DIGITS[Number(d)]);
@@ -43,17 +41,17 @@ export default function PrayerScreen() {
   const minuteMs = Math.floor(now.getTime() / 60000) * 60000;
   const offsetHours = -now.getTimezoneOffset() / 60;
   const next = getNextPrayer(now, times);
-  const nextName = PRAYER_NAMES[next.key];
+  const nextName = prayerName(next.key);
 
   const dayKey = now.toDateString();
   const header = useMemo(() => {
     const hijri = gregorianToHijri(now, 'ar');
-    const gregorian = now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+    const gregorian = now.toLocaleDateString(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
     const moon = moonPhaseAt(now);
     return {
       hijri: `${toArabicDigits(hijri.day)} ${hijri.monthName} ${toArabicDigits(hijri.year)}`,
       gregorian,
-      moon: `${MOON_NAMES[moon.key] ?? moon.key} · ${Math.round(moon.illumination * 100)}%`,
+      moon: `${t[MOON_KEYS[moon.key] ?? 'moonNew']} · ${Math.round(moon.illumination * 100)}%`,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dayKey]);
@@ -76,20 +74,22 @@ export default function PrayerScreen() {
       </View>
 
       <View style={styles.next}>
-        <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>Next prayer</Text>
+        <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>{t.nextPrayer}</Text>
         <View style={styles.nameRow}>
-          <Text style={[styles.prayerName, { color: colors.text, fontFamily: Fonts.display }]}>{nextName.en}</Text>
-          <Text style={[styles.prayerNameAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>{nextName.ar}</Text>
+          <Text style={[styles.prayerName, { color: colors.text, fontFamily: Fonts.display }]}>{nextName.primary}</Text>
+          {nextName.twin ? (
+            <Text style={[styles.prayerNameAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>{nextName.twin}</Text>
+          ) : null}
         </View>
         <Text style={[styles.countdown, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
           {formatCountdown(next.at - now.getTime())}
         </Text>
         <Text style={[styles.at, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-          at {formatLocalTime(next.at, offsetHours)}
+          {t.at} {formatLocalTime(next.at, offsetHours)}
         </Text>
       </View>
 
-      <SectionLabel>Today</SectionLabel>
+      <SectionLabel>{t.today}</SectionLabel>
       <Card>
         {PRAYER_ORDER.map((key, i) => {
           const isNext = key === next.key;
@@ -101,11 +101,13 @@ export default function PrayerScreen() {
               <View style={styles.row}>
                 <View style={styles.rowLead}>
                   <Text style={[styles.rowName, { color: tone, fontFamily: isNext ? Fonts.sansSemiBold : Fonts.sansMedium }]}>
-                    {PRAYER_NAMES[key].en}
+                    {prayerName(key).primary}
                   </Text>
-                  <Text style={[styles.rowNameAr, { color: colors.textSecondary, fontFamily: Fonts.arabic }]}>
-                    {PRAYER_NAMES[key].ar}
-                  </Text>
+                  {prayerName(key).twin ? (
+                    <Text style={[styles.rowNameAr, { color: colors.textSecondary, fontFamily: Fonts.arabic }]}>
+                      {prayerName(key).twin}
+                    </Text>
+                  ) : null}
                 </View>
                 <Text style={[styles.rowTime, { color: tone, fontFamily: Fonts.mono }]}>
                   {formatLocalTime(times[key], offsetHours)}
@@ -117,6 +119,9 @@ export default function PrayerScreen() {
       </Card>
 
       <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{header.moon}</Text>
+
+      <Anywhere />
+      <TwoBooks />
     </Screen>
   );
 }
@@ -131,6 +136,7 @@ const styles = StyleSheet.create({
   next: {
     marginTop: 4,
     gap: 2,
+    alignItems: 'flex-start',
   },
   eyebrow: {
     fontSize: 14,

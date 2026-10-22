@@ -15,18 +15,23 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
 - [ ] Check the location modal (`src/app/location.tsx`) — still a tinted box
 - [ ] Verify on a real device and in the light (day) theme on every screen
 
-## Phase 2 — Language and the missing home sections
+## Phase 2 — Language and the missing home sections (1–3 done, 4 open)
 
-1. **DE / EN / AR in the app** (it is English-only today, the site is
+1. **[done] DE / EN / AR in the app** (it is English-only today, the site is
    trilingual): strings in one dictionary, system language default, RTL
    layout (logical styles only), Arabic digits for Hijri already done.
-2. **Anywhere**: pick a city, see its prayer times, computed locally. Search
+   Strings: `src/lib/i18n.ts` (handwritten, Arabic needs a native proofread).
+   Still English: the labels on the armillary sphere (`falak.tsx`).
+2. **[done] Anywhere**: pick a city, see its prayer times, computed locally. Search
    via our own `GET https://api.openathar.org/v1/places` (returns coordinates
    and the UTC offset for a date) instead of Nominatim — no third party sees
-   the query; keep the last results for offline use.
-3. **Two books**: a verse and an observation from the bundled
-   `web/data/reflections.json` (fallback texts, offline, deterministic per day,
-   "another sign"); carry the provenance line; respect `arabicApproved`.
+   the query; the last five cities are kept for offline use (`components/anywhere.tsx`).
+   Web preview note: the API's CORS list does not include the Expo dev port;
+   native calls are unaffected.
+3. **[done] Two books**: a verse and an observation from the bundled
+   `web/data/reflections.json` (copied to `src/data/`; keep in sync when the
+   website's file changes; offline, deterministic per day, "another sign");
+   provenance line always shown, Arabic review note while `arabicApproved` is false.
 4. **Sky tab** (or section): moon phase, age, next new/full moon (already in
    `athan-core-ts`), "eight faces of one moon", upcoming Islamic dates
    (port the observance list from the API's `EventsService`, same neutral
@@ -51,7 +56,7 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
 
 ## Phase 5 — Store release
 
-- EAS Build profiles, signing, bundle id `org.openathar.app` (to confirm)
+- EAS Build profiles, signing, bundle id `org.openathar.mobile` (already set in `app.json`; confirm)
 - Icon and splash from the Athar mark; store screenshots (generated from the
   real UI, DE/EN/AR)
 - Privacy labels: no data collected, no tracking, no accounts

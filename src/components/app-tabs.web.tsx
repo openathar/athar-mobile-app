@@ -3,11 +3,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Fonts, MaxContentWidth } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
+import { t } from '@/lib/i18n';
 
 const TABS = [
-  { name: 'index', label: 'Prayer' },
-  { name: 'qibla', label: 'Qibla' },
-  { name: 'settings', label: 'Settings' },
+  { name: 'index', label: t.tabPrayer },
+  { name: 'qibla', label: t.tabQibla },
+  { name: 'settings', label: t.tabSettings },
 ] as const;
 
 /**

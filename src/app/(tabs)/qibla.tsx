@@ -17,6 +17,7 @@ import { Kaaba3D } from '@/components/kaaba3d';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { useLoop, useReducedMotion } from '@/components/sprite';
 import { Fonts } from '@/constants/theme';
+import { LOCALE, t } from '@/lib/i18n';
 import { usePhase } from '@/context/phase';
 import { useLocation } from '@/hooks/use-location';
 import { distanceKm } from '@/lib/geo';
@@ -260,16 +261,16 @@ export default function QiblaScreen() {
   if (heading === null) {
     guidance =
       Platform.OS === 'web'
-        ? `The Kaaba lies ${Math.round(bearing)}° clockwise from north — the live compass needs your phone’s sensor.`
-        : 'Hold your phone flat to wake the compass.';
+        ? t.kaabaLies(Math.round(bearing))
+        : t.holdFlat;
   } else {
-    const t = shortest(heading.deg, bearing);
-    guidance = aligned ? 'You are facing the Qibla.' : `Turn ${t > 0 ? 'right' : 'left'} ${Math.round(Math.abs(t))}°`;
+    const turn = shortest(heading.deg, bearing);
+    guidance = aligned ? t.facing : turn > 0 ? t.turnRight(Math.round(Math.abs(turn))) : t.turnLeft(Math.round(Math.abs(turn)));
   }
 
   return (
     <Screen>
-      <ScreenHeader title="Qibla" titleAr="القبلة" subtitle={`from ${location.label}`} />
+      <ScreenHeader title={LOCALE === 'ar' ? undefined : t.qiblaTitle} titleAr="القبلة" subtitle={`${t.from} ${location.label}`} />
 
       <View style={styles.compassWrap}>
         <Compass size={size} bearing={bearing} heading={heading?.deg ?? null} />
@@ -283,20 +284,20 @@ export default function QiblaScreen() {
         {guidance}
       </Text>
 
-      <SectionLabel>Direction</SectionLabel>
+      <SectionLabel>{t.direction}</SectionLabel>
       <Card>
         <View style={styles.readout}>
           <View>
             <Text style={[styles.big, { color: colors.text, fontFamily: Fonts.monoMedium }]}>{Math.round(bearing)}°</Text>
             <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-              {wind} · from true north
+              {wind} · {t.fromNorth}
             </Text>
           </View>
           <View style={styles.readoutRight}>
             <Text style={[styles.big, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
               {Math.round(km).toLocaleString()}
             </Text>
-            <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>km to the Kaaba</Text>
+            <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.kmToKaaba}</Text>
           </View>
         </View>
         {heading && (
@@ -304,10 +305,10 @@ export default function QiblaScreen() {
             <Divider />
             <View style={styles.sensorRow}>
               <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-                heading {Math.round(heading.deg)}°
+                {t.heading} {Math.round(heading.deg)}°
               </Text>
               <Text style={[styles.small, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-                {heading.source === 'true' ? 'true north' : 'magnetic — may be off a few °'}
+                {heading.source === 'true' ? t.trueNorth : t.magnetic}
               </Text>
             </View>
           </>

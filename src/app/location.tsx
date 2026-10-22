@@ -6,6 +6,7 @@ import { Card, Divider, Screen, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
 import { useLocationContext } from '@/context/location';
 import { usePhase } from '@/context/phase';
+import { LOCALE, t } from '@/lib/i18n';
 
 type SearchResult = { lat: string; lon: string; display_name: string };
 
@@ -57,18 +58,18 @@ export default function LocationScreen() {
       <View style={styles.header}>
         <View style={styles.headerText}>
           <View style={styles.titleRow}>
-            <Text style={[styles.title, { color: colors.text, fontFamily: Fonts.display }]}>Location</Text>
+            <Text style={[styles.title, { color: colors.text, fontFamily: Fonts.display }]}>{LOCALE === 'ar' ? t.locationTitle : t.locationTitle}</Text>
             <Text style={[styles.titleAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>الموقع</Text>
           </View>
           <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-            Currently {location.label}
+            {t.currently} {location.label}
           </Text>
         </View>
         <Pressable
           onPress={() => router.back()}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Close"
+          accessibilityLabel={t.close}
           style={({ pressed }) => [styles.close, { borderColor: colors.rule }, pressed && styles.pressed]}>
           <Text style={[styles.closeText, { color: colors.textSecondary }]}>✕</Text>
         </Pressable>
@@ -77,7 +78,7 @@ export default function LocationScreen() {
       <TextInput
         value={query}
         onChangeText={setQuery}
-        placeholder="Search for a city…"
+        placeholder={t.searchCity}
         placeholderTextColor={colors.textSecondary}
         autoFocus
         autoCorrect={false}
@@ -92,14 +93,14 @@ export default function LocationScreen() {
       />
 
       <Pressable onPress={useCurrent} style={({ pressed }) => pressed && styles.pressed}>
-        <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>Use my current location</Text>
+        <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.useCurrent}</Text>
       </Pressable>
 
       {searching && <ActivityIndicator color={colors.accent} style={styles.spinner} />}
 
       {results.length > 0 && (
         <>
-          <SectionLabel>Results</SectionLabel>
+          <SectionLabel>{t.results}</SectionLabel>
           <Card>
             {results.map((r, i) => (
               <View key={r.display_name}>

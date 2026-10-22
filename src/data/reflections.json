@@ -1,0 +1,451 @@
+{
+  "provenance": {
+    "draftModel": "llama3.2",
+    "draftedAt": "2026-09-13",
+    "reviewedAt": "2026-09-24",
+    "note": "Entwürfe lokal mit llama3.2 erzeugt (scripts/generate-reflections.mjs), danach redaktionell geprüft und korrigiert. Am 2026-09-24 um 16 weitere Einträge erweitert (redaktionell verfasst, Verse exakt aus der quran.com-API übernommen). ARABISCH STEHT NOCH UNTER VORBEHALT: muttersprachliche Freigabe durch Ahmad ausstehend.",
+    "arabicApproved": false
+  },
+  "entries": [
+    {
+      "verse": "36:38",
+      "field": {
+        "de": "Astronomie",
+        "en": "Astronomy",
+        "ar": "علم الفلك"
+      },
+      "fallback": {
+        "arabic": "وَٱلشَّمْسُ تَجْرِى لِمُسْتَقَرٍّ لَّهَا ۚ ذَٰلِكَ تَقْدِيرُ ٱلْعَزِيزِ ٱلْعَلِيمِ",
+        "de": "Und die Sonne läuft zu einem für sie bestimmten Aufenthaltsort. Das ist die Anordnung des Allmächtigen und Allwissenden.",
+        "en": "And the sun runs [on course] toward its stopping point. That is the determination of the Exalted in Might, the Knowing."
+      },
+      "observation": {
+        "de": "Die Sonne umkreist das Zentrum der Milchstraße einmal in etwa 225 bis 250 Millionen Jahren. Sie bewegt sich dabei mit rund 220 Kilometern pro Sekunde.",
+        "en": "The Sun completes one orbit around the centre of the Milky Way in roughly 225 to 250 million years. It travels at about 220 kilometres per second.",
+        "ar": "تُتِمّ الشمس دورة واحدة حول مركز مجرّة درب التبّانة في نحو ٢٢٥ إلى ٢٥٠ مليون سنة، وتبلغ سرعتها في ذلك زهاء ٢٢٠ كيلومتراً في الثانية."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "21:33",
+      "field": {
+        "de": "Himmelsmechanik",
+        "en": "Orbital mechanics",
+        "ar": "ميكانيكا الأجرام"
+      },
+      "fallback": {
+        "arabic": "وَهُوَ ٱلَّذِى خَلَقَ ٱلَّيْلَ وَٱلنَّهَارَ وَٱلشَّمْسَ وَٱلْقَمَرَ ۖ كُلٌّ فِى فَلَكٍ يَسْبَحُونَ",
+        "de": "Und Er ist es, Der die Nacht und den Tag, die Sonne und den Mond erschaffen hat; alles läuft in einer (jeweils eigenen) Umlaufbahn.",
+        "en": "And it is He who created the night and the day and the sun and the moon; all [heavenly bodies] in an orbit are swimming."
+      },
+      "observation": {
+        "de": "Ein Körper bleibt auf seiner Umlaufbahn, weil Bahngeschwindigkeit und Anziehungskraft des massereicheren Körpers einander ausgleichen. Wird er langsamer, fällt er nach innen; erreicht er die Fluchtgeschwindigkeit, verlässt er die Bahn.",
+        "en": "A body stays in orbit because its speed and the pull of the more massive body balance out. Too slow and it falls inward; at escape velocity it leaves the orbit altogether.",
+        "ar": "يبقى الجرم في مداره لأن سرعته وجاذبية الجرم الأكبر كتلةً تتوازنان. فإن تباطأ سقط نحو الداخل، وإن بلغ سرعة الإفلات غادر المدار."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "30:22",
+      "field": {
+        "de": "Genetik",
+        "en": "Genetics",
+        "ar": "علم الوراثة"
+      },
+      "fallback": {
+        "arabic": "وَمِنْ ءَايَـٰتِهِۦ خَلْقُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ وَٱخْتِلَـٰفُ أَلْسِنَتِكُمْ وَأَلْوَٰنِكُمْ ۚ إِنَّ فِى ذَٰلِكَ لَـَٔايَـٰتٍ لِّلْعَـٰلِمِينَ",
+        "de": "Und zu Seinen Zeichen gehört die Erschaffung der Himmel und der Erde und (auch) die Verschiedenheit eurer Sprachen und Farben. Darin sind wahrlich Zeichen für die Wissenden.",
+        "en": "And of His signs is the creation of the heavens and the earth and the diversity of your languages and your colors. Indeed in that are signs for those of knowledge."
+      },
+      "observation": {
+        "de": "Zwei beliebige Menschen stimmen in ihrer DNA zu etwa 99,9 Prozent überein. Die sichtbaren Unterschiede wie Hautfarbe oder Gesichtszüge gehen auf einen sehr kleinen Teil des verbleibenden Promilles zurück.",
+        "en": "Any two humans share about 99.9 percent of their DNA. Visible differences such as skin colour or features arise from a very small part of the remaining tenth of a percent.",
+        "ar": "يتشارك أيّ إنسانين نحو ٩٩٫٩ بالمئة من حمضهما النووي، والفروق الظاهرة كلون البشرة والملامح تنشأ من جزء ضئيل جداً مما تبقّى."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "13:28",
+      "field": {
+        "de": "Psychologie",
+        "en": "Psychology",
+        "ar": "علم النفس"
+      },
+      "fallback": {
+        "arabic": "ٱلَّذِينَ ءَامَنُوا۟ وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ ٱللَّهِ ۗ أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ",
+        "de": "(Es sind) diejenigen, die glauben und deren Herzen im Gedenken Allahs Ruhe finden. Sicherlich, im Gedenken Allahs finden die Herzen Ruhe!",
+        "en": "Those who have believed and whose hearts are assured by the remembrance of Allāh. Unquestionably, by the remembrance of Allāh hearts are assured."
+      },
+      "observation": {
+        "de": "Langsames, regelmäßiges Atmen von etwa sechs Zügen pro Minute erhöht messbar die Herzratenvariabilität. Sie gilt als Marker dafür, dass der beruhigende Teil des vegetativen Nervensystems die Führung übernimmt.",
+        "en": "Breathing slowly and regularly at about six breaths per minute measurably raises heart rate variability. That is treated as a marker of the calming branch of the autonomic nervous system taking over.",
+        "ar": "التنفّس البطيء المنتظم بمعدّل نحو ستّ مرّات في الدقيقة يرفع قياسياً تغيّر معدّل ضربات القلب، وهو مؤشّر على تولّي الشقّ المهدّئ من الجهاز العصبي الذاتي زمام الأمر."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "51:47",
+      "field": {
+        "de": "Kosmologie",
+        "en": "Cosmology",
+        "ar": "علم الكون"
+      },
+      "fallback": {
+        "arabic": "وَٱلسَّمَآءَ بَنَيْنَـٰهَا بِأَيْي۟دٍ وَإِنَّا لَمُوسِعُونَ",
+        "de": "Und den Himmel haben Wir mit Kraft aufgebaut, und Wir weiten (ihn) wahrlich (noch) aus.",
+        "en": "And the heaven We constructed with strength, and indeed, We are [its] expander."
+      },
+      "observation": {
+        "de": "Galaxien entfernen sich voneinander; das Universum dehnt sich aus. Die Expansionsrate wird mit etwa 70 Kilometern pro Sekunde pro Megaparsec Abstand gemessen.",
+        "en": "Galaxies recede from one another; the universe is expanding. The expansion rate is measured at roughly 70 kilometres per second per megaparsec of distance.",
+        "ar": "تتباعد المجرّات عن بعضها؛ فالكون يتمدّد. يُقاس معدّل التمدّد بنحو ٧٠ كيلومتراً في الثانية لكلّ ميغا فرسخ من المسافة."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "21:30",
+      "field": {
+        "de": "Kosmologie",
+        "en": "Cosmology",
+        "ar": "علم الكون"
+      },
+      "fallback": {
+        "arabic": "أَوَلَمْ يَرَ ٱلَّذِينَ كَفَرُوٓا۟ أَنَّ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضَ كَانَتَا رَتْقًا فَفَتَقْنَـٰهُمَا ۖ وَجَعَلْنَا مِنَ ٱلْمَآءِ كُلَّ شَىْءٍ حَىٍّ ۖ أَفَلَا يُؤْمِنُونَ",
+        "de": "Sehen denn diejenigen, die ungläubig sind, nicht, daß die Himmel und die Erde eine zusammenhängende Masse waren? Da haben Wir sie getrennt und aus dem Wasser alles Lebendige gemacht. Wollen sie denn nicht glauben?",
+        "en": "Have those who disbelieved not considered that the heavens and the earth were a joined entity, and then We separated them and made from water every living thing? Then will they not believe?"
+      },
+      "observation": {
+        "de": "Das beobachtbare Universum war in seinen ersten Minuten ein heißes, dichtes Plasma. Die Hintergrundstrahlung, die es heute durchdringt, stammt aus der Zeit, in der es abkühlte und durchsichtig wurde.",
+        "en": "In its first minutes the observable universe was a hot, dense plasma. The background radiation filling it today dates from the time it cooled and became transparent.",
+        "ar": "كان الكون المرصود في دقائقه الأولى بلازما حارّة كثيفة. والإشعاع الخلفي الذي يملؤه اليوم يعود إلى زمن برودته وشفافيّته."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "41:11",
+      "field": {
+        "de": "Kosmologie",
+        "en": "Cosmology",
+        "ar": "علم الكون"
+      },
+      "fallback": {
+        "arabic": "ثُمَّ ٱسْتَوَىٰٓ إِلَى ٱلسَّمَآءِ وَهِىَ دُخَانٌ فَقَالَ لَهَا وَلِلْأَرْضِ ٱئْتِيَا طَوْعًا أَوْ كَرْهًا قَالَتَآ أَتَيْنَا طَآئِعِينَ",
+        "de": "Hierauf wandte Er sich dem Himmel zu, während er noch aus Rauch bestand, und sagte dann zu ihm und zur Erde: Kommt beide her, freiwillig oder widerwillig. Sie sagten: Wir kommen in Gehorsam.",
+        "en": "Then He directed Himself to the heaven while it was smoke and said to it and to the earth, \"Come [into being], willingly or by compulsion.\" They said, \"We have come willingly.\""
+      },
+      "observation": {
+        "de": "Vor der Entstehung der ersten Sterne und Galaxien war das Universum mit einem dünnen, fast gleichmäßigen Gas aus Wasserstoff gefüllt. Aus diesem Gas bildeten sich durch die Schwerkraft die ersten Strukturen.",
+        "en": "Before the first stars and galaxies formed, the universe was filled with a thin, nearly uniform gas of hydrogen. Gravity condensed this gas into the first structures.",
+        "ar": "قبل نشوء النجوم والمجرّات الأولى، كان الكون مملوءاً بغاز هيدروجين رقيق شبه متجانس. ومن هذا الغاز تكتّلت بالجاذبية البُنى الأولى."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "67:5",
+      "field": {
+        "de": "Astronomie",
+        "en": "Astronomy",
+        "ar": "علم الفلك"
+      },
+      "fallback": {
+        "arabic": "وَلَقَدْ زَيَّنَّا ٱلسَّمَآءَ ٱلدُّنْيَا بِمَصَـٰبِيحَ وَجَعَلْنَـٰهَا رُجُومًا لِّلشَّيَـٰطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ ٱلسَّعِيرِ",
+        "de": "Wir haben ja den untersten Himmel mit Lampen geschmückt und haben sie zu Wurfgeschossen gegen die Satane gemacht. Und bereitet haben Wir für sie die Strafe der Feuerglut.",
+        "en": "And We have certainly beautified the nearest heaven with lamps [i.e., stars] and have made [from] them what is thrown at the devils and have prepared for them the punishment of the Blaze."
+      },
+      "observation": {
+        "de": "Sterne leuchten, weil in ihrem Kern Wasserstoff zu Helium fusioniert. Die Sonne wandelt dabei jede Sekunde etwa 600 Millionen Tonnen Wasserstoff um.",
+        "en": "Stars shine because hydrogen fuses into helium in their cores. The Sun converts about 600 million tonnes of hydrogen every second.",
+        "ar": "تتوهّج النجوم لأن الهيدروجين يندمج في نواتها إلى هيليوم. وتحوّل الشمس نحو ٦٠٠ مليون طنّ من الهيدروجين كلّ ثانية."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "55:19",
+      "field": {
+        "de": "Ozeanographie",
+        "en": "Oceanography",
+        "ar": "علم المحيطات"
+      },
+      "fallback": {
+        "arabic": "مَرَجَ ٱلْبَحْرَيْنِ يَلْتَقِيَانِ",
+        "de": "Er hat den beiden Meeren freien Lauf gelassen; sie treffen aufeinander,",
+        "en": "He released the two seas, meeting [one another];"
+      },
+      "observation": {
+        "de": "Wo Flüsse ins Meer münden, bleiben Süß- und Salzwasser wegen ihrer unterschiedlichen Dichte zunächst getrennt. Die Grenzschicht heißt Halokline.",
+        "en": "Where rivers enter the sea, fresh and salt water initially stay separate because of their different densities. The boundary layer is called a halocline.",
+        "ar": "حيث تصبّ الأنهار في البحر، يبقى الماء العذب والمالح منفصلين في البداية لاختلاف كثافتيهما. وتُسمّى الطبقة الفاصلة «هالوكلين»."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "24:45",
+      "field": {
+        "de": "Biologie",
+        "en": "Biology",
+        "ar": "علم الأحياء"
+      },
+      "fallback": {
+        "arabic": "وَٱللَّهُ خَلَقَ كُلَّ دَآبَّةٍ مِّن مَّآءٍ ۖ فَمِنْهُم مَّن يَمْشِى عَلَىٰ بَطْنِهِۦ وَمِنْهُم مَّن يَمْشِى عَلَىٰ رِجْلَيْنِ وَمِنْهُم مَّن يَمْشِى عَلَىٰٓ أَرْبَعٍ ۚ يَخْلُقُ ٱللَّهُ مَا يَشَآءُ ۚ إِنَّ ٱللَّهَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ",
+        "de": "Und Allah hat jedes Tier aus Wasser erschaffen. So gibt es unter ihnen solche, die auf ihrem Bauch kriechen, und solche, die auf zwei Beinen gehen, und (wieder) solche, die auf Vieren gehen. Allah erschafft, was Er will. Gewiß, Allah hat zu allem die Macht.",
+        "en": "Allāh has created every [living] creature from water. And of them are those that move on their bellies, and of them are those that walk on two legs, and of them are those that walk on four. Allāh creates what He wills. Indeed, Allāh is over all things competent."
+      },
+      "observation": {
+        "de": "Alles bekannte Leben benötigt flüssiges Wasser als Lösungsmittel für seine Biochemie. Auch Organismen, die an Land leben, führen Wasser in ihren Zellen.",
+        "en": "All known life needs liquid water as the solvent for its biochemistry. Even organisms that live on land carry water inside their cells.",
+        "ar": "جميع الكائنات الحية المعروفة تحتاج إلى الماء السائل مذيباً لكيميائها الحيوي. وحتى الكائنات التي تعيش على اليابسة تحمل الماء داخل خلاياها."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "16:68",
+      "field": {
+        "de": "Zoologie",
+        "en": "Zoology",
+        "ar": "علم الحيوان"
+      },
+      "fallback": {
+        "arabic": "وَأَوْحَىٰ رَبُّكَ إِلَى ٱلنَّحْلِ أَنِ ٱتَّخِذِى مِنَ ٱلْجِبَالِ بُيُوتًا وَمِنَ ٱلشَّجَرِ وَمِمَّا يَعْرِشُونَ",
+        "de": "Und dein Herr hat der Biene eingegeben: Nimm dir in den Bergen Häuser, in den Bäumen und in dem, was sie an Spalieren errichten.",
+        "en": "And your Lord inspired to the bee, \"Take for yourself among the mountains, houses [i.e., hives], and among the trees and [in] that which they construct."
+      },
+      "observation": {
+        "de": "Honigbienen orientieren sich am Polarisationsmuster des Himmels und am Sonnenstand. Im Schwänzeltanz übermitteln sie Artgenossen Richtung und Entfernung einer Futterquelle.",
+        "en": "Honeybees navigate by the polarisation pattern of the sky and the position of the sun. In the waggle dance they convey the direction and distance of a food source to nest mates.",
+        "ar": "يهتدي نحل العسل بنمط استقطاب السماء وموقع الشمس. وفي رقصة الاهتزاز ينقل إلى أفراد الخليّة اتجاه مصدر الغذاء وبُعده."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "23:14",
+      "field": {
+        "de": "Embryologie",
+        "en": "Embryology",
+        "ar": "علم الأجنّة"
+      },
+      "fallback": {
+        "arabic": "ثُمَّ خَلَقْنَا ٱلنُّطْفَةَ عَلَقَةً فَخَلَقْنَا ٱلْعَلَقَةَ مُضْغَةً فَخَلَقْنَا ٱلْمُضْغَةَ عِظَـٰمًا فَكَسَوْنَا ٱلْعِظَـٰمَ لَحْمًا ثُمَّ أَنشَأْنَـٰهُ خَلْقًا ءَاخَرَ ۚ فَتَبَارَكَ ٱللَّهُ أَحْسَنُ ٱلْخَـٰلِقِينَ",
+        "de": "Hierauf schufen Wir den Samentropfen zu einem Anhängsel, dann schufen Wir das Anhängsel zu einem kleinen Klumpen, dann schufen Wir den kleinen Klumpen zu Knochen, dann bekleideten Wir die Knochen mit Fleisch. Hierauf ließen Wir ihn als eine weitere Schöpfung entstehen. Segensreich ist Allah, der beste Schöpfer.",
+        "en": "Then We made the sperm-drop into a clinging clot, and We made the clot into a lump [of flesh], and We made [from] the lump, bones, and We covered the bones with flesh; then We developed him into another creation. So blessed is Allāh, the best of creators."
+      },
+      "observation": {
+        "de": "Nach der Befruchtung teilt sich die Eizelle und nistet sich in der Gebärmutterwand ein. Aus dem Zellhaufen entstehen nacheinander Gewebeschichten, Knorpel, Knochen und Muskulatur.",
+        "en": "After fertilisation the egg divides and implants in the uterine wall. From the cell cluster, tissue layers, cartilage, bone and muscle develop in sequence.",
+        "ar": "بعد الإخصاب تنقسم البويضة وتنغرس في جدار الرحم. ومن كتلة الخلايا تنشأ تباعاً طبقات الأنسجة والغضاريف والعظام والعضلات."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "39:6",
+      "field": {
+        "de": "Embryologie",
+        "en": "Embryology",
+        "ar": "علم الأجنّة"
+      },
+      "fallback": {
+        "arabic": "خَلَقَكُم مِّن نَّفْسٍ وَٰحِدَةٍ ثُمَّ جَعَلَ مِنْهَا زَوْجَهَا وَأَنزَلَ لَكُم مِّنَ ٱلْأَنْعَـٰمِ ثَمَـٰنِيَةَ أَزْوَٰجٍ ۚ يَخْلُقُكُمْ فِى بُطُونِ أُمَّهَـٰتِكُمْ خَلْقًا مِّنۢ بَعْدِ خَلْقٍ فِى ظُلُمَـٰتٍ ثَلَـٰثٍ ۚ ذَٰلِكُمُ ٱللَّهُ رَبُّكُمْ لَهُ ٱلْمُلْكُ ۖ لَآ إِلَـٰهَ إِلَّا هُوَ ۖ فَأَنَّىٰ تُصْرَفُونَ",
+        "de": "Er schuf euch aus einem einzigen Wesen, hierauf machte Er aus ihm seine Gattin. Und Er hat für euch an Vieh acht (Tiere) in Paaren herabgesandt. Er erschafft euch in den Leibern eurer Mütter, eine Schöpfung nach der anderen in dreifacher Finsternis. Dies ist doch Allah, euer Herr. Ihm gehört die Herrschaft. Es gibt keinen Gott außer Ihm. Wie laßt ihr euch also abwenden?",
+        "en": "He created you from one soul. Then He made from it its mate, and He produced for you from the grazing livestock eight mates. He creates you in the wombs of your mothers, creation after creation, within three darknesses. That is Allāh, your Lord; to Him belongs dominion. There is no deity except Him, so how are you averted?"
+      },
+      "observation": {
+        "de": "Der Embryo entwickelt sich in drei schützenden Hüllen: Bauchdecke, Gebärmutterwand und Fruchtblase. Sie umgeben ihn während der gesamten Schwangerschaft.",
+        "en": "The embryo develops within three protective layers: the abdominal wall, the uterine wall and the amniotic sac. They surround it throughout pregnancy.",
+        "ar": "يتطوّر الجنين داخل ثلاث طبقات حامية: جدار البطن، وجدار الرحم، والكيس السلوي. وهي تحيط به طوال فترة الحمل."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "75:4",
+      "field": {
+        "de": "Biometrie",
+        "en": "Biometrics",
+        "ar": "القياسات الحيوية"
+      },
+      "fallback": {
+        "arabic": "بَلَىٰ قَـٰدِرِينَ عَلَىٰٓ أَن نُّسَوِّىَ بَنَانَهُۥ",
+        "de": "Ja doch! (Wir) haben die Macht dazu, seine Fingerspitzen zurechtzuformen.",
+        "en": "Yes. [We are] Able [even] to proportion his fingertips."
+      },
+      "observation": {
+        "de": "Die Papillarlinien an den Fingerspitzen sind bei jedem Menschen einzigartig und bleiben ein Leben lang unverändert. Sie bilden sich bereits vor der Geburt.",
+        "en": "The ridge patterns on fingertips are unique to each person and remain unchanged for life. They form before birth.",
+        "ar": "الخطوط الحليمية على أطراف الأصابع فريدة لكلّ إنسان وتبقى ثابتة طوال حياته. وتتكوّن قبل الولادة."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "86:5",
+      "field": {
+        "de": "Physiologie",
+        "en": "Physiology",
+        "ar": "علم وظائف الأعضاء"
+      },
+      "fallback": {
+        "arabic": "فَلْيَنظُرِ ٱلْإِنسَـٰنُ مِمَّ خُلِقَ",
+        "de": "So soll der Mensch doch hinsehen, woraus er erschaffen ist.",
+        "en": "So let man observe from what he was created."
+      },
+      "observation": {
+        "de": "Ei- und Samenzellen entstehen in den Keimdrüsen, die beim Embryo nahe der Nieren im hinteren Bauchraum angelegt werden. Von dort wandern sie im Laufe der Entwicklung an ihren endgültigen Ort.",
+        "en": "Egg and sperm cells form in the gonads, which in the embryo develop near the kidneys in the rear of the abdominal cavity. During development they migrate to their final position.",
+        "ar": "تتكوّن البويضات والحيوانات المنوية في الغدد التناسلية التي تنشأ في الجنين قرب الكليتين في مؤخّرة التجويف البطني. ثم تنتقل أثناء النموّ إلى موضعها النهائي."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "10:5",
+      "field": {
+        "de": "Astronomie",
+        "en": "Astronomy",
+        "ar": "علم الفلك"
+      },
+      "fallback": {
+        "arabic": "هُوَ ٱلَّذِى جَعَلَ ٱلشَّمْسَ ضِيَآءً وَٱلْقَمَرَ نُورًا وَقَدَّرَهُۥ مَنَازِلَ لِتَعْلَمُوا۟ عَدَدَ ٱلسِّنِينَ وَٱلْحِسَابَ ۚ مَا خَلَقَ ٱللَّهُ ذَٰلِكَ إِلَّا بِٱلْحَقِّ ۚ يُفَصِّلُ ٱلْـَٔايَـٰتِ لِقَوْمٍ يَعْلَمُونَ",
+        "de": "Er ist es, Der die Sonne zu einer Leuchte und den Mond zu einem Licht gemacht und ihm Himmelspunkte zugemessen hat, damit ihr die Zahl der Jahre und die (Zeit)rechnung wißt. Allah hat dies ja nur in Wahrheit erschaffen. Er legt die Zeichen ausführlich dar für Leute, die Bescheid wissen.",
+        "en": "It is He who made the sun a shining light and the moon a derived light and determined for it phases - that you may know the number of years and account [of time]. Allāh has not created this except in truth. He details the signs for a people who know."
+      },
+      "observation": {
+        "de": "Der Mond leuchtet nicht selbst, sondern reflektiert Sonnenlicht. Seine Phasen entstehen dadurch, dass er die Erde in etwa 29,5 Tagen umrundet.",
+        "en": "The Moon does not shine by itself; it reflects sunlight. Its phases arise from its orbit around Earth, which takes about 29.5 days.",
+        "ar": "لا يضيء القمر بنفسه بل يعكس ضوء الشمس. وتنشأ أطواره من دورانه حول الأرض في نحو ٢٩٫٥ يوماً."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "36:40",
+      "field": {
+        "de": "Astronomie",
+        "en": "Astronomy",
+        "ar": "علم الفلك"
+      },
+      "fallback": {
+        "arabic": "لَا ٱلشَّمْسُ يَنۢبَغِى لَهَآ أَن تُدْرِكَ ٱلْقَمَرَ وَلَا ٱلَّيْلُ سَابِقُ ٱلنَّهَارِ ۚ وَكُلٌّ فِى فَلَكٍ يَسْبَحُونَ",
+        "de": "Weder ziemt es der Sonne, den Mond einzuholen, noch wird die Nacht dem Tag zuvorkommen; alle laufen in einer (jeweils eigenen) Umlaufbahn.",
+        "en": "It is not allowable [i.e., possible] for the sun to reach the moon, nor does the night overtake the day, but each, in an orbit, is swimming."
+      },
+      "observation": {
+        "de": "Sonne und Mond folgen getrennten Bahnen am Himmel, die sich nicht kreuzen. Der Wechsel von Tag und Nacht entsteht durch die Erdrotation.",
+        "en": "The Sun and the Moon follow separate paths across the sky that do not cross. The alternation of day and night results from Earth's rotation.",
+        "ar": "تتبع الشمس والقمر مسارين منفصلين في السماء لا يتقاطعان. وتناوب الليل والنهار ناتج عن دوران الأرض."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "27:88",
+      "field": {
+        "de": "Geologie",
+        "en": "Geology",
+        "ar": "علم الجيولوجيا"
+      },
+      "fallback": {
+        "arabic": "وَتَرَى ٱلْجِبَالَ تَحْسَبُهَا جَامِدَةً وَهِىَ تَمُرُّ مَرَّ ٱلسَّحَابِ ۚ صُنْعَ ٱللَّهِ ٱلَّذِىٓ أَتْقَنَ كُلَّ شَىْءٍ ۚ إِنَّهُۥ خَبِيرٌۢ بِمَا تَفْعَلُونَ",
+        "de": "Und du siehst die Berge, von denen du meinst, sie seien unbeweglich, während sie wie Wolken vorbeiziehen. - (Es ist) das Werk Allahs, Der alles sehr geschickt gemacht hat. Gewiß, Er ist Kundig dessen, was ihr tut.",
+        "en": "And you see the mountains, thinking them motionless, while they will pass as the passing of clouds. [It is] the work of Allāh, who perfected all things. Indeed, He is Aware of that which you do."
+      },
+      "observation": {
+        "de": "Die Kontinentalplatten bewegen sich mit zwei bis zehn Zentimetern pro Jahr. Die Bewegung ist über Satellitenmessungen direkt nachweisbar.",
+        "en": "The continental plates move at two to ten centimetres per year. The motion is directly measurable with satellite techniques.",
+        "ar": "تتحرّك الصفائح القارّية من ٢ إلى ١٠ سنتيمترات في السنة. وحركتها قابلة للقياس المباشر بتقنيات الأقمار الاصطناعية."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "57:25",
+      "field": {
+        "de": "Astrophysik",
+        "en": "Astrophysics",
+        "ar": "الفيزياء الفلكية"
+      },
+      "fallback": {
+        "arabic": "لَقَدْ أَرْسَلْنَا رُسُلَنَا بِٱلْبَيِّنَـٰتِ وَأَنزَلْنَا مَعَهُمُ ٱلْكِتَـٰبَ وَٱلْمِيزَانَ لِيَقُومَ ٱلنَّاسُ بِٱلْقِسْطِ ۖ وَأَنزَلْنَا ٱلْحَدِيدَ فِيهِ بَأْسٌ شَدِيدٌ وَمَنَـٰفِعُ لِلنَّاسِ وَلِيَعْلَمَ ٱللَّهُ مَن يَنصُرُهُۥ وَرُسُلَهُۥ بِٱلْغَيْبِ ۚ إِنَّ ٱللَّهَ قَوِىٌّ عَزِيزٌ",
+        "de": "Wir haben ja Unsere Gesandten mit den klaren Beweisen gesandt und mit ihnen die Schrift und die Waage herabgesandt, damit die Menschen für die Gerechtigkeit eintreten. Und Wir haben das Eisen herabgesandt. In ihm ist starke Gewalt und Nutzen für die Menschen -, damit Allah kennt, wer Ihm und Seinen Gesandten im Verborgenen hilft. Gewiß, Allah ist Stark und Allmächtig.",
+        "en": "We have already sent Our messengers with clear evidences and sent down with them the Scripture and the balance that the people may maintain [their affairs] in justice. And We sent down iron, wherein is great military might and benefits for the people, and so that Allāh may make evident those who support Him and His messengers unseen. Indeed, Allāh is Powerful and Exalted in Might."
+      },
+      "observation": {
+        "de": "Eisen entsteht in den Endstadien massereicher Sterne und bei Verschmelzungen von Neutronensternen. Das Eisen in der Erdkruste stammt aus solchen Ereignissen.",
+        "en": "Iron forms in the final stages of massive stars and in mergers of neutron stars. The iron in Earth's crust comes from such events.",
+        "ar": "يتكوّن الحديد في المراحل الأخيرة من النجوم الضخمة وعند اندماج النجوم النيوترونية. وحديد القشرة الأرضية مصدره مثل هذه الأحداث."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    },
+    {
+      "verse": "15:22",
+      "field": {
+        "de": "Meteorologie",
+        "en": "Meteorology",
+        "ar": "علم الأرصاد"
+      },
+      "fallback": {
+        "arabic": "وَأَرْسَلْنَا ٱلرِّيَـٰحَ لَوَٰقِحَ فَأَنزَلْنَا مِنَ ٱلسَّمَآءِ مَآءً فَأَسْقَيْنَـٰكُمُوهُ وَمَآ أَنتُمْ لَهُۥ بِخَـٰزِنِينَ",
+        "de": "Und Wir senden die Winde zur Befruchtung. Und Wir lassen dann vom Himmel Wasser hinabkommen und geben es euch zu trinken, doch ihr könnt es nicht (alles davon) als Vorrat lagern.",
+        "en": "And We have sent the fertilizing winds and sent down water from the sky and given you drink from it. And you are not its retainers."
+      },
+      "observation": {
+        "de": "Wind transportiert Pollen und trägt so zur Bestäubung vieler Pflanzen bei. Er bewegt auch Wolken, aus denen Niederschlag fällt.",
+        "en": "Wind carries pollen and thus contributes to the pollination of many plants. It also moves the clouds from which precipitation falls.",
+        "ar": "يحمل الريح حبوب اللقاح فيسهم في تلقيح كثير من النباتات. ويحرّك أيضاً السحب التي يتساقط منها المطر."
+      },
+      "reviewed": {
+        "by": "editorial",
+        "at": "2026-09-24"
+      }
+    }
+  ]
+}
