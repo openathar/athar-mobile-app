@@ -13,7 +13,7 @@ import Animated, {
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
-import Svg, { Defs, Path, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
 import { Fonts, type PhasePalette } from '@/constants/theme';
 import { PRAYER_ORDER, type PrayerKey } from '@/hooks/use-prayer';
@@ -517,13 +517,6 @@ function FalakScene({
       style={{ width: size, height }}>
       {/* Layer 1 — beneath the horizon */}
       <Svg width={size} height={height} viewBox={`${-ox} ${-oy} ${size} ${height}`} style={StyleSheet.absoluteFill}>
-        <Defs>
-          <RadialGradient id="falak-sky" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor={gold} stopOpacity={0.16} />
-            <Stop offset="100%" stopColor={gold} stopOpacity={0} />
-          </RadialGradient>
-        </Defs>
-        <Path d={`M${-R * 1.25} 0a${R * 1.25} ${R * 1.25} 0 1 0 ${R * 2.5} 0a${R * 1.25} ${R * 1.25} 0 1 0 ${-R * 2.5} 0`} fill="url(#falak-sky)" />
         <AnimatedPath animatedProps={meridianLower} stroke={colors.textSecondary} strokeOpacity={0.25} strokeWidth={0.8} fill="none" />
         <AnimatedPath animatedProps={axisDown} stroke={colors.textSecondary} strokeOpacity={0.3} strokeWidth={0.8} strokeDasharray="2 4" />
         <AnimatedPath animatedProps={nightProps} fill={colors.textSecondary} fillOpacity={0.22} />
@@ -535,15 +528,9 @@ function FalakScene({
       ))}
       {!model.sunAbove && <Bead {...common} H={null} size={9} color={gold} halo={gold} />}
 
-      {/* Layer 2 — the horizon as frosted glass, then everything above it */}
+      {/* Layer 2 — the horizon disc (flat, no glass), then everything above it */}
       <Svg width={size} height={height} viewBox={`${-ox} ${-oy} ${size} ${height}`} style={StyleSheet.absoluteFill}>
-        <Defs>
-          <RadialGradient id="falak-disk" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor={colors.surface} stopOpacity={0.35} />
-            <Stop offset="100%" stopColor={colors.surface} stopOpacity={0.85} />
-          </RadialGradient>
-        </Defs>
-        <Path d={staticGeo.rim} fill="url(#falak-disk)" stroke={gold} strokeOpacity={0.55} strokeWidth={1.1} />
+        <Path d={staticGeo.rim} fill={colors.surface} fillOpacity={0.6} stroke={gold} strokeOpacity={0.55} strokeWidth={1.1} />
         <AnimatedPath animatedProps={ticks} stroke={gold} strokeOpacity={0.5} strokeWidth={0.9} />
         <AnimatedPath animatedProps={qiblaLine} stroke={gold} strokeOpacity={0.45} strokeWidth={0.9} strokeDasharray="1.5 3.5" />
         <AnimatedPath animatedProps={qiblaMark} fill={gold} />

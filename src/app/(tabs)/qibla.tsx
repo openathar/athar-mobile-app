@@ -283,7 +283,7 @@ export default function QiblaScreen() {
         {guidance}
       </Text>
 
-      <SectionLabel>direction</SectionLabel>
+      <SectionLabel>Direction</SectionLabel>
       <Card>
         <View style={styles.readout}>
           <View>

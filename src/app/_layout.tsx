@@ -1,7 +1,6 @@
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
 import { JetBrainsMono_400Regular, JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
-import { Newsreader_400Regular, Newsreader_500Medium } from '@expo-google-fonts/newsreader';
-import { PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-sans';
+import { PlusJakartaSans_300Light, PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-sans';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
@@ -23,8 +22,7 @@ export default function RootLayout() {
     Amiri_700Bold,
     JetBrainsMono_400Regular,
     JetBrainsMono_500Medium,
-    Newsreader_400Regular,
-    Newsreader_500Medium,
+    PlusJakartaSans_300Light,
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
     PlusJakartaSans_600SemiBold,

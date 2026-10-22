@@ -1,29 +1,25 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { type ReactNode } from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   View,
-  useWindowDimensions,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Defs, Rect, RadialGradient as SvgRadialGradient, Stop } from 'react-native-svg';
 
-import { Celestial, SkyLight } from '@/components/celestial';
+import { Celestial } from '@/components/celestial';
 import { StarField } from '@/components/star-field';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
-import { mixHex, withAlpha } from '@/lib/color';
 
 /**
- * Every screen's frame: the real sky for this moment (computed from the
- * sun's altitude, so it moves continuously through dawn, day and dusk), the
- * light of the sun, stars that fade out as it gets light, and a scroll
- * container. One component so no screen can drift into its own palette or
- * forget to scroll again.
+ * Every screen's frame: one flat colour that follows the sun (night navy,
+ * day paper — the same two themes as openathar.org), stars that fade out as
+ * it gets light, and a scroll container. One component so no screen can
+ * drift into its own palette or forget to scroll again. No gradient, no
+ * vignette, no glow.
  */
 export function Screen({
   children,
@@ -34,34 +30,12 @@ export function Screen({
   scroll?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
 }) {
-  const { colors, sky, starOpacity } = usePhase();
-  const { width, height } = useWindowDimensions();
-
-  // A little atmospheric depth: a warm haze band low over the horizon (real
-  // skies aren't a flat two-stop blend near the ground), plus a soft
-  // vignette so the frame doesn't read as a flat rectangle of colour.
-  const [zenith, horizon] = sky;
-  const haze = mixHex(horizon, '#fff3d6', 0.14);
+  const { colors, starOpacity } = usePhase();
 
   return (
-    <View style={styles.fill}>
-      <LinearGradient
-        colors={[zenith, horizon, haze]}
-        locations={[0, 0.72, 1]}
-        style={StyleSheet.absoluteFill}
-      />
-      <Svg width={width} height={height} style={StyleSheet.absoluteFill} pointerEvents="none">
-        <Defs>
-          <SvgRadialGradient id="vignette" cx="50%" cy="38%" r="75%">
-            <Stop offset="55%" stopColor="#000" stopOpacity={0} />
-            <Stop offset="100%" stopColor="#000" stopOpacity={0.22} />
-          </SvgRadialGradient>
-        </Defs>
-        <Rect x={0} y={0} width={width} height={height} fill="url(#vignette)" />
-      </Svg>
-      <SkyLight width={width} />
+    <View style={[styles.fill, { backgroundColor: colors.background }]}>
       {starOpacity > 0 && (
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: starOpacity }]}>
+        <View pointerEvents="none" style={[styles.stars, { opacity: starOpacity }]}>
           <StarField colors={colors.stars} />
         </View>
       )}
@@ -126,27 +100,20 @@ export function ScreenHeader({
   );
 }
 
-/** Section label in the website's voice: `// label`. */
+/** Section label: plain sentence case, quiet, like the landing page's list headers. */
 export function SectionLabel({ children }: { children: ReactNode }) {
   const { colors } = usePhase();
-  return (
-    <Text style={[styles.section, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-      <Text style={{ color: colors.rule }}>{'// '}</Text>
-      {children}
-    </Text>
-  );
+  return <Text style={[styles.section, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>{children}</Text>;
 }
 
-/** Frosted surface: the phase's surface colour, a hairline edge, generous radius. */
+/**
+ * A list block: hairline above and below, no box, no radius, no tint — rows
+ * sit directly on the page like the landing page's lists.
+ */
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const { colors } = usePhase();
   return (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: withAlpha(colors.surface, 0.86), borderColor: withAlpha(colors.rule, 0.9) },
-        style,
-      ]}>
+    <View style={[styles.card, { borderColor: colors.rule }, style]}>
       {children}
     </View>
   );
@@ -159,6 +126,15 @@ export function Divider() {
 }
 
 const styles = StyleSheet.create({
+  // Stars only over the upper part (header and sphere), like the landing page's
+  // moon canvas — never behind the text.
+  stars: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 400,
+  },
   fill: {
     flex: 1,
   },
@@ -192,8 +168,8 @@ const styles = StyleSheet.create({
     columnGap: 10,
   },
   title: {
-    fontSize: 32,
-    lineHeight: 40,
+    fontSize: 34,
+    lineHeight: 42,
   },
   titleArPrimary: {
     fontSize: 26,
@@ -207,16 +183,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   section: {
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'lowercase',
-    marginTop: 26,
-    marginBottom: 10,
+    fontSize: 14,
+    marginTop: 32,
+    marginBottom: 6,
   },
   card: {
-    borderRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 18,
-    overflow: 'hidden',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 });

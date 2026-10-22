@@ -1,5 +1,12 @@
 # Redesign status & next steps
 
+> **Update 2026-10-22:** the app now follows the landing page's design
+> language — flat night/day palette, no gradient/glass/glow/boxes, light Plus
+> Jakarta Sans, hairline lists. Read `design.md` (rules) and `plan.md` (order
+> of work). The "Done" list below is history: the sky *gradient*, the
+> frosted `Card`, `SkyLight` and Newsreader are gone; the background colour
+> still follows the real sun altitude (`daylight()`).
+
 Living hand-off for the app-wide redesign (Sept/Oct 2026). Read this before
 continuing the redesign work.
 

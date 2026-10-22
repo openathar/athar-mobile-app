@@ -23,13 +23,20 @@ Optional sync only for Khatma progress/Tasbeeh (no mandatory account).
   breaks git-dep preparation and npx-spawned installs (EALLOWSCRIPTS).
   Keep it that way until npm is fixed or the package is published.
 
+## Design and plan
+
+Design contract: `docs/design.md` (same language as openathar.org: flat night/day
+palette, one gold accent, Plus Jakarta Sans light, hairline lists, no
+gradients/glass/glow/boxes). Work order: `docs/plan.md`. Screens use only
+`usePhase().colors` and the components in `src/components/screen.tsx`.
+
 ## Current state
 
 MVP with the openathar.org design language (web palette Layl/Mushaf,
-Newsreader/Plus Jakarta Sans/JetBrains Mono/Amiri, Khatam signet):
+Plus Jakarta Sans/JetBrains Mono/Amiri):
 
-- **Prayer screen**: day-phase hero (6 phases alternate between the dark
-  Layl and light Mushaf palettes, crossfade on change), Hijri date in Amiri,
+- **Prayer screen**: flat night/day palette (the website's Layl/Mushaf, the
+  background colour follows the sun), Hijri date in Amiri, armillary sphere,
   countdown to the next prayer, today's times.
 - **Moon & stars** (from the openathar.org design language): the real moon
   phase as an SVG (`Moon` — terminator computed, not painted, breathing

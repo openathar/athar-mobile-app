@@ -164,38 +164,6 @@ export function Celestial({ size = 104 }: { size?: number }) {
   );
 }
 
-/**
- * Sunlight on the screen, from the top-right corner where the sun sits: a
- * low sun throws a wide warm wash, the noon sun a tight pale one. At night
- * there is none — the sky itself carries the mood.
- */
-export function SkyLight({ width }: { width: number }) {
-  const { isDay, sunHeight } = usePhase();
-  const insets = useSafeAreaInsets();
-  if (width <= 0 || !isDay) return null;
-
-  const color = mixHex('#ff8a3d', '#fff1c1', sunHeight);
-  const strength = 0.3 - 0.14 * sunHeight;
-  const r = width * (1.2 - 0.35 * sunHeight);
-  const cx = width - 72;
-  const cy = insets.top + 52;
-
-  return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <Svg width="100%" height="100%">
-        <Defs>
-          <RadialGradient id="sky-light" cx={cx} cy={cy} r={r} gradientUnits="userSpaceOnUse">
-            <Stop offset="0%" stopColor={color} stopOpacity={strength} />
-            <Stop offset="45%" stopColor={color} stopOpacity={strength * 0.35} />
-            <Stop offset="100%" stopColor={color} stopOpacity={0} />
-          </RadialGradient>
-        </Defs>
-        <Circle cx={cx} cy={cy} r={r} fill="url(#sky-light)" />
-      </Svg>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   center: {
     alignItems: 'center',

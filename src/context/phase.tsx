@@ -1,11 +1,12 @@
 import type { PrayerTimesResult } from '@openathar/athan-core-ts';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
-import { PhaseColors, type DayPhase, type PhasePalette } from '@/constants/theme';
+import { DayPalette, NightPalette, type DayPhase, type PhasePalette } from '@/constants/theme';
+import { mixHex } from '@/lib/color';
 import { useLocationContext } from '@/context/location';
 import { useNow } from '@/hooks/use-now';
 import { getDayPhase, getTodayTimes } from '@/hooks/use-prayer';
-import { DARK_SKY_BELOW_DEG, skyGradient, starOpacity, sunAltitudeDeg } from '@/lib/sky';
+import { daylight, starOpacity, sunAltitudeDeg } from '@/lib/sky';
 
 export type PhaseState = {
   phase: DayPhase;
@@ -18,8 +19,8 @@ export type PhaseState = {
   sunAltitude: number;
   /** 0 at the horizon … 1 high in the sky — drives the sun's tint and light. */
   sunHeight: number;
-  /** [zenith, horizon] — the real sky for this moment and place. */
-  sky: [string, string];
+  /** 0 night … 1 day, from the sun's altitude — moves the flat background between the two palettes. */
+  daylight: number;
   starOpacity: number;
   /** Rounded to 20s — the resolution every consumer of the phase needs. */
   now: Date;
@@ -49,15 +50,18 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
     const phase = getDayPhase(now, times);
     const isDay = t >= times.sunrise && t < times.maghrib;
     const altitude = sunAltitudeDeg(now, location.lat, times.dhuhr);
-    const evening = t > times.dhuhr;
 
-    // Text colours follow the sky's brightness: just after sunrise the sky is
-    // still dark, and in late Asr it is already dimming — the phase alone
-    // would put dark text on a dark sky there.
-    let colors = PhaseColors[phase];
-    if (altitude < DARK_SKY_BELOW_DEG && (phase === 'sunrise' || phase === 'dhuhr' || phase === 'asr')) {
-      colors = PhaseColors[evening ? 'maghrib' : 'fajr'];
-    }
+    // Flat palette: the background moves with the sun (night -> day over the
+    // twilight band); text and accent flip at the midpoint so they never sit
+    // between the two themes.
+    const d = daylight(altitude);
+    const base = d >= 0.5 ? DayPalette : NightPalette;
+    const colors: PhasePalette = {
+      ...base,
+      background: mixHex(NightPalette.background, DayPalette.background, d),
+      surface: mixHex(NightPalette.surface, DayPalette.surface, d),
+      rule: mixHex(NightPalette.rule, DayPalette.rule, d),
+    };
 
     return {
       phase,
@@ -66,7 +70,7 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
       isDay,
       sunAltitude: altitude,
       sunHeight: Math.min(1, Math.max(0, altitude / 45)),
-      sky: skyGradient(altitude, evening),
+      daylight: d,
       starOpacity: starOpacity(altitude),
       now,
     };

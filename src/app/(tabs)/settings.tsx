@@ -33,7 +33,7 @@ export default function SettingsScreen() {
     <Screen>
       <ScreenHeader title="Settings" titleAr="الإعدادات" subtitle="Your alarms, your place" />
 
-      <SectionLabel>adhan alarms</SectionLabel>
+      <SectionLabel>Adhan alarms</SectionLabel>
       <Card>
         {PRAYER_ORDER.map((key, i) => (
           <View key={key}>
@@ -56,7 +56,7 @@ export default function SettingsScreen() {
                 value={enabled[key]}
                 onValueChange={() => toggle(key)}
                 trackColor={{ true: colors.accent, false: colors.rule }}
-                thumbColor="#ffffff"
+                thumbColor={colors.text}
                 accessibilityLabel={`${PRAYER_NAMES[key].en} alarm`}
               />
             </View>
@@ -72,7 +72,7 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      <SectionLabel>place</SectionLabel>
+      <SectionLabel>Place</SectionLabel>
       <Card>
         <Link href="/location" asChild>
           <Pressable style={({ pressed }) => pressed && styles.pressed}>
@@ -83,13 +83,13 @@ export default function SettingsScreen() {
                   {location.label}
                 </Text>
               </View>
-              <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.mono }]}>change →</Text>
+              <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>Change</Text>
             </View>
           </Pressable>
         </Link>
       </Card>
 
-      <SectionLabel>coming next</SectionLabel>
+      <SectionLabel>Coming next</SectionLabel>
       <Card>
         {SOON_ROWS.map((row, i) => (
           <View key={row.label}>
@@ -105,7 +105,7 @@ export default function SettingsScreen() {
         ))}
       </Card>
 
-      <SectionLabel>about</SectionLabel>
+      <SectionLabel>About</SectionLabel>
       <Card>
         <View style={styles.about}>
           <Text style={[styles.aboutAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>
@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
   },
   action: {
     fontSize: 12,
-    letterSpacing: 1,
   },
   note: {
     fontSize: 12,

@@ -35,11 +35,10 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
-/** Drei Stimmen wie auf der Website: serif (Newsreader), sans (Plus Jakarta
- *  Sans), mono (JetBrains Mono) — Arabisch in Amiri. */
+/** Wie die Website: Plus Jakarta Sans (Display leicht, kein Serif), JetBrains
+ *  Mono fuer Daten, Amiri fuer Arabisch. */
 export const Fonts = {
-  display: 'Newsreader_500Medium',
-  serif: 'Newsreader_400Regular',
+  display: 'PlusJakartaSans_300Light',
   sans: 'PlusJakartaSans_400Regular',
   sansMedium: 'PlusJakartaSans_500Medium',
   sansSemiBold: 'PlusJakartaSans_600SemiBold',
@@ -63,10 +62,10 @@ export const BottomTabInset = Platform.select({ ios: 50, android: 80, web: 64 })
 export const MaxContentWidth = 800;
 
 /**
- * Day-phase design: the app's palette follows the religious day
- * (Fajr → Sunrise → Dhuhr → Asr → Maghrib → Isha). The phases alternate
- * between the website's two themes — Layl (dark) at night, Mushaf (light)
- * by day — with gold/green accents from the web palette.
+ * Zwei flache Paletten, identisch mit der Landingpage: Nacht (Layl) und Tag
+ * (Mushaf). Kein Verlauf, kein Glas: Der Hintergrund ist eine Farbe, die sich
+ * mit der Sonnenhoehe vom einen zum anderen Ton bewegt (siehe context/phase).
+ * Genau ein Akzent (Gold) — Gruen bleibt dem Baum und den Wurzeln vorbehalten.
  */
 export type DayPhase = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
 
@@ -76,81 +75,36 @@ export type PhasePalette = {
   accent: string;
   text: string;
   textSecondary: string;
-  /** Two-stop gradient for the screen background. */
-  gradient: readonly [string, string];
-  /** Hairline separator color inside the phase-tinted card. */
+  /** Hairline-Linien zwischen Zeilen und Abschnitten. */
   rule: string;
+  /** Text auf einer Akzentflaeche (Buttons). */
+  onAccent: string;
   /** Moon rendering (lit disk, dark side, glow + maria tones). */
   moon: { lit: string; dark: string; glow: string; maria: string };
   /** Star-field colors: [gold, green, ink] like the web hero. */
   stars: readonly [string, string, string];
 };
 
-export const PhaseColors: Record<DayPhase, PhasePalette> = {
-  fajr: {
-    background: '#0b0f17',
-    surface: '#121a26',
-    accent: '#d4a95f',
-    text: '#e9e3d4',
-    textSecondary: '#939bab',
-    gradient: ['#0b0f17', '#1a2133'],
-    rule: '#222b3a',
-    moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#d4a95f', maria: '#b8b09c' },
-    stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
-  },
-  sunrise: {
-    background: '#faf5ea',
-    surface: '#f2ecdd',
-    accent: '#9a6f1f',
-    text: '#23261f',
-    textSecondary: '#5c6156',
-    gradient: ['#faf5ea', '#f3e7c8'],
-    rule: '#d8d0bb',
-    moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
-    stars: ['#9a6f1f', '#0d7a55', '#23261f'],
-  },
-  dhuhr: {
-    background: '#faf5ea',
-    surface: '#f2ecdd',
-    accent: '#0d7a55',
-    text: '#23261f',
-    textSecondary: '#5c6156',
-    gradient: ['#faf5ea', '#e6efe8'],
-    rule: '#d8d0bb',
-    moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
-    stars: ['#9a6f1f', '#0d7a55', '#23261f'],
-  },
-  asr: {
-    background: '#faf5ea',
-    surface: '#f2ecdd',
-    accent: '#8a6f3b',
-    text: '#23261f',
-    textSecondary: '#5c6156',
-    gradient: ['#faf5ea', '#f0e4c4'],
-    rule: '#d8d0bb',
-    moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
-    stars: ['#9a6f1f', '#0d7a55', '#23261f'],
-  },
-  maghrib: {
-    background: '#0b0f17',
-    surface: '#121a26',
-    accent: '#d4a95f',
-    text: '#e9e3d4',
-    textSecondary: '#939bab',
-    gradient: ['#0b0f17', '#2a1f18'],
-    rule: '#222b3a',
-    moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#d4a95f', maria: '#b8b09c' },
-    stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
-  },
-  isha: {
-    background: '#0b0f17',
-    surface: '#121a26',
-    accent: '#4aa583',
-    text: '#e9e3d4',
-    textSecondary: '#939bab',
-    gradient: ['#0b0f17', '#101c2b'],
-    rule: '#222b3a',
-    moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#4aa583', maria: '#b8b09c' },
-    stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
-  },
+export const NightPalette: PhasePalette = {
+  background: '#0b0f17',
+  surface: '#0f151f',
+  accent: '#d4a95f',
+  text: '#e9e3d4',
+  textSecondary: '#98a0b0',
+  rule: '#232c3b',
+  onAccent: '#11141b',
+  moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#d4a95f', maria: '#b8b09c' },
+  stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
+};
+
+export const DayPalette: PhasePalette = {
+  background: '#faf5ea',
+  surface: '#f4eedf',
+  accent: '#9a6f1f',
+  text: '#23261f',
+  textSecondary: '#5c6156',
+  rule: '#d8d0bb',
+  onAccent: '#faf5ea',
+  moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
+  stars: ['#9a6f1f', '#0d7a55', '#23261f'],
 };

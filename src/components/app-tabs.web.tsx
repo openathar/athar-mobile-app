@@ -1,11 +1,8 @@
 import { Tabs, TabList, TabTrigger, TabSlot, type TabTriggerSlotProps, type TabListProps } from 'expo-router/ui';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Khatam } from './khatam';
-
 import { Fonts, MaxContentWidth } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
-import { withAlpha } from '@/lib/color';
 
 const TABS = [
   { name: 'index', label: 'Prayer' },
@@ -14,8 +11,8 @@ const TABS = [
 ] as const;
 
 /**
- * Web tab bar: a frosted capsule floating over the sky (screens leave room
- * for it at the bottom), in the same day-phase palette as everything else.
+ * Web tab bar: a flat strip with a hairline on top, text labels and a short
+ * mark under the active one (screens leave room for it at the bottom).
  */
 export default function AppTabs() {
   return (
@@ -37,16 +34,15 @@ export default function AppTabs() {
 export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
   const { colors } = usePhase();
   return (
-    <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
-      <View style={[styles.tabButton, isFocused && { backgroundColor: withAlpha(colors.accent, 0.16) }]}>
-        <Text
-          style={[
-            styles.tabLabel,
-            { color: isFocused ? colors.accent : colors.textSecondary, fontFamily: isFocused ? Fonts.sansSemiBold : Fonts.sansMedium },
-          ]}>
-          {children}
-        </Text>
-      </View>
+    <Pressable {...props} style={({ pressed }) => [styles.tabButton, pressed && styles.pressed]}>
+      <Text
+        style={[
+          styles.tabLabel,
+          { color: isFocused ? colors.accent : colors.textSecondary, fontFamily: isFocused ? Fonts.sansSemiBold : Fonts.sansMedium },
+        ]}>
+        {children}
+      </Text>
+      <View style={[styles.mark, { backgroundColor: isFocused ? colors.accent : 'transparent' }]} />
     </Pressable>
   );
 }
@@ -54,15 +50,8 @@ export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps
 export function CustomTabList(props: TabListProps) {
   const { colors } = usePhase();
   return (
-    <View {...props} style={styles.tabListContainer} pointerEvents="box-none">
-      <View
-        style={[
-          styles.capsule,
-          { backgroundColor: withAlpha(colors.surface, 0.9), borderColor: withAlpha(colors.rule, 0.95) },
-        ]}>
-        <Khatam size={20} color={colors.stars[0]} opacity={0.9} duration={60000} />
-        {props.children}
-      </View>
+    <View {...props} style={[styles.tabListContainer, { backgroundColor: colors.background, borderTopColor: colors.rule }]}>
+      <View style={styles.row}>{props.children}</View>
     </View>
   );
 }
@@ -73,29 +62,31 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    padding: 16,
+    borderTopWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
   },
-  capsule: {
+  row: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 6,
-    paddingLeft: 16,
-    paddingRight: 6,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
+    width: '100%',
     maxWidth: MaxContentWidth,
   },
   pressed: {
     opacity: 0.7,
   },
   tabButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 999,
+    flex: 1,
+    alignItems: 'center',
+    paddingTop: 12,
+    paddingBottom: 10,
+    gap: 6,
   },
   tabLabel: {
     fontSize: 14,
+  },
+  // A short bar under the active label — the page's only tab marker.
+  mark: {
+    width: 18,
+    height: 2,
+    borderRadius: 1,
   },
 });

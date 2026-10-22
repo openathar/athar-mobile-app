@@ -11,7 +11,7 @@ export default function AppTabs() {
   return (
     <NativeTabs
       backgroundColor={colors.background}
-      indicatorColor={withAlpha(colors.accent, 0.18)}
+      indicatorColor={withAlpha(colors.accent, 0.12)}
       iconColor={{ default: colors.textSecondary, selected: colors.accent }}
       labelStyle={{ default: { color: colors.textSecondary }, selected: { color: colors.accent } }}>
       <NativeTabs.Trigger name="index">

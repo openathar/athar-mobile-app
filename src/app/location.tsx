@@ -6,7 +6,6 @@ import { Card, Divider, Screen, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
 import { useLocationContext } from '@/context/location';
 import { usePhase } from '@/context/phase';
-import { withAlpha } from '@/lib/color';
 
 type SearchResult = { lat: string; lon: string; display_name: string };
 
@@ -85,8 +84,7 @@ export default function LocationScreen() {
         style={[
           styles.input,
           {
-            backgroundColor: withAlpha(colors.surface, 0.86),
-            borderColor: colors.rule,
+            borderBottomColor: colors.rule,
             color: colors.text,
             fontFamily: Fonts.sans,
           },
@@ -94,14 +92,14 @@ export default function LocationScreen() {
       />
 
       <Pressable onPress={useCurrent} style={({ pressed }) => pressed && styles.pressed}>
-        <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.mono }]}>◎ use my current location</Text>
+        <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>Use my current location</Text>
       </Pressable>
 
       {searching && <ActivityIndicator color={colors.accent} style={styles.spinner} />}
 
       {results.length > 0 && (
         <>
-          <SectionLabel>results</SectionLabel>
+          <SectionLabel>Results</SectionLabel>
           <Card>
             {results.map((r, i) => (
               <View key={r.display_name}>
@@ -166,17 +164,18 @@ const styles = StyleSheet.create({
   closeText: {
     fontSize: 15,
   },
+  // A single hairline underneath, like a form line on paper — no box.
   input: {
-    borderRadius: 16,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 0,
     paddingVertical: 14,
-    fontSize: 16,
-  },
+    fontSize: 22,
+    // web: no browser focus ring
+    outlineStyle: 'none',
+  } as never,
   current: {
-    fontSize: 13,
-    letterSpacing: 0.5,
-    marginTop: 16,
+    fontSize: 16,
+    marginTop: 18,
   },
   spinner: {
     marginTop: 20,

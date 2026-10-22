@@ -76,9 +76,7 @@ export default function PrayerScreen() {
       </View>
 
       <View style={styles.next}>
-        <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-          next prayer
-        </Text>
+        <Text style={[styles.eyebrow, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>Next prayer</Text>
         <View style={styles.nameRow}>
           <Text style={[styles.prayerName, { color: colors.text, fontFamily: Fonts.display }]}>{nextName.en}</Text>
           <Text style={[styles.prayerNameAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>{nextName.ar}</Text>
@@ -86,43 +84,30 @@ export default function PrayerScreen() {
         <Text style={[styles.countdown, { color: colors.text, fontFamily: Fonts.monoMedium }]}>
           {formatCountdown(next.at - now.getTime())}
         </Text>
-        <Text style={[styles.at, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+        <Text style={[styles.at, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
           at {formatLocalTime(next.at, offsetHours)}
         </Text>
       </View>
 
-      <SectionLabel>today</SectionLabel>
+      <SectionLabel>Today</SectionLabel>
       <Card>
         {PRAYER_ORDER.map((key, i) => {
           const isNext = key === next.key;
           const passed = times[key] <= now.getTime();
+          const tone = isNext ? colors.accent : passed ? colors.textSecondary : colors.text;
           return (
             <View key={key}>
               {i > 0 && <Divider />}
               <View style={styles.row}>
                 <View style={styles.rowLead}>
-                  <View
-                    style={[
-                      styles.dot,
-                      { backgroundColor: isNext ? colors.accent : passed ? colors.rule : colors.textSecondary },
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.rowName,
-                      {
-                        color: isNext ? colors.accent : passed ? colors.textSecondary : colors.text,
-                        fontFamily: isNext ? Fonts.sansSemiBold : Fonts.sansMedium,
-                      },
-                    ]}>
+                  <Text style={[styles.rowName, { color: tone, fontFamily: isNext ? Fonts.sansSemiBold : Fonts.sansMedium }]}>
                     {PRAYER_NAMES[key].en}
                   </Text>
                   <Text style={[styles.rowNameAr, { color: colors.textSecondary, fontFamily: Fonts.arabic }]}>
                     {PRAYER_NAMES[key].ar}
                   </Text>
                 </View>
-                <Text
-                  style={[styles.rowTime, { color: isNext ? colors.accent : colors.textSecondary, fontFamily: Fonts.mono }]}>
+                <Text style={[styles.rowTime, { color: tone, fontFamily: Fonts.mono }]}>
                   {formatLocalTime(times[key], offsetHours)}
                 </Text>
               </View>
@@ -131,7 +116,7 @@ export default function PrayerScreen() {
         })}
       </Card>
 
-      <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{header.moon}</Text>
+      <Text style={[styles.moonCaption, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{header.moon}</Text>
     </Screen>
   );
 }
@@ -141,67 +126,61 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: -8,
   },
+  // Left-aligned, like the landing page's hero: the name set large and light,
+  // the live countdown beneath it.
   next: {
-    alignItems: 'center',
-    marginTop: -6,
+    marginTop: 4,
+    gap: 2,
   },
   eyebrow: {
-    fontSize: 11,
-    letterSpacing: 2,
+    fontSize: 14,
   },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 12,
-    marginTop: 2,
+    flexWrap: 'wrap',
+    columnGap: 14,
+    marginTop: 4,
   },
   prayerName: {
-    fontSize: 40,
-    lineHeight: 48,
+    fontSize: 56,
+    lineHeight: 64,
+    letterSpacing: -1.5,
   },
   prayerNameAr: {
-    fontSize: 30,
-    lineHeight: 44,
+    fontSize: 34,
+    lineHeight: 50,
   },
   countdown: {
-    fontSize: 50,
-    lineHeight: 60,
-    letterSpacing: 2,
+    fontSize: 34,
+    lineHeight: 42,
+    letterSpacing: 1,
   },
   at: {
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 13,
+    alignItems: 'baseline',
+    paddingVertical: 15,
   },
   rowLead: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
     gap: 10,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
   rowName: {
-    fontSize: 16,
+    fontSize: 18,
   },
   rowNameAr: {
-    fontSize: 15,
-  },
-  rowTime: {
     fontSize: 16,
   },
+  rowTime: {
+    fontSize: 18,
+  },
   moonCaption: {
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    marginTop: 14,
+    fontSize: 14,
+    marginTop: 16,
   },
 });
