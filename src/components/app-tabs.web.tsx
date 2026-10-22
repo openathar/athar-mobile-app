@@ -8,6 +8,8 @@ import { t } from '@/lib/i18n';
 const TABS = [
   { name: 'index', label: t.tabPrayer },
   { name: 'qibla', label: t.tabQibla },
+  { name: 'sky', label: t.tabSky },
+  { name: 'feelings', label: t.tabFeelings },
   { name: 'settings', label: t.tabSettings },
 ] as const;
 
@@ -37,6 +39,8 @@ export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps
   return (
     <Pressable {...props} style={({ pressed }) => [styles.tabButton, pressed && styles.pressed]}>
       <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
         style={[
           styles.tabLabel,
           { color: isFocused ? colors.accent : colors.textSecondary, fontFamily: isFocused ? Fonts.sansSemiBold : Fonts.sansMedium },
@@ -76,13 +80,15 @@ const styles = StyleSheet.create({
   },
   tabButton: {
     flex: 1,
+    minWidth: 0,
+    paddingHorizontal: 2,
     alignItems: 'center',
     paddingTop: 12,
     paddingBottom: 10,
     gap: 6,
   },
   tabLabel: {
-    fontSize: 14,
+    fontSize: 13,
   },
   // A short bar under the active label — the page's only tab marker.
   mark: {

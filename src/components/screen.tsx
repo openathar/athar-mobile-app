@@ -1,6 +1,6 @@
-import { type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import {
-  ScrollView,
+  Animated,
   StyleSheet,
   Text,
   View,
@@ -31,23 +31,28 @@ export function Screen({
   contentStyle?: StyleProp<ViewStyle>;
 }) {
   const { colors, starOpacity } = usePhase();
+  // The stars belong to the top of the page: they fade as you scroll away from it.
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const fade = scrollY.interpolate({ inputRange: [0, 240], outputRange: [1, 0], extrapolate: 'clamp' });
 
   return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       {starOpacity > 0 && (
-        <View pointerEvents="none" style={[styles.stars, { opacity: starOpacity }]}>
+        <Animated.View pointerEvents="none" style={[styles.stars, { opacity: Animated.multiply(fade, starOpacity) }]}>
           <StarField colors={colors.stars} />
-        </View>
+        </Animated.View>
       )}
       <SafeAreaView style={styles.fill} edges={['top']}>
         {scroll ? (
-          <ScrollView
+          <Animated.ScrollView
             style={styles.fill}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+            scrollEventThrottle={16}
             contentContainerStyle={[styles.content, contentStyle]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
             {children}
-          </ScrollView>
+          </Animated.ScrollView>
         ) : (
           <View style={[styles.fill, styles.content, contentStyle]}>{children}</View>
         )}
@@ -64,10 +69,12 @@ export function ScreenHeader({
   title,
   titleAr,
   subtitle,
+  subtitleLines = 1,
 }: {
   title?: string;
   titleAr?: string;
   subtitle?: string;
+  subtitleLines?: number;
 }) {
   const { colors } = usePhase();
   return (
@@ -88,7 +95,7 @@ export function ScreenHeader({
           ) : null}
         </View>
         {subtitle ? (
-          <Text numberOfLines={1} style={[styles.subtitle, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+          <Text numberOfLines={subtitleLines} style={[styles.subtitle, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
             {subtitle}
           </Text>
         ) : null}

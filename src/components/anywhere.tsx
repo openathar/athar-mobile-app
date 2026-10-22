@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Card, Divider, SectionLabel } from '@/components/screen';
+import { BUNDLED_CITIES } from '@/data/cities';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import { LOCALE, PRAYER_KEYS, t } from '@/lib/i18n';
@@ -27,6 +28,21 @@ function offsetHoursNow(zone: string, fallback: number): number {
     // zone data missing on this runtime
   }
   return fallback;
+}
+
+const fold = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+/** Bundled cities that match the query in any of the three languages — instant and offline. */
+function localMatches(q: string): Place[] {
+  const needle = fold(q.trim());
+  return BUNDLED_CITIES.filter((c) => Object.values(c.name).some((n) => fold(n).includes(needle))).map((c) => ({
+    name: c.name[LOCALE],
+    country: c.country,
+    latitude: c.latitude,
+    longitude: c.longitude,
+    timezone: c.timezone,
+    utcOffsetHours: 0,
+  }));
 }
 
 function timesFor(place: Place) {
@@ -60,22 +76,26 @@ export function Anywhere() {
       .catch(() => {});
   }, []);
 
+  // Local matches answer at once; the server adds the rest of the world. If the
+  // server cannot be reached, nothing is shown about it — the local list stands.
   const search = useCallback(async (q: string) => {
     if (q.trim().length < 2) {
       setFound([]);
       setStatus('idle');
       return;
     }
-    setStatus('loading');
+    const local = localMatches(q);
+    setFound(local.slice(0, 5));
+    setStatus(local.length ? 'idle' : 'loading');
     try {
       const res = await fetch(`${API}/v1/places?limit=5&q=${encodeURIComponent(q.trim())}`);
       const data = (await res.json()) as { places?: Place[] };
-      const places = data.places ?? [];
-      setFound(places);
-      setStatus(places.length ? 'idle' : 'empty');
+      const remote = data.places ?? [];
+      const merged = [...local, ...remote.filter((r) => !local.some((l) => l.latitude.toFixed(1) === r.latitude.toFixed(1) && l.longitude.toFixed(1) === r.longitude.toFixed(1)))].slice(0, 6);
+      setFound(merged);
+      setStatus(merged.length ? 'idle' : 'empty');
     } catch {
-      setFound([]);
-      setStatus('offline');
+      setStatus(local.length ? 'idle' : 'empty');
     }
   }, []);
 
@@ -115,7 +135,6 @@ export function Anywhere() {
       />
 
       {status === 'empty' && <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.anywhereNoResult}</Text>}
-      {status === 'offline' && <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.anywhereOffline}</Text>}
 
       {found.length > 0 && (
         <Card style={styles.results}>

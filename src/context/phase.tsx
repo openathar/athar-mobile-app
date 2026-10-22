@@ -6,7 +6,7 @@ import { mixHex } from '@/lib/color';
 import { useLocationContext } from '@/context/location';
 import { useNow } from '@/hooks/use-now';
 import { getDayPhase, getTodayTimes } from '@/hooks/use-prayer';
-import { daylight, starOpacity, sunAltitudeDeg } from '@/lib/sky';
+import { luminance, skyColor, starOpacity, sunAltitudeDeg } from '@/lib/sky';
 
 export type PhaseState = {
   phase: DayPhase;
@@ -51,17 +51,20 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
     const isDay = t >= times.sunrise && t < times.maghrib;
     const altitude = sunAltitudeDeg(now, location.lat, times.dhuhr);
 
-    // Flat palette: the background moves with the sun (night -> day over the
-    // twilight band); text and accent flip at the midpoint so they never sit
-    // between the two themes.
-    const d = daylight(altitude);
-    const base = d >= 0.5 ? DayPalette : NightPalette;
+    // One flat page colour that follows the sun (see lib/sky.ts); light or dark
+    // ink is chosen from its luminance, so text never sits on a mid-tone it
+    // cannot read.
+    const evening = t > times.dhuhr;
+    const bg = skyColor(altitude, evening);
+    const dayInk = luminance(bg) > 0.3;
+    const base = dayInk ? DayPalette : NightPalette;
     const colors: PhasePalette = {
       ...base,
-      background: mixHex(NightPalette.background, DayPalette.background, d),
-      surface: mixHex(NightPalette.surface, DayPalette.surface, d),
-      rule: mixHex(NightPalette.rule, DayPalette.rule, d),
+      background: bg,
+      surface: mixHex(bg, base.text, 0.05),
+      rule: mixHex(bg, base.text, 0.16),
     };
+    const d = dayInk ? 1 : 0;
 
     return {
       phase,

@@ -5,7 +5,7 @@ State on 2026-10-22. The calculation, notifications and Qibla MVP exist
 follows the landing page (see `design.md`). This plan is the order of work
 to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
 
-## Phase 1 — Design alignment (done in this change)
+## Phase 1 — Design alignment (done; round 2 with Sleek on 2026-10-22: five tabs, day-follows-sun background, Sky + Feelings)
 
 - [x] Flat palette from the website (night/day), one gold accent, no gradient,
       glow, glass or boxes; background follows the real sun
@@ -32,7 +32,7 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
    `web/data/reflections.json` (copied to `src/data/`; keep in sync when the
    website's file changes; offline, deterministic per day, "another sign");
    provenance line always shown, Arabic review note while `arabicApproved` is false.
-4. **Sky tab** (or section): moon phase, age, next new/full moon (already in
+4. **[done] Sky tab**: moon phase, age, next new/full moon (already in
    `athan-core-ts`), "eight faces of one moon", upcoming Islamic dates
    (port the observance list from the API's `EventsService`, same neutral
    wording for Mawlid and Laylat al-Qadr).

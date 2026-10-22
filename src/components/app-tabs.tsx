@@ -29,6 +29,20 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="sky">
+        <NativeTabs.Trigger.Label>{t.tabSky}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="moon-waning-crescent" />}
+        />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="feelings">
+        <NativeTabs.Trigger.Label>{t.tabFeelings}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="tree-outline" />}
+        />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Label>{t.tabSettings}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon

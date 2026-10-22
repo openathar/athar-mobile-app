@@ -1,0 +1,134 @@
+{
+ "en": {
+  "title": "Feelings grow like a tree.",
+  "hint": "Tap a feeling on the tree.",
+  "counterpart": "Its counterpart",
+  "chest": "Chest · branches",
+  "belly": "Belly · roots",
+  "sideStrong": "Right side of the body · stronger",
+  "sideWeak": "Left side of the body · weaker",
+  "sideMid": "Centre",
+  "all": "All {n} feelings",
+  "count": "The map counts 135 feelings and sensors. {n} of them are here.",
+  "heart": {
+   "name": "The heart",
+   "body": "A flower in the middle of the tree, in the centre of the chest."
+  },
+  "items": [
+   {
+    "name": "Love",
+    "body": "A branch in the chest. You feel love there, not in the belly."
+   },
+   {
+    "name": "Hatred",
+    "body": "Its sensors sit in the belly, which is why it turns your stomach."
+   },
+   {
+    "name": "Fear",
+    "body": "Tied to the unknown and the future. It sits in the chest."
+   },
+   {
+    "name": "Sadness",
+    "body": "About something that already happened or was lost. It sits in the belly."
+   },
+   {
+    "name": "Trust in the unseen",
+    "body": "Faith and the feeling of safety sit in the chest, on the branches."
+   },
+   {
+    "name": "Peace",
+    "body": "Sits in the belly. When it is lost, the stomach is the first to know."
+   }
+  ],
+  "alt": "A human torso with a tree inside: roots in the belly, branches in the chest and a flower at the heart",
+  "note": "A researcher's model, not a medical claim."
+ },
+ "de": {
+  "title": "Gefühle wachsen wie ein Baum.",
+  "hint": "Tipp ein Gefühl am Baum an.",
+  "counterpart": "Sein Gegenstück",
+  "chest": "Brust · Äste",
+  "belly": "Bauch · Wurzeln",
+  "sideStrong": "Rechte Körperseite · stärker",
+  "sideWeak": "Linke Körperseite · schwächer",
+  "sideMid": "Mitte",
+  "all": "Alle {n} Gefühle",
+  "count": "Die Karte zählt 135 Gefühle und Sensoren. {n} davon sind hier.",
+  "heart": {
+   "name": "Das Herz",
+   "body": "Eine Blume in der Mitte des Baums, im Zentrum der Brust."
+  },
+  "items": [
+   {
+    "name": "Liebe",
+    "body": "Ein Ast in der Brust. Liebe spürst du dort, nicht im Bauch."
+   },
+   {
+    "name": "Hass",
+    "body": "Seine Sensoren sitzen im Bauch, darum dreht er dir den Magen um."
+   },
+   {
+    "name": "Angst",
+    "body": "Gehört zum Unbekannten und zur Zukunft. Sie sitzt in der Brust."
+   },
+   {
+    "name": "Trauer",
+    "body": "Gilt etwas, das schon geschehen oder verloren ist. Sie sitzt im Bauch."
+   },
+   {
+    "name": "Vertrauen ins Ungesehene",
+    "body": "Glaube und das Gefühl von Sicherheit sitzen in der Brust, auf den Ästen."
+   },
+   {
+    "name": "Frieden",
+    "body": "Sitzt im Bauch. Geht er verloren, merkt es der Magen zuerst."
+   }
+  ],
+  "alt": "Ein menschlicher Oberkörper mit einem Baum darin: Wurzeln im Bauch, Äste in der Brust und eine Blume am Herzen",
+  "note": "Das Modell eines Forschers, keine medizinische Aussage."
+ },
+ "ar": {
+  "title": "المشاعر شجرة.",
+  "hint": "المس شعورًا على الشجرة.",
+  "counterpart": "ما يقابله",
+  "chest": "الصدر · الأغصان",
+  "belly": "البطن · الجذور",
+  "sideStrong": "الجهة اليمنى · أقوى",
+  "sideWeak": "الجهة اليسرى · أضعف",
+  "sideMid": "الوسط",
+  "all": "كل المشاعر ({n})",
+  "count": "تضم الخريطة ١٣٥ شعورًا ومستشعرًا، وهنا {n} منها.",
+  "heart": {
+   "name": "القلب",
+   "body": "زهرة في وسط الشجرة، في منتصف الصدر."
+  },
+  "items": [
+   {
+    "name": "الحب",
+    "body": "غصن في الصدر. تشعر به هناك، لا في البطن."
+   },
+   {
+    "name": "الكراهية",
+    "body": "مستشعراتها في البطن، ولهذا تشعر بها في بطنك."
+   },
+   {
+    "name": "الخوف",
+    "body": "يرتبط بالمجهول والمستقبل، ومكانه الصدر."
+   },
+   {
+    "name": "الحزن",
+    "body": "يكون على أمر وقع وانتهى أو شيء فُقد، ومكانه البطن."
+   },
+   {
+    "name": "الإيمان بالغيب",
+    "body": "الإيمان والشعور بالأمان في الصدر، على الأغصان."
+   },
+   {
+    "name": "السلام",
+    "body": "مكانه البطن. إذا فُقد كان البطن أول من يشعر."
+   }
+  ],
+  "alt": "جسد إنسان وفي داخله شجرة: جذورها في البطن وأغصانها في الصدر وزهرة عند القلب",
+  "note": "هذا نموذج باحث، وليس ادّعاءً طبيًّا."
+ }
+}

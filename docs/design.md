@@ -1,5 +1,11 @@
 # App design — one language with openathar.org
 
+> **Round 2 (2026-10-22):** designed with Sleek (`docs/design-sleek/`, project
+> https://sleek.design/project/5FzT8ztoIVh — four screens before the trial
+> credits ran out) and built from there: five tabs (Today, Qibla, Sky,
+> Feelings, Settings), the page colour follows the day in six moods, Sky and
+> Feelings mirror the website, and everything works offline with no sign of it.
+
 The app and the landing page are one product: same night, same gold, same
 type, same quiet. This file is the contract. Change it here first.
 
@@ -100,3 +106,29 @@ Checked against the usual generated look and changed where it matched:
 3. Latin text with its Arabic twin where a prayer or term has one.
 4. Plain, active copy: name things as the person knows them ("Next prayer",
    not "Upcoming event").
+
+## Round 2 additions
+
+### The day as the background
+One flat colour moves with the real sun (`skyColor()` in `lib/sky.ts`),
+morning and evening differ: deep navy → cold blue-grey before Fajr → pale warm
+paper at sunrise → day paper → amber paper at Asr → dusky rose-brown at
+Maghrib → navy at Isha. Light or dark ink is picked from the colour's
+luminance, so text is always readable. Stars sit at the top of the page and
+fade as you scroll away from it. No gradient, no glow.
+
+### Five tabs
+Today · Qibla · Sky · Feelings · Settings. (Sleek drew a sixth tab, Calendar;
+it lives inside Sky, because iOS shows at most five tabs.) Sky = tonight's
+real moon, age, next new/full moon, "eight faces of one moon", the Hijri month
+grid and the next observances. Feelings = the website's tree, tappable.
+
+### Offline first, server invisible
+No spinners, no offline banners, no "sync" UI — ever.
+- Everything that can be computed is computed on the device: prayer times,
+  Qibla, moon, Hijri calendar, observances.
+- Content ships with the app (verses and observations, the feelings map, a
+  bundled city list); the server only *adds*: city search merges the bundled
+  matches with `api.openathar.org/v1/places` and shows the local ones first;
+  recently looked-at cities are kept.
+- If a request fails the screen simply stays as it is.

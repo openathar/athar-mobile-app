@@ -139,6 +139,18 @@ function Moon({
   );
 }
 
+/** The moon at any time of day (the Sky screen), tonight's phase laid over the real surface. */
+export function BigMoon({ size = 300 }: { size?: number }) {
+  const { colors, now } = usePhase();
+  const reduced = useReducedMotion();
+  const minuteNow = useMemo(() => new Date(Math.floor(now.getTime() / 60000) * 60000), [now]);
+  return (
+    <View accessible accessibilityRole="image" accessibilityLabel="The moon" pointerEvents="none">
+      <Moon size={size} now={minuteNow} lit={colors.moon.lit} dark={colors.moon.dark} reduced={reduced} />
+    </View>
+  );
+}
+
 /** Sun by day, moon by night — whichever is actually up. */
 export function Celestial({ size = 104 }: { size?: number }) {
   const { isDay, sunHeight, colors, now } = usePhase();
