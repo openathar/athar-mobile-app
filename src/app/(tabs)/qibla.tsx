@@ -1,7 +1,7 @@
 import { qiblaBearing } from '@openathar/athan-core-ts';
 import * as Location from 'expo-location';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
 
 import { Earth } from '@/components/earth';
@@ -9,6 +9,7 @@ import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import { useLocation } from '@/hooks/use-location';
+import { useScreenWidth } from '@/hooks/use-screen-width';
 import { midLongitude } from '@/lib/globe';
 import { distanceKm } from '@/lib/geo';
 import { IS_RTL, LOCALE, t } from '@/lib/i18n';
@@ -112,7 +113,7 @@ function Ring({ size, bearing, heading, aligned }: { size: number; bearing: numb
 export default function QiblaScreen() {
   const { location } = useLocation();
   const { colors } = usePhase();
-  const { width } = useWindowDimensions();
+  const width = useScreenWidth();
   const heading = useHeading();
   const [spin, setSpin] = useState(0);
 
@@ -190,7 +191,8 @@ export default function QiblaScreen() {
 
 const styles = StyleSheet.create({
   stage: { alignItems: 'center', marginTop: 8 },
-  guidance: { textAlign: 'center', fontSize: 16, lineHeight: 23, marginTop: 14, paddingHorizontal: 12 },
+  // Left-aligned like every other sentence in the app, on the same rail as the list below.
+  guidance: { fontSize: 16, lineHeight: 23, marginTop: 14 },
   readout: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16 },
   readoutRight: { alignItems: 'flex-end' },
   big: { fontSize: 30, lineHeight: 36 },

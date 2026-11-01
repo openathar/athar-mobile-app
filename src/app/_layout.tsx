@@ -11,6 +11,7 @@ import { I18nManager, Platform, useColorScheme } from 'react-native';
 import { AlarmsProvider } from '@/context/alarms';
 import { LocationProvider } from '@/context/location';
 import { PhaseProvider } from '@/context/phase';
+import { SettingsProvider } from '@/context/settings';
 import { configureNotifications } from '@/lib/alarms';
 import { IS_RTL, LOCALE } from '@/lib/i18n';
 
@@ -46,14 +47,17 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <LocationProvider>
-        <PhaseProvider>
-          <AlarmsProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="location" options={{ presentation: 'modal' }} />
-            </Stack>
-          </AlarmsProvider>
-        </PhaseProvider>
+        <SettingsProvider>
+          <PhaseProvider>
+            <AlarmsProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="location" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="method" options={{ presentation: 'modal' }} />
+              </Stack>
+            </AlarmsProvider>
+          </PhaseProvider>
+        </SettingsProvider>
       </LocationProvider>
     </ThemeProvider>
   );

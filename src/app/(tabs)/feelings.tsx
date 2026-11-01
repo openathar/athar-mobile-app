@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
 import { Screen, ScreenHeader, SectionLabel } from '@/components/screen';
@@ -7,10 +7,10 @@ import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import copyJson from '@/data/emotions-copy.json';
 import { HEART, MAP_H, MAP_W, NAVEL, TEXT_IDS, clusters, counterpartOf, placed } from '@/data/emotion-map';
+import { useScreenWidth } from '@/hooks/use-screen-width';
 import { IS_RTL, LOCALE, t } from '@/lib/i18n';
 
 const COPY = copyJson[LOCALE];
-const GREEN = '#8fd1b4';
 const VIEW = { x: -170, w: MAP_W + 340 };
 
 /**
@@ -21,7 +21,7 @@ const VIEW = { x: -170, w: MAP_W + 340 };
  */
 export default function FeelingsScreen() {
   const { colors } = usePhase();
-  const { width } = useWindowDimensions();
+  const width = useScreenWidth();
   const [shown, setShown] = useState(0);
   const [sel, setSel] = useState<string>('love');
   const w = Math.min(width - 24, 560);
@@ -56,7 +56,7 @@ export default function FeelingsScreen() {
           <Path d={`M${NAVEL.x} ${NAVEL.y}V${HEART.y}`} stroke={colors.text} strokeWidth={9} strokeLinecap="round" opacity={shown > 0 ? 1 : 0} />
           {clusters.map((c, ci) => {
             if (ci >= shown) return null;
-            const ink = c.zone === 'belly' ? GREEN : colors.text;
+            const ink = c.zone === 'belly' ? colors.green : colors.text;
             return (
               <G key={c.id}>
                 {c.stem ? <Path d={c.stem} stroke={ink} strokeWidth={3.4} strokeLinecap="round" fill="none" /> : null}

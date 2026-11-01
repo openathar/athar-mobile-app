@@ -145,3 +145,22 @@ bare moon (Sky) are gone. All three now use the website's planet:
   lit by the same sun, starting at tonight's real phase and passing through
   every phase in four minutes, in front of and behind the Earth.
 Pre-rendered sprites, no GL (`assets/images/earth/README.md`).
+
+### Round 4 — controls and the two modals (2026-11-01)
+- **Switch** (`src/components/switch.tsx`): a flat pill from the palette.
+  The platform switch brought iOS green and a shadow into a page that has
+  neither. Knob at the start when off, at the end when on — `justifyContent`,
+  not a transform, so it mirrors in RTL.
+- **Modals** (location, calculation method) share `<ModalHeader>`: same
+  title/twin/subtitle rhythm as the screens, a hairline close mark instead of
+  the sun. Titles are set at 28, not 34 — a sentence-long title ("Calculation
+  method") pushes its Arabic twin onto a line of its own at 34.
+- **Labels are not repeated**: the section says "Times", the row says
+  "Calculation method". A heading and its only row must not carry the same words.
+- **Nothing says "Soon"**: rows are either a real choice or plain information
+  ("Automatic — follows the sun: night and day").
+- **Sunrise is a time, not a prayer**: it stays in the day's list, it has no
+  alarm toggle and no adhan.
+- **Numbers get `textAlign` explicitly** in RTL: a Latin-only string such as
+  "Fajr 18° · Isha 17°" is auto-detected as LTR and would otherwise sit on the
+  wrong side of its Arabic label.

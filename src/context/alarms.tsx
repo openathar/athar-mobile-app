@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { AppState } from 'react-native';
 
 import { useLocationContext } from '@/context/location';
+import { useSettingsContext } from '@/context/settings';
 import type { PrayerKey } from '@/hooks/use-prayer';
 import {
   ALL_ALARMS_ON,
@@ -39,6 +40,7 @@ const AlarmsContext = createContext<AlarmsContextValue | null>(null);
  */
 export function AlarmsProvider({ children }: { children: ReactNode }) {
   const { location } = useLocationContext();
+  const { calculator } = useSettingsContext();
   const [enabled, setEnabled] = useState<AlarmSettings>(ALL_ALARMS_ON);
   const [permission, setPermission] = useState<AlarmPermission>('unknown');
   const [foregroundCount, setForegroundCount] = useState(0);
@@ -76,18 +78,20 @@ export function AlarmsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!loaded || permission !== 'granted') return;
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(enabled)).catch(() => {});
-    schedulePrayerAlarms(location.lat, location.lng, enabled).catch(() => {});
+    schedulePrayerAlarms(location.lat, location.lng, enabled, calculator).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, locationKey, foregroundCount, permission, loaded]);
+  }, [enabled, locationKey, foregroundCount, permission, loaded, calculator]);
 
+  // The toggle is a preference: it flips even when notifications are not
+  // permitted (the screen then shows how to enable them). Scheduling only
+  // runs once permission is granted, and again the moment it is.
   const toggle = useCallback(
     async (key: PrayerKey) => {
+      setEnabled((prev) => ({ ...prev, [key]: !prev[key] }));
       if (permission !== 'granted') {
         const granted = await ensureNotificationPermission();
         setPermission(granted ? 'granted' : 'denied');
-        if (!granted) return;
       }
-      setEnabled((prev) => ({ ...prev, [key]: !prev[key] }));
     },
     [permission]
   );

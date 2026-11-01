@@ -1,13 +1,15 @@
 import { formatLocalTime } from '@openathar/athan-core-ts';
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
+import { Switch } from '@/components/switch';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
+import { useSettingsContext, type MethodKey } from '@/context/settings';
 import { useAlarms } from '@/hooks/use-alarms';
 import { useLocation } from '@/hooks/use-location';
-import { PRAYER_ORDER } from '@/hooks/use-prayer';
+import { ALARM_PRAYERS, PRAYER_ORDER } from '@/hooks/use-prayer';
 import { LOCALE, PRAYER_KEYS, t } from '@/lib/i18n';
 
 const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
@@ -19,15 +21,20 @@ const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
   isha: 'العشاء',
 };
 
-const SOON_ROWS = [
-  { label: t.calcMethod, hint: t.calcMethodHint },
-  { label: t.theme, hint: t.themeHint },
-];
+const METHOD_NAMES: Record<MethodKey, string> = {
+  MWL: t.methodMWL,
+  ISNA: t.methodISNA,
+  EGYPT: t.methodEGYPT,
+  MAKKAH: t.methodMAKKAH,
+  KARACHI: t.methodKARACHI,
+  TEHRAN: t.methodTEHRAN,
+};
 
 export default function SettingsScreen() {
   const { colors, times, now } = usePhase();
   const { location } = useLocation();
   const { enabled, toggle, permission } = useAlarms();
+  const { method } = useSettingsContext();
   const offsetHours = -now.getTimezoneOffset() / 60;
 
   return (
@@ -36,7 +43,7 @@ export default function SettingsScreen() {
 
       <SectionLabel>{t.adhanAlarms}</SectionLabel>
       <Card>
-        {PRAYER_ORDER.map((key, i) => (
+        {ALARM_PRAYERS.map((key, i) => (
           <View key={key}>
             {i > 0 && <Divider />}
             <View style={styles.row}>
@@ -57,10 +64,8 @@ export default function SettingsScreen() {
               </View>
               <Switch
                 value={enabled[key]}
-                onValueChange={() => toggle(key)}
-                trackColor={{ true: colors.accent, false: colors.rule }}
-                thumbColor={colors.text}
-                accessibilityLabel={`${t[PRAYER_KEYS[key]]} ${t.alarmFor}`}
+                onChange={() => toggle(key)}
+                label={`${t[PRAYER_KEYS[key]]} ${t.alarmFor}`}
               />
             </View>
           </View>
@@ -92,20 +97,29 @@ export default function SettingsScreen() {
         </Link>
       </Card>
 
-      <SectionLabel>{t.comingNext}</SectionLabel>
+      <SectionLabel>{t.times}</SectionLabel>
       <Card>
-        {SOON_ROWS.map((row, i) => (
-          <View key={row.label}>
-            {i > 0 && <Divider />}
+        <Link href="/method" asChild>
+          <Pressable style={({ pressed }) => pressed && styles.pressed}>
             <View style={styles.row}>
               <View style={styles.rowText}>
-                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{row.label}</Text>
-                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{row.hint}</Text>
+                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.calcMethod}</Text>
+                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{METHOD_NAMES[method]}</Text>
               </View>
-              <Text style={[styles.action, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{t.soon}</Text>
+              <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.change}</Text>
             </View>
+          </Pressable>
+        </Link>
+      </Card>
+
+      <SectionLabel>{t.display}</SectionLabel>
+      <Card>
+        <View style={styles.row}>
+          <View style={styles.rowText}>
+            <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.automatic}</Text>
+            <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.themeHint}</Text>
           </View>
-        ))}
+        </View>
       </Card>
 
       <SectionLabel>{t.about}</SectionLabel>
@@ -117,9 +131,8 @@ export default function SettingsScreen() {
           <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
             {t.aboutText}
           </Text>
-          <Text style={[styles.credit, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
-            {t.credit}
-          </Text>
+          <Text style={[styles.creditLabel, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.creditLabel}</Text>
+          <Text style={[styles.credit, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{t.credit}</Text>
         </View>
       </Card>
     </Screen>
@@ -170,9 +183,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 34,
   },
+  creditLabel: {
+    fontSize: 12,
+  },
   credit: {
-    fontSize: 10,
-    letterSpacing: 0.5,
+    fontSize: 11,
+    letterSpacing: 0.3,
     opacity: 0.8,
   },
 });

@@ -1,6 +1,8 @@
+import { router } from 'expo-router';
 import { useRef, type ReactNode } from 'react';
 import {
   Animated,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -107,6 +109,60 @@ export function ScreenHeader({
   );
 }
 
+/**
+ * Header for the modal screens (location, calculation method): the same
+ * title/twin/subtitle rhythm as ScreenHeader, with a close mark instead of
+ * the sun or moon.
+ */
+export function ModalHeader({
+  title,
+  titleAr,
+  subtitle,
+  subtitleLines = 3,
+}: {
+  title?: string;
+  titleAr?: string;
+  subtitle?: string;
+  subtitleLines?: number;
+}) {
+  const { colors } = usePhase();
+  return (
+    <View style={styles.modalHeader}>
+      <View style={styles.headerText}>
+        <View style={styles.titleRow}>
+          {title ? (
+            <Text style={[styles.titleCompact, { color: colors.text, fontFamily: Fonts.display }]}>{title}</Text>
+          ) : null}
+          {titleAr ? (
+            <Text
+              style={[
+                title ? styles.titleArSecondary : styles.titleArPrimary,
+                { color: colors.accent, fontFamily: title ? Fonts.arabic : Fonts.arabicBold },
+              ]}>
+              {titleAr}
+            </Text>
+          ) : null}
+        </View>
+        {subtitle ? (
+          <Text
+            numberOfLines={subtitleLines}
+            style={[styles.subtitle, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+            {subtitle}
+          </Text>
+        ) : null}
+      </View>
+      <Pressable
+        onPress={() => router.back()}
+        hitSlop={12}
+        accessibilityRole="button"
+        accessibilityLabel="Close"
+        style={({ pressed }) => [styles.close, { borderColor: colors.rule }, pressed && styles.pressed]}>
+        <Text style={[styles.closeText, { color: colors.textSecondary }]}>✕</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 /** Section label: plain sentence case, quiet, like the landing page's list headers. */
 export function SectionLabel({ children }: { children: ReactNode }) {
   const { colors } = usePhase();
@@ -151,6 +207,28 @@ const styles = StyleSheet.create({
     // Clear the floating tab bar.
     paddingBottom: 120,
   },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  close: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeText: {
+    fontSize: 15,
+  },
+  pressed: {
+    opacity: 0.6,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -162,11 +240,11 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
-  // The halo/corona extends past the body; let it bleed into the margins
-  // instead of pushing the header taller.
+  // The disc may bleed into the right margin, but never above the header:
+  // the sun and moon are real spheres here, a clipped top reads as a bug.
   celestial: {
-    marginVertical: -18,
-    marginRight: -14,
+    marginVertical: -4,
+    marginRight: -10,
   },
   titleRow: {
     flexDirection: 'row',
@@ -177,6 +255,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
     lineHeight: 42,
+  },
+  // Modal titles carry a sentence ("Calculation method"), so they are set one
+  // step smaller — at 34 the twin Arabic slides onto its own line.
+  titleCompact: {
+    fontSize: 28,
+    lineHeight: 36,
   },
   titleArPrimary: {
     fontSize: 26,

@@ -1,170 +1,124 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Card, Divider, Screen, SectionLabel } from '@/components/screen';
+import { Card, Divider, ModalHeader, Screen, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
 import { useLocationContext } from '@/context/location';
 import { usePhase } from '@/context/phase';
-import { LOCALE, t } from '@/lib/i18n';
+import { IS_RTL, t } from '@/lib/i18n';
+import { bundledPlaces, searchPlaces, type Place } from '@/lib/places';
 
-type SearchResult = { lat: string; lon: string; display_name: string };
-
-const NOMINATIM = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&q=';
-
+/**
+ * Where the app prays. The lookup is our own (bundled cities first, then
+ * `api.openathar.org`) — a third-party geocoder would see every city a user
+ * searches for, which this app promises not to do.
+ */
 export default function LocationScreen() {
   const { colors } = usePhase();
   const { location, setCustom } = useLocationContext();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<Place[] | null>(null);
   const [searching, setSearching] = useState(false);
 
-  const search = useCallback(async (q: string) => {
-    if (q.trim().length < 2) {
-      setResults([]);
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) {
+      setResults(null);
+      setSearching(false);
       return;
     }
     setSearching(true);
-    try {
-      const res = await fetch(NOMINATIM + encodeURIComponent(q), {
-        headers: { 'User-Agent': 'athar-mobile-app (openathar.org)' },
-      });
-      const data = (await res.json()) as SearchResult[] | { error: string };
-      setResults(Array.isArray(data) ? data : []);
-    } catch {
-      setResults([]);
-    } finally {
+    const id = setTimeout(async () => {
+      const found = await searchPlaces(q);
+      setResults(found.places);
       setSearching(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const id = setTimeout(() => search(query), 400);
+    }, 350);
     return () => clearTimeout(id);
-  }, [query, search]);
+  }, [query]);
 
-  const pick = (r: SearchResult) => {
-    setCustom({ lat: parseFloat(r.lat), lng: parseFloat(r.lon), label: r.display_name.split(',')[0] });
-    router.back();
-  };
+  const pick = useCallback(
+    (place: Place) => {
+      setCustom({ lat: place.latitude, lng: place.longitude, label: place.name });
+      setQuery('');
+      router.back();
+    },
+    [setCustom]
+  );
 
-  const useCurrent = () => {
-    setCustom(null);
-    router.back();
-  };
+  const list = results ?? bundledPlaces();
+  const active = location.label;
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <View style={styles.headerText}>
-          <View style={styles.titleRow}>
-            <Text style={[styles.title, { color: colors.text, fontFamily: Fonts.display }]}>{LOCALE === 'ar' ? t.locationTitle : t.locationTitle}</Text>
-            <Text style={[styles.titleAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>الموقع</Text>
-          </View>
-          <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-            {t.currently} {location.label}
-          </Text>
-        </View>
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel={t.close}
-          style={({ pressed }) => [styles.close, { borderColor: colors.rule }, pressed && styles.pressed]}>
-          <Text style={[styles.closeText, { color: colors.textSecondary }]}>✕</Text>
-        </Pressable>
-      </View>
+      <ModalHeader
+        title={IS_RTL ? undefined : t.locationTitle}
+        titleAr={IS_RTL ? t.locationTitle : 'الموقع'}
+        subtitle={`${t.currently} ${location.label}`}
+      />
 
       <TextInput
         value={query}
         onChangeText={setQuery}
         placeholder={t.searchCity}
         placeholderTextColor={colors.textSecondary}
-        autoFocus
         autoCorrect={false}
         style={[
           styles.input,
-          {
-            borderBottomColor: colors.rule,
-            color: colors.text,
-            fontFamily: Fonts.sans,
-          },
+          { borderBottomColor: colors.rule, color: colors.text, fontFamily: Fonts.sans },
         ]}
       />
 
-      <Pressable onPress={useCurrent} style={({ pressed }) => pressed && styles.pressed}>
-        <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.useCurrent}</Text>
+      <Pressable
+        onPress={() => {
+          setCustom(null);
+          router.back();
+        }}
+        style={({ pressed }) => [styles.currentRow, pressed && styles.pressed]}>
+        <Text style={[styles.current, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>
+          {t.useCurrent}
+        </Text>
       </Pressable>
 
-      {searching && <ActivityIndicator color={colors.accent} style={styles.spinner} />}
+      <SectionLabel>{query.trim().length >= 2 ? t.results : t.cities}</SectionLabel>
 
-      {results.length > 0 && (
-        <>
-          <SectionLabel>{t.results}</SectionLabel>
-          <Card>
-            {results.map((r, i) => (
-              <View key={r.display_name}>
-                {i > 0 && <Divider />}
-                <Pressable onPress={() => pick(r)} style={({ pressed }) => pressed && styles.pressed}>
-                  <View style={styles.resultRow}>
-                    <Text style={[styles.resultName, { color: colors.text, fontFamily: Fonts.sansMedium }]}>
-                      {r.display_name.split(',')[0]}
-                    </Text>
-                    <Text
-                      numberOfLines={1}
-                      style={[styles.resultHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
-                      {r.display_name.split(',').slice(1).join(',').trim()}
-                    </Text>
-                  </View>
-                </Pressable>
-              </View>
-            ))}
-          </Card>
-        </>
+      {results !== null && results.length === 0 && !searching && (
+        <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+          {t.anywhereNoResult}
+        </Text>
       )}
+
+      <Card>
+        {list.map((place, i) => {
+          const isActive = place.name === active;
+          return (
+            <View key={`${place.name}-${place.country}-${place.latitude}`}>
+              {i > 0 && <Divider />}
+              <Pressable
+                onPress={() => pick(place)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isActive }}
+                style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+                <Text
+                  style={[
+                    styles.name,
+                    { color: isActive ? colors.accent : colors.text, fontFamily: isActive ? Fonts.sansMedium : Fonts.sans },
+                  ]}>
+                  {place.name}
+                </Text>
+                <Text style={[styles.country, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>
+                  {place.country}
+                </Text>
+              </Pressable>
+            </View>
+          );
+        })}
+      </Card>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginTop: 8,
-    marginBottom: 20,
-  },
-  headerText: {
-    flex: 1,
-    gap: 2,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 10,
-  },
-  title: {
-    fontSize: 32,
-    lineHeight: 40,
-  },
-  titleAr: {
-    fontSize: 24,
-    lineHeight: 36,
-  },
-  subtitle: {
-    fontSize: 13,
-  },
-  close: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: StyleSheet.hairlineWidth,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeText: {
-    fontSize: 15,
-  },
   // A single hairline underneath, like a form line on paper — no box.
   input: {
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -174,21 +128,27 @@ const styles = StyleSheet.create({
     // web: no browser focus ring
     outlineStyle: 'none',
   } as never,
+  currentRow: {
+    paddingVertical: 18,
+  },
   current: {
     fontSize: 16,
-    marginTop: 18,
   },
-  spinner: {
-    marginTop: 20,
+  note: {
+    fontSize: 14,
+    marginBottom: 10,
   },
-  resultRow: {
+  row: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: 12,
     paddingVertical: 13,
-    gap: 2,
   },
-  resultName: {
-    fontSize: 16,
+  name: {
+    fontSize: 17,
   },
-  resultHint: {
+  country: {
     fontSize: 12,
   },
   pressed: {

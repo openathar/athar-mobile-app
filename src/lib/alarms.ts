@@ -1,8 +1,8 @@
-import { Methods, PrayerTimes } from '@openathar/athan-core-ts';
+import { Methods, PrayerTimes, type Method } from '@openathar/athan-core-ts';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import { PRAYER_ORDER, type PrayerKey } from '@/hooks/use-prayer';
+import { ALARM_PRAYERS, PRAYER_ORDER, type PrayerKey } from '@/hooks/use-prayer';
 
 export type AlarmSettings = Record<PrayerKey, boolean>;
 
@@ -64,19 +64,21 @@ export const SCHEDULE_DAYS_AHEAD = 7;
  * Replace all scheduled alarms with one-shot DATE triggers for the enabled
  * prayers, computed per day for the next SCHEDULE_DAYS_AHEAD days. Per-day
  * computation matters because prayer times shift daily — a repeating DAILY
- * trigger would freeze today's times forever. Returns the scheduled count.
+ * trigger would freeze today's times forever. Sunrise is skipped: it is a
+ * marker in the list, not a prayer with an adhan. Returns the scheduled count.
  * Web is a no-op (notifications are native-only).
  */
 export async function schedulePrayerAlarms(
   lat: number,
   lng: number,
   enabled: AlarmSettings,
+  method: Method = Methods.MWL,
   now: Date = new Date(),
 ): Promise<number> {
   if (Platform.OS === 'web') return 0;
   await Notifications.cancelAllScheduledNotificationsAsync().catch(() => {});
   const nowMs = now.getTime();
-  const calculator = new PrayerTimes(Methods.MWL);
+  const calculator = new PrayerTimes(method);
   let scheduled = 0;
   for (let offset = 0; offset < SCHEDULE_DAYS_AHEAD; offset++) {
     const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
@@ -87,7 +89,7 @@ export async function schedulePrayerAlarms(
       lat,
       lng,
     );
-    for (const key of PRAYER_ORDER) {
+    for (const key of ALARM_PRAYERS) {
       if (!enabled[key]) continue;
       const at = times[key];
       if (at <= nowMs) continue;

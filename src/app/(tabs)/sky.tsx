@@ -1,6 +1,6 @@
 import { moonPhaseAt, nextMoonEvents } from '@openathar/athan-core-ts';
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { EarthMoon } from '@/components/earth-moon';
 import { HijriCalendar } from '@/components/hijri-calendar';
@@ -9,6 +9,7 @@ import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import { FACES, daysUntilFraction } from '@/lib/lunation';
+import { useScreenWidth } from '@/hooks/use-screen-width';
 import { IS_RTL, MOON_KEYS, t } from '@/lib/i18n';
 
 /**
@@ -18,7 +19,7 @@ import { IS_RTL, MOON_KEYS, t } from '@/lib/i18n';
  */
 export default function SkyScreen() {
   const { colors, now } = usePhase();
-  const { width } = useWindowDimensions();
+  const width = useScreenWidth();
   const [face, setFace] = useState<number | null>(null);
   const minute = useMemo(() => new Date(Math.floor(now.getTime() / 60000) * 60000), [now]);
   const moon = useMemo(() => moonPhaseAt(minute), [minute]);

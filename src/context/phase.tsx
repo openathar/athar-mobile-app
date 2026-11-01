@@ -1,6 +1,8 @@
 import type { PrayerTimesResult } from '@openathar/athan-core-ts';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
+import { useSettingsContext } from '@/context/settings';
+
 import { DayPalette, NightPalette, type DayPhase, type PhasePalette } from '@/constants/theme';
 import { mixHex } from '@/lib/color';
 import { useLocationContext } from '@/context/location';
@@ -37,12 +39,13 @@ const PhaseContext = createContext<PhaseState | null>(null);
 export function PhaseProvider({ children }: { children: ReactNode }) {
   const now = useNow(20_000);
   const { location } = useLocationContext();
+  const { calculator } = useSettingsContext();
   const dayKey = now.toDateString();
 
   const times = useMemo(
-    () => getTodayTimes(now, location.lat, location.lng),
+    () => getTodayTimes(now, location.lat, location.lng, calculator),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dayKey, location.lat, location.lng]
+    [dayKey, location.lat, location.lng, calculator]
   );
 
   const value = useMemo<PhaseState>(() => {

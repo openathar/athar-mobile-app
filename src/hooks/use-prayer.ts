@@ -1,14 +1,23 @@
-import { Methods, PrayerTimes, type PrayerTimesResult } from '@openathar/athan-core-ts';
+import { Methods, PrayerTimes, type Method, type PrayerTimesResult } from '@openathar/athan-core-ts';
 
 import type { DayPhase } from '@/constants/theme';
 
 export const PRAYER_ORDER = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
 export type PrayerKey = (typeof PRAYER_ORDER)[number];
 
+/**
+ * The five prayers an adhan can announce. Sunrise is on the list above
+ * because it is a time people want to see, but it is a marker, not a
+ * prayer — no alarm, no adhan.
+ */
+export const ALARM_PRAYERS = PRAYER_ORDER.filter((key) => key !== 'sunrise') as ReadonlyArray<
+  Exclude<PrayerKey, 'sunrise'>
+>;
+
 const DAY_MS = 86_400_000;
 
-export function getTodayTimes(now: Date, lat: number, lng: number): PrayerTimesResult {
-  return new PrayerTimes(Methods.MWL).getTimes(
+export function getTodayTimes(now: Date, lat: number, lng: number, method: Method = Methods.MWL): PrayerTimesResult {
+  return new PrayerTimes(method).getTimes(
     now.getFullYear(),
     now.getMonth() + 1,
     now.getDate(),

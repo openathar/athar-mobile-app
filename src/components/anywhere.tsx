@@ -1,54 +1,29 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PrayerTimes, Methods, formatLocalTime } from '@openathar/athan-core-ts';
+import { PrayerTimes, formatLocalTime, type Method } from '@openathar/athan-core-ts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Card, Divider, SectionLabel } from '@/components/screen';
-import { BUNDLED_CITIES } from '@/data/cities';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
+import { useSettingsContext } from '@/context/settings';
 import { LOCALE, PRAYER_KEYS, t } from '@/lib/i18n';
+import { matchLocal, offsetHoursNow, searchPlaces, type Place } from '@/lib/places';
 
-/** Our own city lookup (GeoNames data, no third-party geocoder sees the query). */
-const API = 'https://api.openathar.org';
 const STORAGE_KEY = 'athar.anywhere.v1';
 const ORDER = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
 
-type Place = { name: string; country: string; latitude: number; longitude: number; timezone: string; utcOffsetHours: number };
-
-/** The place's UTC offset right now, from its IANA zone (daylight saving included); falls back to the stored one. */
-function offsetHoursNow(zone: string, fallback: number): number {
-  try {
-    const part = new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'longOffset' })
-      .formatToParts(new Date())
-      .find((p) => p.type === 'timeZoneName')?.value;
-    const m = part?.match(/GMT([+-])(\d{2}):(\d{2})/);
-    if (m) return (m[1] === '-' ? -1 : 1) * (Number(m[2]) + Number(m[3]) / 60);
-  } catch {
-    // zone data missing on this runtime
-  }
-  return fallback;
-}
-
-const fold = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-/** Bundled cities that match the query in any of the three languages — instant and offline. */
-function localMatches(q: string): Place[] {
-  const needle = fold(q.trim());
-  return BUNDLED_CITIES.filter((c) => Object.values(c.name).some((n) => fold(n).includes(needle))).map((c) => ({
-    name: c.name[LOCALE],
-    country: c.country,
-    latitude: c.latitude,
-    longitude: c.longitude,
-    timezone: c.timezone,
-    utcOffsetHours: 0,
-  }));
-}
-
-function timesFor(place: Place) {
+/** Today's times at the place, in the app's calculation method, as wall-clock times there. */
+function timesFor(place: Place, method: Method) {
   const offset = offsetHoursNow(place.timezone, place.utcOffsetHours);
   const local = new Date(Date.now() + offset * 3_600_000);
-  const result = new PrayerTimes(Methods.MWL).getTimes(local.getUTCFullYear(), local.getUTCMonth() + 1, local.getUTCDate(), place.latitude, place.longitude);
+  const result = new PrayerTimes(method).getTimes(
+    local.getUTCFullYear(),
+    local.getUTCMonth() + 1,
+    local.getUTCDate(),
+    place.latitude,
+    place.longitude
+  );
   return { offset, result };
 }
 
@@ -59,6 +34,7 @@ function timesFor(place: Place) {
  */
 export function Anywhere() {
   const { colors } = usePhase();
+  const { calculator } = useSettingsContext();
   const [query, setQuery] = useState('');
   const [found, setFound] = useState<Place[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'empty' | 'offline'>('idle');
@@ -84,19 +60,12 @@ export function Anywhere() {
       setStatus('idle');
       return;
     }
-    const local = localMatches(q);
-    setFound(local.slice(0, 5));
+    const local = matchLocal(q);
+    setFound(local);
     setStatus(local.length ? 'idle' : 'loading');
-    try {
-      const res = await fetch(`${API}/v1/places?limit=5&q=${encodeURIComponent(q.trim())}`);
-      const data = (await res.json()) as { places?: Place[] };
-      const remote = data.places ?? [];
-      const merged = [...local, ...remote.filter((r) => !local.some((l) => l.latitude.toFixed(1) === r.latitude.toFixed(1) && l.longitude.toFixed(1) === r.longitude.toFixed(1)))].slice(0, 6);
-      setFound(merged);
-      setStatus(merged.length ? 'idle' : 'empty');
-    } catch {
-      setStatus(local.length ? 'idle' : 'empty');
-    }
+    const { places, remoteFailed } = await searchPlaces(q);
+    setFound(places);
+    setStatus(places.length ? 'idle' : remoteFailed && !local.length ? 'offline' : 'empty');
   }, []);
 
   useEffect(() => {
@@ -120,11 +89,12 @@ export function Anywhere() {
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
   };
 
-  const shown = useMemo(() => (selected ? timesFor(selected) : null), [selected]);
+  const shown = useMemo(() => (selected ? timesFor(selected, calculator) : null), [selected, calculator]);
 
   return (
     <View>
       <SectionLabel>{t.anywhere}</SectionLabel>
+      <Text style={[styles.lead, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.anywhereLead}</Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
@@ -135,6 +105,7 @@ export function Anywhere() {
       />
 
       {status === 'empty' && <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.anywhereNoResult}</Text>}
+      {status === 'offline' && <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.anywhereOffline}</Text>}
 
       {found.length > 0 && (
         <Card style={styles.results}>
@@ -189,6 +160,7 @@ export function Anywhere() {
 }
 
 const styles = StyleSheet.create({
+  lead: { fontSize: 13, marginBottom: 2 },
   input: { borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 12, fontSize: 18, outlineStyle: 'none' } as never,
   note: { fontSize: 14, marginTop: 10 },
   results: { marginTop: 6 },

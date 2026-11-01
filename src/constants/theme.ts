@@ -77,6 +77,8 @@ export type PhasePalette = {
   textSecondary: string;
   /** Hairline-Linien zwischen Zeilen und Abschnitten. */
   rule: string;
+  /** The one green: the feelings tree's roots (the website's tree colour). */
+  green: string;
   /** Text auf einer Akzentflaeche (Buttons). */
   onAccent: string;
   /** Moon rendering (lit disk, dark side, glow + maria tones). */
@@ -92,6 +94,7 @@ export const NightPalette: PhasePalette = {
   text: '#e9e3d4',
   textSecondary: '#98a0b0',
   rule: '#232c3b',
+  green: '#4aa583',
   onAccent: '#11141b',
   moon: { lit: '#e9e3d4', dark: '#39445c', glow: '#d4a95f', maria: '#b8b09c' },
   stars: ['#d4a95f', '#4aa583', '#e9e3d4'],
@@ -104,6 +107,7 @@ export const DayPalette: PhasePalette = {
   text: '#23261f',
   textSecondary: '#5c6156',
   rule: '#d8d0bb',
+  green: '#0d7a55',
   onAccent: '#faf5ea',
   moon: { lit: '#efe6cf', dark: '#d6cdb2', glow: '#9a6f1f', maria: '#c9bfa4' },
   stars: ['#9a6f1f', '#0d7a55', '#23261f'],

@@ -1,6 +1,6 @@
 # Mobile app — plan
 
-State on 2026-10-22. The calculation, notifications and Qibla MVP exist
+State on 2026-11-01. The calculation, notifications and Qibla MVP exist
 (Expo SDK 57, offline-first, `@openathar/athan-core-ts`); the design now
 follows the landing page (see `design.md`). This plan is the order of work
 to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
@@ -12,16 +12,23 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
 - [x] Plus Jakarta Sans light display; Newsreader dropped
 - [x] Home, Qibla and Settings restyled through the shared components;
       flat tab strip (web) / matching native tabs
-- [ ] Check the location modal (`src/app/location.tsx`) — still a tinted box
-- [ ] Verify on a real device and in the light (day) theme on every screen
+- [x] Location modal rebuilt on the shared components: hairline lists, the
+      bundled cities when the field is empty, the active place in accent. The
+      lookup is our own (`lib/places.ts`, shared with "Anywhere") — Nominatim
+      is gone, so no third party sees a city a user searches for.
+- [x] Day theme checked on every screen in the browser (`?at=12:00`): page
+      colour, ink, switches, the feelings tree's roots (now `colors.green`
+      instead of a night-only hex) and the sun/moon in the header (no longer
+      clipped at the top edge).
+- [ ] Verify on a real device (Phase 3)
 
-## Phase 2 — Language and the missing home sections (1–3 done, 4 open)
+## Phase 2 — Language and the missing home sections (done)
 
 1. **[done] DE / EN / AR in the app** (it is English-only today, the site is
    trilingual): strings in one dictionary, system language default, RTL
    layout (logical styles only), Arabic digits for Hijri already done.
-   Strings: `src/lib/i18n.ts` (handwritten, Arabic needs a native proofread).
-   Still English: the labels on the armillary sphere (`falak.tsx`).
+   Strings: `src/lib/i18n.ts` (handwritten, Arabic needs a native proofread —
+   the two-book provenance note is the main open item, see `redesign-status.md`).
 2. **[done] Anywhere**: pick a city, see its prayer times, computed locally. Search
    via our own `GET https://api.openathar.org/v1/places` (returns coordinates
    and the UTC offset for a date) instead of Nominatim — no third party sees
@@ -36,6 +43,17 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
    `athan-core-ts`), "eight faces of one moon", upcoming Islamic dates
    (port the observance list from the API's `EventsService`, same neutral
    wording for Mawlid and Laylat al-Qadr).
+
+## Phase 2b — Calculation method (done 2026-11-01)
+
+- **[done] One convention for the whole app** (`context/settings.tsx`, persisted):
+  MWL, ISNA, Egypt, Umm al-Qura, Karachi, Tehran. Prayer times, the countdown,
+  "Anywhere", the Sky times and every scheduled alarm read it from there, so a
+  change moves all of them at once. First guess comes from the device's time
+  zone (Riyadh → Umm al-Qura, Cairo → Egypt, North America → ISNA, else MWL),
+  the picker is `src/app/method.tsx` (Settings → Times).
+- **[done] Sunrise is no longer an adhan toggle**: `ALARM_PRAYERS` excludes it
+  from the Settings list and from scheduling — it is a marker, not a prayer.
 
 ## Phase 3 — Reliable on a device (blocks release)
 

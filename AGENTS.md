@@ -33,28 +33,33 @@ gradients/glass/glow/boxes). Work order: `docs/plan.md`. Screens use only
 ## Current state
 
 MVP with the openathar.org design language (web palette Layl/Mushaf,
-Plus Jakarta Sans/JetBrains Mono/Amiri):
+Plus Jakarta Sans/JetBrains Mono/Amiri), five tabs: Today, Qibla, Sky,
+Feelings, Settings. The full list of what exists and what is open:
+`docs/redesign-status.md`; work order: `docs/plan.md`; the design contract:
+`docs/design.md`.
 
-- **Prayer screen**: flat night/day palette (the website's Layl/Mushaf, the
-  background colour follows the sun), Hijri date in Amiri, the website's Earth (day/night line, city lights),
-  countdown to the next prayer, today's times.
-- **Moon & stars** (from the openathar.org design language): the real moon
-  phase as an SVG (`Moon` — terminator computed, not painted, breathing
-  glow, slowly drifting maria) plus the hero twinkling star field
-  (`StarField`, 25% gold / 12% green / rest ink, static under reduced
-  motion). Phase math lives in the shared `@openathar/athan-core-ts`
-  (`moonPhaseAt`, `nextMoonEvents`), mirroring the web's `lib/moon-phase.ts`.
-- **Qibla**: compass with bearing needle + rotating Khatam center; the
-  needle tracks the device heading (magnetometer via `expo-location`
-  `watchHeadingAsync`) on native, static bearing on web.
-- **Settings**: per-prayer Adhan alarm toggles (one-shot DATE triggers
-  computed per day 7 days ahead via `schedulePrayerAlarms`, rescheduled on
-  settings/location change + app foreground, persisted via AsyncStorage,
-  never push), location picker
-  (Nominatim city search, stored in a shared `LocationProvider`).
-  Android declares `SCHEDULE_EXACT_ALARM` for exact delivery.
+- **Today**: the website's Earth (day/night line, city lights, drag to turn),
+  Hijri date, countdown to the next prayer, today's times, then "Anywhere"
+  (any city's day, computed on the device) and "Two books" (verse + observed
+  sign, bundled, offline).
+- **Qibla**: compass ring around the Earth turned so you and the Kaaba both
+  face you; the needle tracks the magnetometer on native, static on web.
+- **Sky**: tonight's real moon, age, next new/full moon, the eight faces, the
+  Hijri month grid, upcoming observances.
+- **Feelings**: the website's tree (chest branches, belly roots), tappable.
+- **Settings**: per-prayer adhan alarms (five prayers, never sunrise; one-shot
+  DATE triggers computed 7 days ahead, rescheduled on settings/location change
+  + foreground, persisted via AsyncStorage, never push), location picker,
+  calculation method, information rows. Android declares
+  `SCHEDULE_EXACT_ALARM` for exact delivery.
+- **Calculation method** (`src/context/settings.tsx`): one convention for the
+  whole app (times, countdown, Anywhere, alarms), default guessed from the
+  device time zone.
+- **City lookup** (`src/lib/places.ts`): bundled cities first, then our own
+  `api.openathar.org/v1/places` — never a third-party geocoder. Web preview
+  logs a CORS error because the API's allow-list has no Expo dev port; native
+  is unaffected.
 - Location: manual city > auto-detect > Berlin fallback.
-- Tabs: Prayer / Qibla / Settings (native tabs bottom; web tab bar bottom).
 
 Next milestones: native builds to verify location + notifications on device,
 Adhan audio, store submission.
