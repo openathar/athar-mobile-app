@@ -1,39 +1,4 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
-
-/**
- * Palette der Website openathar.org: dunkles "Layl"-Theme als Basis,
- * helles "Mushaf"-Theme. Grün ist der Akzent, Gold ist dem أثر-Wortzeichen
- * vorbehalten. Siehe web/app/globals.css.
- */
-export const Colors = {
-  light: {
-    text: '#23261f',
-    background: '#faf5ea',
-    backgroundElement: '#f2ecdd',
-    backgroundSelected: '#eae3d0',
-    textSecondary: '#5c6156',
-    accent: '#0d7a55',
-    gold: '#9a6f1f',
-    rule: '#d8d0bb',
-  },
-  dark: {
-    text: '#e9e3d4',
-    background: '#0b0f17',
-    backgroundElement: '#121a26',
-    backgroundSelected: '#1a2433',
-    textSecondary: '#939bab',
-    accent: '#4aa583',
-    gold: '#d4a95f',
-    rule: '#222b3a',
-  },
-} as const;
-
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 /** Wie die Website: Plus Jakarta Sans (Display leicht, kein Serif), JetBrains
  *  Mono fuer Daten, Amiri fuer Arabisch. */

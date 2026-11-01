@@ -1,4 +1,5 @@
 import { Tabs, TabList, TabTrigger, TabSlot, type TabTriggerSlotProps, type TabListProps } from 'expo-router/ui';
+import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Fonts, MaxContentWidth } from '@/constants/theme';
@@ -36,8 +37,12 @@ export default function AppTabs() {
 
 export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
   const { colors } = usePhase();
+  // react-native 0.88 declares `View` as a function component, so the slot's
+  // `RefAttributes<View>` no longer matches the `ReactNativeElement` ref that
+  // Pressable takes. Same object at runtime — only the ref type differs.
+  const pressable = props as ComponentProps<typeof Pressable>;
   return (
-    <Pressable {...props} style={({ pressed }) => [styles.tabButton, pressed && styles.pressed]}>
+    <Pressable {...pressable} style={({ pressed }) => [styles.tabButton, pressed && styles.pressed]}>
       <Text
         numberOfLines={1}
         adjustsFontSizeToFit

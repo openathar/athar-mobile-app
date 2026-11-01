@@ -15,7 +15,7 @@ Optional sync only for Khatma progress/Tasbeeh (no mandatory account).
 - NEVER rely on push for Adhan timing (Doze/iOS background are unreliable)
   — use local alarms/notifications (see the superproject AGENTS.md,
   "Mobile constraints" section).
-- Framework decision: **React Native / Expo** (SDK 57, expo-router native
+- Framework decision: **React Native / Expo** (SDK 58, expo-router native
   tabs). The shared calculation logic lives in `@openathar/athan-core-ts`
   (wired as `file:../core-ts`), which is also used by `athar-web`.
 - `@openathar/athan-core-ts` is a **file dependency** (`file:../core-ts`),
@@ -73,14 +73,10 @@ iOS simulator smoke (macos-15: pod install, xcodebuild Debug-iphonesimulator,
 simctl install/launch, liveness assert, screenshot). Screenshots land as
 workflow artifacts.
 
-`expo-modules-jsi` is pinned to 57.1.1 (npm overrides) and carries a
-`patches/expo-modules-jsi+57.1.1.patch`: strips `SWIFT_RETURNS_RETAINED`
-from the `RuntimeScheduler` constructors and boxes raw-pointer captures in
-`JavaScriptRuntime` host closures — both hard-error under Xcode 26.2+
-(`weak let` needs 26.2+, but its stricter sending-region analysis rejects
-the upstream `nonisolated(unsafe)` pattern; Xcode 26.1 predates `weak let`).
-Applied automatically via `postinstall: patch-package`. Re-evaluate the
-patch when Expo ships an SDK 57.x release targeting Xcode 26.2+.
+SDK 58 (RN 0.88): the former `expo-modules-jsi` 57.1.1 pin and its
+patch-package patch are gone — upstream fixed the Xcode 26 / Swift 6.2
+errors (`SWIFT_RETURNS_RETAINED` constructors, `sending` captures) in 58.x.
+`patch-package` stays in `postinstall` for future patches.
 
 Requires the repo secret **`CORE_TS_TOKEN`**: a fine-grained PAT with
 read-only Contents access on `openathar/athan-core-ts`. (Historically both
