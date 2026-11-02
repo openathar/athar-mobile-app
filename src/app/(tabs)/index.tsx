@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Anywhere } from '@/components/anywhere';
+import { DuaNow } from '@/components/dua-now';
 import { Earth } from '@/components/earth';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { TwoBooks } from '@/components/two-books';
@@ -116,6 +117,7 @@ export default function PrayerScreen() {
         })}
       </Card>
 
+      <DuaNow />
       <Anywhere />
       <TwoBooks />
     </Screen>
