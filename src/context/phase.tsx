@@ -1,7 +1,7 @@
 import type { PrayerTimesResult } from '@openathar/athan-core-ts';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
-import { useSettingsContext } from '@/context/settings';
+import { FIXED_THEME_COLOR, useSettingsContext } from '@/context/settings';
 
 import { DayPalette, NightPalette, type DayPhase, type PhasePalette } from '@/constants/theme';
 import { mixHex } from '@/lib/color';
@@ -39,7 +39,7 @@ const PhaseContext = createContext<PhaseState | null>(null);
 export function PhaseProvider({ children }: { children: ReactNode }) {
   const now = useNow(20_000);
   const { location } = useLocationContext();
-  const { calculator } = useSettingsContext();
+  const { calculator, theme } = useSettingsContext();
   const dayKey = now.toDateString();
 
   const times = useMemo(
@@ -58,7 +58,7 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
     // ink is chosen from its luminance, so text never sits on a mid-tone it
     // cannot read.
     const evening = t > times.dhuhr;
-    const bg = skyColor(altitude, evening);
+    const bg = FIXED_THEME_COLOR[theme] ?? skyColor(altitude, evening, theme === 'sunEmerald' ? 'emerald' : 'garnet');
     const dayInk = luminance(bg) > 0.3;
     const base = dayInk ? DayPalette : NightPalette;
     const colors: PhasePalette = {
@@ -80,7 +80,7 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
       starOpacity: starOpacity(altitude),
       now,
     };
-  }, [now, times, location.lat]);
+  }, [now, times, location.lat, theme]);
 
   return <PhaseContext.Provider value={value}>{children}</PhaseContext.Provider>;
 }

@@ -7,7 +7,7 @@ import { Switch } from '@/components/switch';
 import { Fonts } from '@/constants/theme';
 import { useLanguage } from '@/context/language';
 import { usePhase } from '@/context/phase';
-import { useSettingsContext, type MethodKey } from '@/context/settings';
+import { useSettingsContext, type MethodKey, type ThemeKey } from '@/context/settings';
 import { useAlarms } from '@/hooks/use-alarms';
 import { useLocation } from '@/hooks/use-location';
 import { ALARM_PRAYERS, PRAYER_ORDER } from '@/hooks/use-prayer';
@@ -23,6 +23,15 @@ const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
 };
 
 /** Read at render time — the language can change while the app runs. */
+const themeNames = (): Record<ThemeKey, string> => ({
+  sunGarnet: t.thSunGarnet,
+  sunEmerald: t.thSunEmerald,
+  obsidian: t.thObsidian,
+  lapis: t.thLapis,
+  porcelain: t.thPorcelain,
+});
+
+/** Read at render time — the language can change while the app runs. */
 const methodNames = (): Record<MethodKey, string> => ({
   MWL: t.methodMWL,
   ISNA: t.methodISNA,
@@ -36,7 +45,7 @@ export default function SettingsScreen() {
   const { colors, times, now } = usePhase();
   const { location } = useLocation();
   const { enabled, toggle, permission } = useAlarms();
-  const { method } = useSettingsContext();
+  const { method, theme } = useSettingsContext();
   const { preference, locale } = useLanguage();
   const offsetHours = -now.getTimezoneOffset() / 60;
 
@@ -131,12 +140,17 @@ export default function SettingsScreen() {
           </Pressable>
         </Link>
         <Divider />
-        <View style={styles.row}>
-          <View style={styles.rowText}>
-            <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.automatic}</Text>
-            <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.themeHint}</Text>
-          </View>
-        </View>
+        <Link href="/theme" asChild>
+          <Pressable style={({ pressed }) => pressed && styles.pressed}>
+            <View style={styles.row}>
+              <View style={styles.rowText}>
+                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.theme}</Text>
+                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{themeNames()[theme]}</Text>
+              </View>
+              <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.change}</Text>
+            </View>
+          </Pressable>
+        </Link>
       </Card>
 
       <SectionLabel>{t.about}</SectionLabel>

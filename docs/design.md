@@ -164,3 +164,14 @@ Pre-rendered sprites, no GL (`assets/images/earth/README.md`).
 - **Numbers get `textAlign` explicitly** in RTL: a Latin-only string such as
   "Fajr 18° · Isha 17°" is auto-detected as LTR and would otherwise sit on the
   wrong side of its Arabic label.
+
+### Round 5 — stones and themes (2026-11-02)
+The page colour is a stone for each part of the day (`lib/sky.ts`): obsidian
+at night, sapphire before Fajr, lapis lazuli at Fajr, cobalt in the blue
+hour, pearl at sunrise, porcelain by day, jade mist at Asr, silver mist
+before Maghrib, then garnet or emerald at Maghrib, amethyst into Isha.
+**No yellow surfaces** — gold is the accent for text only. The dark↔light
+change at the horizon takes 0.2° of sun altitude (about a minute) instead of
+blending through muddy mid-tones. Settings → Display → Theme offers the two
+sun courses (garnet, emerald) and three one-stone themes (obsidian, lapis
+lazuli, porcelain); the picker shows each as a string of stones.

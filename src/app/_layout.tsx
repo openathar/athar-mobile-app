@@ -50,6 +50,7 @@ export default function RootLayout() {
                 <Stack.Screen name="location" options={{ presentation: 'modal' }} />
                 <Stack.Screen name="method" options={{ presentation: 'modal' }} />
                 <Stack.Screen name="language" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="theme" options={{ presentation: 'modal' }} />
               </Stack>
               </LocaleBoundary>
             </AlarmsProvider>
