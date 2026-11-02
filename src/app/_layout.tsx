@@ -14,6 +14,7 @@ import { LocationProvider } from '@/context/location';
 import { PhaseProvider } from '@/context/phase';
 import { SettingsProvider } from '@/context/settings';
 import { configureNotifications } from '@/lib/alarms';
+import '../global.css';
 import { LanguageProvider, LocaleBoundary } from '@/context/language';
 
 SplashScreen.preventAutoHideAsync();
