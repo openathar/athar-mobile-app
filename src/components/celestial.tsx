@@ -1,5 +1,6 @@
 import { moonPhaseAt } from '@openathar/athan-core-ts';
 import { useMemo } from 'react';
+import Animated, { useAnimatedProps, type SharedValue } from 'react-native-reanimated';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
@@ -47,6 +48,7 @@ function SpriteSphere({ sprite, diameter, frame }: { sprite: Sprite; diameter: n
 
 /** Region of a disc of radius R lit at `illumination`; the unlit region is the same shape mirrored. */
 function discRegion(R: number, illumination: number, rightSide: boolean): string {
+  'worklet';
   const rx = Math.max(0.001, R * Math.abs(1 - 2 * illumination));
   const outerSweep = rightSide ? 1 : 0;
   const termSweep = rightSide === illumination < 0.5 ? 0 : 1;
@@ -99,12 +101,12 @@ function Moon({
   lit: string;
   dark: string;
   reduced: boolean;
-  /** Lunation fraction 0..1 (0 new, 0.5 full) — overrides `now`, for the orbiting moon. */
-  fraction?: number;
+  /** Lunation fraction 0..1 (0 new, 0.5 full) on the UI thread — overrides `now`, for the orbiting moon. */
+  fraction?: SharedValue<number>;
 }) {
   const phase = useMemo(() => moonPhaseAt(now), [now]);
-  const k = fraction === undefined ? phase.illumination : (1 - Math.cos(2 * Math.PI * fraction)) / 2;
-  const waxing = fraction === undefined ? phase.phaseAngle < 180 : fraction < 0.5;
+  const k = phase.illumination;
+  const waxing = phase.phaseAngle < 180;
   const diameter = Math.round(size * 0.6);
   const R = 50;
 
@@ -132,9 +134,9 @@ function Moon({
           viewBox={`${-R} ${-R} ${2 * R} ${2 * R}`}
           style={StyleSheet.absoluteFill}
           pointerEvents="none">
-          {shadows.map((s, i) => (
-            <Path key={i} d={s.d} fill={dark} fillOpacity={s.o} />
-          ))}
+          {fraction
+            ? SHADOW_STEPS.map((step, i) => <OrbitShadow key={i} fraction={fraction} step={step} fill={dark} />)
+            : shadows.map((s, i) => <Path key={i} d={s.d} fill={dark} fillOpacity={s.o} />)}
           <Circle r={R - 0.5} fill="none" stroke={lit} strokeOpacity={0.22} strokeWidth={1} />
         </Svg>
       </View>
@@ -142,8 +144,28 @@ function Moon({
   );
 }
 
+const AnimatedPath = Animated.createAnimatedComponent(Path);
+
+/** The three soft-terminator layers: offset of the shadow edge and its opacity. */
+const SHADOW_STEPS = [
+  { delta: 0.03, o: 0.35 },
+  { delta: 0, o: 0.35 },
+  { delta: -0.03, o: 0.3 },
+];
+
+/** One terminator layer whose shape follows a lunation fraction on the UI thread. */
+function OrbitShadow({ fraction, step, fill }: { fraction: SharedValue<number>; step: { delta: number; o: number }; fill: string }) {
+  const props = useAnimatedProps(() => {
+    const f = ((fraction.value % 1) + 1) % 1;
+    const k = (1 - Math.cos(2 * Math.PI * f)) / 2;
+    const waxing = f < 0.5;
+    return { d: discRegion(50, Math.min(1, Math.max(0, 1 - k + step.delta)), !waxing) };
+  });
+  return <AnimatedPath animatedProps={props} fill={fill} fillOpacity={step.o} />;
+}
+
 /** The moon at any time of day (the Sky screen), tonight's phase laid over the real surface. */
-export function BigMoon({ size = 300, fraction }: { size?: number; fraction?: number }) {
+export function BigMoon({ size = 300, fraction }: { size?: number; fraction?: SharedValue<number> }) {
   const { colors, now } = usePhase();
   const reduced = useReducedMotion();
   const minuteNow = useMemo(() => new Date(Math.floor(now.getTime() / 60000) * 60000), [now]);

@@ -1,5 +1,5 @@
 import { gregorianToHijri, formatLocalTime } from '@openathar/athan-core-ts';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Anywhere } from '@/components/anywhere';
@@ -39,7 +39,6 @@ export default function PrayerScreen() {
   const { colors, times } = usePhase();
   const width = useScreenWidth();
   const globeSize = Math.min(width - 60, 330);
-  const [spin, setSpin] = useState(0);
   const side = sunSideFor(location.lng, now);
   const minuteMs = Math.floor(now.getTime() / 60000) * 60000;
   const offsetHours = -now.getTimezoneOffset() / 60;
@@ -65,11 +64,10 @@ export default function PrayerScreen() {
       <View style={styles.stage}>
         <Earth
           size={globeSize}
-          centralLon={centralMeridian(now, side) + spin}
+          centralLon={centralMeridian(now, side)}
           decl={declinationDeg(now)}
           side={side}
           pins={[{ lat: location.lat, lon: location.lng, color: colors.accent, size: 4.5, ring: true }]}
-          onSpin={(d) => setSpin((v) => v + d)}
         />
       </View>
 

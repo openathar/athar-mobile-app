@@ -115,7 +115,6 @@ export default function QiblaScreen() {
   const { colors } = usePhase();
   const width = useScreenWidth();
   const heading = useHeading();
-  const [spin, setSpin] = useState(0);
 
   const bearing = qiblaBearing(location.lat, location.lng);
   const km = distanceKm(location, KAABA);
@@ -124,7 +123,7 @@ export default function QiblaScreen() {
   const globe = Math.round(ring * 0.72);
   const aligned = heading !== null && Math.abs(shortest(heading.deg, bearing)) <= ALIGNED_DEG;
   // Turn the Earth so that you and the Kaaba both face the viewer.
-  const centre = midLongitude(location.lng, KAABA.lng) + spin;
+  const centre = midLongitude(location.lng, KAABA.lng);
 
   let guidance: string;
   if (heading === null) {
@@ -152,7 +151,6 @@ export default function QiblaScreen() {
             ]}
             arc={[{ lat: location.lat, lon: location.lng }, { lat: KAABA.lat, lon: KAABA.lng }]}
             arcColor={colors.accent}
-            onSpin={(d) => setSpin((v) => v + d)}
           />
         </View>
       </View>

@@ -6,7 +6,8 @@ import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AlarmsProvider } from '@/context/alarms';
 import { LocationProvider } from '@/context/location';
@@ -38,6 +39,7 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
+    <GestureHandlerRootView style={StyleSheet.absoluteFill}>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <LanguageProvider>
       <LocationProvider>
@@ -59,5 +61,6 @@ export default function RootLayout() {
       </LocationProvider>
       </LanguageProvider>
     </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
