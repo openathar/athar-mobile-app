@@ -195,7 +195,7 @@ jobs:
       - name: Expo prebuild (ios)
         run: ./node_modules/.bin/expo prebuild -p ios --no-install
 
-      # Expo SDK 57 needs Swift 6.2 (Xcode 26). Xcode 26.1 rejects
+      # Expo SDK 57/58 need Swift 6.2 (Xcode 26). Xcode 26.1 rejects
       # expo-modules-jsi's `weak let` (SE-0481, needs 26.2+); 26.2+ flags
       # upstream `sending` captures — patched via patch-package (see patches/).
       - name: Select suitable Xcode (prefer 26.2)
