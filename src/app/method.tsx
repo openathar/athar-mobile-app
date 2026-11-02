@@ -7,14 +7,15 @@ import { usePhase } from '@/context/phase';
 import { METHOD_KEYS, methodParams, useSettingsContext, type MethodKey } from '@/context/settings';
 import { IS_RTL, t } from '@/lib/i18n';
 
-const LABELS: Record<MethodKey, string> = {
+/** Read at render time — the language can change while the app runs. */
+const labels = (): Record<MethodKey, string> => ({
   MWL: t.methodMWL,
   ISNA: t.methodISNA,
   EGYPT: t.methodEGYPT,
   MAKKAH: t.methodMAKKAH,
   KARACHI: t.methodKARACHI,
   TEHRAN: t.methodTEHRAN,
-};
+});
 
 /**
  * Picks the calculation convention. It is one choice for the whole app —
@@ -54,7 +55,7 @@ export default function MethodScreen() {
                       styles.name,
                       { color: selected ? colors.accent : colors.text, fontFamily: selected ? Fonts.sansMedium : Fonts.sans },
                     ]}>
-                    {LABELS[key]}
+                    {labels()[key]}
                   </Text>
                   <Text style={[styles.params, { color: colors.textSecondary, fontFamily: Fonts.mono, textAlign: IS_RTL ? 'right' : 'left' }]}>
                     {methodParams(key)}

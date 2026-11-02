@@ -59,6 +59,9 @@ Feelings, Settings. The full list of what exists and what is open:
   `api.openathar.org/v1/places` — never a third-party geocoder. Web preview
   logs a CORS error because the API's allow-list has no Expo dev port; native
   is unaffected.
+- **Languages**: EN, DE, AR (RTL), PL, TR; picker in Settings, default =
+  phone language. Strings in `src/lib/i18n.ts`; PL/TR content falls back to
+  English (`CONTENT_LOCALE`).
 - Location: manual city > auto-detect > Berlin fallback.
 
 Next milestones: native builds to verify location + notifications on device,

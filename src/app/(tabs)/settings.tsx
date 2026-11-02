@@ -5,12 +5,13 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { Switch } from '@/components/switch';
 import { Fonts } from '@/constants/theme';
+import { useLanguage } from '@/context/language';
 import { usePhase } from '@/context/phase';
 import { useSettingsContext, type MethodKey } from '@/context/settings';
 import { useAlarms } from '@/hooks/use-alarms';
 import { useLocation } from '@/hooks/use-location';
 import { ALARM_PRAYERS, PRAYER_ORDER } from '@/hooks/use-prayer';
-import { LOCALE, PRAYER_KEYS, t } from '@/lib/i18n';
+import { LOCALE, LOCALE_NAMES, PRAYER_KEYS, t } from '@/lib/i18n';
 
 const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
   fajr: 'الفجر',
@@ -21,20 +22,22 @@ const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
   isha: 'العشاء',
 };
 
-const METHOD_NAMES: Record<MethodKey, string> = {
+/** Read at render time — the language can change while the app runs. */
+const methodNames = (): Record<MethodKey, string> => ({
   MWL: t.methodMWL,
   ISNA: t.methodISNA,
   EGYPT: t.methodEGYPT,
   MAKKAH: t.methodMAKKAH,
   KARACHI: t.methodKARACHI,
   TEHRAN: t.methodTEHRAN,
-};
+});
 
 export default function SettingsScreen() {
   const { colors, times, now } = usePhase();
   const { location } = useLocation();
   const { enabled, toggle, permission } = useAlarms();
   const { method } = useSettingsContext();
+  const { preference, locale } = useLanguage();
   const offsetHours = -now.getTimezoneOffset() / 60;
 
   return (
@@ -104,7 +107,7 @@ export default function SettingsScreen() {
             <View style={styles.row}>
               <View style={styles.rowText}>
                 <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.calcMethod}</Text>
-                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{METHOD_NAMES[method]}</Text>
+                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{methodNames()[method]}</Text>
               </View>
               <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.change}</Text>
             </View>
@@ -114,6 +117,20 @@ export default function SettingsScreen() {
 
       <SectionLabel>{t.display}</SectionLabel>
       <Card>
+        <Link href="/language" asChild>
+          <Pressable style={({ pressed }) => pressed && styles.pressed}>
+            <View style={styles.row}>
+              <View style={styles.rowText}>
+                <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.language}</Text>
+                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
+                  {preference === 'device' ? `${t.languageDevice} · ${LOCALE_NAMES[locale]}` : LOCALE_NAMES[locale]}
+                </Text>
+              </View>
+              <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.change}</Text>
+            </View>
+          </Pressable>
+        </Link>
+        <Divider />
         <View style={styles.row}>
           <View style={styles.rowText}>
             <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.automatic}</Text>

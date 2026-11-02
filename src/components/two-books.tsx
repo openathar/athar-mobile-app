@@ -5,7 +5,7 @@ import { SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import reflections from '@/data/reflections.json';
-import { LOCALE, t } from '@/lib/i18n';
+import { CONTENT_LOCALE, LOCALE, t } from '@/lib/i18n';
 
 type Entry = (typeof reflections.entries)[number];
 const ENTRIES = reflections.entries as Entry[];
@@ -24,9 +24,13 @@ export function TwoBooks() {
   const { colors } = usePhase();
   const [step, setStep] = useState(0);
   const entry = useMemo(() => ENTRIES[(dayIndex(new Date()) + step) % ENTRIES.length], [step]);
-  const translation = LOCALE === 'ar' ? null : (entry.fallback as Record<string, string>)[LOCALE];
-  const field = (entry.field as Record<string, string>)[LOCALE];
-  const observation = (entry.observation as Record<string, string>)[LOCALE];
+  // Polish and Turkish read the English translation and observation: a Qur'an
+  // translation needs a licence-clean source and the observations an editor,
+  // so neither is machine-translated. The fallback is stated, not hidden.
+  const translation = CONTENT_LOCALE === 'ar' ? null : (entry.fallback as Record<string, string>)[CONTENT_LOCALE];
+  const field = (entry.field as Record<string, string>)[CONTENT_LOCALE];
+  const observation = (entry.observation as Record<string, string>)[CONTENT_LOCALE];
+  const fallback = CONTENT_LOCALE !== LOCALE;
 
   return (
     <View>
@@ -49,6 +53,7 @@ export function TwoBooks() {
         <Text style={[styles.fine, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
           {t.provenance}
           {LOCALE === 'ar' && !reflections.provenance.arabicApproved ? ` ${t.arabicPending}` : ''}
+          {fallback ? ` ${t.contentInEnglish}` : ''}
         </Text>
       </View>
 

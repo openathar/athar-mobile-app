@@ -48,6 +48,17 @@ Living hand-off for the app-wide redesign. Read this before continuing.
   distance to the Kaaba.
 - Dev preview on web: `?at=HH:MM` pins the clock (`src/lib/clock.ts`).
 
+- **Language picker** (Settings → Display → Language, `src/app/language.tsx`,
+  `src/context/language.tsx`): EN, DE, AR, PL, TR or "same as the phone",
+  persisted. The screens sit in `<LocaleBoundary>` (keyed by language) so
+  they re-mount with the new strings; providers keep their state. Native
+  RTL flips via `I18nManager.forceRTL` + `reloadAppAsync()` (from `expo`).
+  `t`/`LOCALE` are live bindings — never copy them into module constants.
+- **Polish and Turkish**: all UI strings and the observances. Verses,
+  observations, feeling names, city names and Hijri month names fall back to
+  English (`CONTENT_LOCALE`) with a visible note — the Qur'an translation
+  needs a licence-clean source and the observations an editor.
+
 ## Open
 
 1. **Real device pass** (plan.md Phase 3) — nothing in this round was run on
@@ -55,8 +66,12 @@ Living hand-off for the app-wide redesign. Read this before continuing.
 2. **Stars behind text**: a star can land under a header subtitle, while
    `design.md` says stars live over the header and the sphere, never behind
    text. Needs a decision (a masked header band, or accept it).
-3. **Arabic proofread** of the handwritten strings, including the new method
-   names and the two-book provenance note.
+3. **Native proofread** of Arabic, Polish and Turkish strings (method names,
+   provenance note, Turkish prayer names Sabah/Öğle/İkindi/Akşam/Yatsı).
+5. **Polish/Turkish content**: licence-clean Qur'an translations (PL/TR),
+   reviewed observations and feeling names; Hijri month names need
+   `pl`/`tr` in athan-core-ts (`hijriMonthNames` only knows en/de/ar —
+   ICU has "Cemaziyelevvel", "Dżumada I").
 4. **Web preview noise**: `api.openathar.org` CORS does not include the Expo
    dev port, so city searches log a fetch error in the browser and fall back
    to the bundled cities. Native is unaffected.
