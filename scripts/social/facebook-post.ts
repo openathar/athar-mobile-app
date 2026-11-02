@@ -6,7 +6,7 @@
  * Output: a ready-to-paste post with text + hashtags.
  */
 import { DUAS, DUAS_BY_PHASE } from '../../src/data/duas';
-import { OBSERVANCES } from '../data/observances';
+
 import { BUNDLED_CITIES } from '../../src/data/cities';
 
 type Lang = 'en' | 'de' | 'ar' | 'pl' | 'tr';
@@ -41,7 +41,7 @@ function duaPost(lang: Lang) {
 }
 
 function prayerTimesPost(lang: Lang, city: string) {
-  const c = BUNDLED_CITIES.find((x) => x.name.en.toLowerCase() === city.toLowerCase()) ?? BUNDLED_CITIES[0];
+  const c = BUNDLED_CITIES.find((x: { name: { en: string } }) => x.name.en.toLowerCase() === city.toLowerCase()) ?? BUNDLED_CITIES[0];
   return `🕌 ${t(lang, 'today')} — ${c.name[lang as 'en' | 'de' | 'ar']}\n\n${HASHTAGS[lang]}`;
 }
 
@@ -68,8 +68,8 @@ function t(lang: Lang, key: string) {
 }
 
 const args = process.argv.slice(2);
-const lang = (args.find((a) => a.startsWith('--lang='))?.split('=')[1] ?? 'de') as Lang;
-const type = args.find((a) => a.startsWith('--type='))?.split('=')[1] ?? 'dua';
+const lang = (args.find((a: string) => a.startsWith('--lang='))?.split('=')[1] ?? 'de') as Lang;
+const type = args.find((a: string) => a.startsWith('--type='))?.split('=')[1] ?? 'dua';
 
 if (type === 'dua') console.log(duaPost(lang));
-else if (type === 'prayer-times') console.log(prayerTimesPost(lang, args.find((a) => a.startsWith('--city='))?.split('=')[1] ?? 'Berlin'));
+else if (type === 'prayer-times') console.log(prayerTimesPost(lang, args.find((a: string) => a.startsWith('--city='))?.split('=')[1] ?? 'Berlin'));
