@@ -6,7 +6,7 @@ import { Card, Divider, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
 import { OBSERVANCES } from '@/data/observances';
 import { usePhase } from '@/context/phase';
-import { LOCALE, t } from '@/lib/i18n';
+import { CONTENT_LOCALE, LOCALE, t } from '@/lib/i18n';
 
 const DAY_MS = 86_400_000;
 const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
@@ -61,7 +61,7 @@ export function HijriCalendar() {
     return { year: Math.floor(idx / 12), month: (idx % 12) + 1 };
   }, [todayH, offset]);
   const month = useMemo(() => buildMonth(view.year, view.month), [view]);
-  const names = hijriMonthNames(LOCALE);
+  const names = hijriMonthNames(CONTENT_LOCALE);
   const weekdays = useMemo(() => {
     const base = new Date(Date.UTC(2024, 0, 1)); // a Monday
     return Array.from({ length: 7 }, (_, i) => new Date(base.getTime() + i * DAY_MS).toLocaleDateString(LOCALE, { weekday: 'narrow', timeZone: 'UTC' }));

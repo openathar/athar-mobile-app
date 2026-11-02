@@ -1,9 +1,18 @@
 /**
- * App strings in the website's three languages. Texts are handwritten per
- * language (not machine-translated); the Arabic should be proofread by a
- * native reader. The language follows the device; `en` is the fallback.
+ * App strings. Texts are written per language, not run through a
+ * translator; Arabic, Polish and Turkish still need a native proofread. The
+ * language follows the device until the user picks one in Settings.
  */
-export type Locale = 'en' | 'de' | 'ar';
+export type Locale = 'en' | 'de' | 'ar' | 'pl' | 'tr';
+
+/**
+ * Languages the bundled content (verses, observations, feelings, city names,
+ * Hijri month names from athan-core-ts) exists in. Polish and Turkish UI
+ * strings are complete; their content falls back to English until a
+ * licence-clean translation (the Qur'an) or an editorial review (the
+ * observations) exists — never machine-translated.
+ */
+export type ContentLocale = 'en' | 'de' | 'ar';
 
 const en = {
   tabPrayer: 'Prayer',
@@ -110,6 +119,11 @@ const en = {
   methodMAKKAH: 'Umm al-Qura University, Makkah',
   methodKARACHI: 'University of Islamic Sciences, Karachi',
   methodTEHRAN: 'Institute of Geophysics, University of Tehran',
+  language: 'Language',
+  languageTitle: 'Language',
+  languageLead: 'The app speaks the language you choose here, whatever the phone is set to.',
+  languageDevice: 'Same as the phone',
+  contentInEnglish: 'This text is not available in your language yet, so it is shown in English.',
 };
 
 type Dict = { [K in keyof typeof en]: (typeof en)[K] };
@@ -219,6 +233,11 @@ const de: Dict = {
   methodMAKKAH: 'Umm-al-Qura-Universität, Mekka',
   methodKARACHI: 'Universität für Islamische Wissenschaften, Karatschi',
   methodTEHRAN: 'Institut für Geophysik, Universität Teheran',
+  language: 'Sprache',
+  languageTitle: 'Sprache',
+  languageLead: 'Die App spricht die Sprache, die du hier wählst – egal, worauf das Handy eingestellt ist.',
+  languageDevice: 'Wie das Handy',
+  contentInEnglish: 'Diesen Text gibt es noch nicht in deiner Sprache, deshalb steht er auf Englisch da.',
 };
 
 const ar: Dict = {
@@ -326,24 +345,282 @@ const ar: Dict = {
   methodMAKKAH: 'جامعة أم القرى، مكة المكرمة',
   methodKARACHI: 'جامعة العلوم الإسلامية، كراتشي',
   methodTEHRAN: 'معهد الجيوفيزياء، جامعة طهران',
+  language: 'اللغة',
+  languageTitle: 'اللغة',
+  languageLead: 'يتحدث التطبيق باللغة التي تختارها هنا، أيًّا كانت لغة الهاتف.',
+  languageDevice: 'مثل لغة الهاتف',
+  contentInEnglish: 'هذا النص غير متوفر بلغتك بعد، لذلك يظهر بالإنجليزية.',
 };
 
-const DICTS: Record<Locale, Dict> = { en, de, ar };
+
+const pl: Dict = {
+  tabPrayer: 'Modlitwa',
+  tabQibla: 'Kibla',
+  tabSettings: 'Ustawienia',
+  tabSky: 'Niebo',
+  tabFeelings: 'Uczucia',
+  skyTitle: 'Niebo',
+  illumination: 'Oświetlenie',
+  moonAge: 'Wiek',
+  daysShort: 'dni',
+  nextNew: 'Następny nów',
+  nextFull: 'Następna pełnia',
+  facesTitle: 'Osiem twarzy jednego księżyca',
+  facesHint: 'Wybierz jedną: kiedy wróci?',
+  returnsIn: (n) => (n === 0 ? 'Dziś w nocy' : n === 1 ? 'Wraca jutro' : `Wraca za ${n} dni`),
+  calendarTitle: 'Kalendarz',
+  upcoming: 'Wkrótce',
+  inDays: (n) => (n === 0 ? 'Dziś' : n === 1 ? 'Jutro' : `za ${n} dni`),
+  feelingsTitle: 'Uczucia',
+  feelingsLead: 'Korzenie w brzuchu, gałęzie w piersi, serce pośrodku. Dotknij uczucia.',
+  feelingsSource: 'Według modelu badacza Amina Sabry’ego.',
+
+  nextPrayer: 'Następna modlitwa',
+  at: 'o',
+  today: 'Dziś',
+  anywhere: 'Gdziekolwiek',
+  anywhereLead: 'Wybierz miasto, zobacz jego dzień.',
+  anywhereHint: 'Szukaj miasta',
+  anywhereNoResult: 'Nie znaleziono miasta. Sprawdź pisownię albo wpisz nazwę po angielsku.',
+  anywhereOffline: 'Wyszukiwanie wymaga połączenia. Miasta, które już oglądałeś, zostają poniżej.',
+  recent: 'Ostatnio oglądane',
+  forget: 'Usuń',
+  books: 'Dwie księgi',
+  booksLead: 'Werset taki, jak został objawiony, i świat taki, jak go mierzymy.',
+  revelation: 'Objawienie',
+  creation: 'Obserwacja',
+  anotherSign: 'Kolejny znak',
+  provenance: 'Tekst obserwacji przygotowany z pomocą AI i sprawdzony przez redakcję. Werset jest cytatem z Koranu.',
+  arabicPending: 'Tekst arabski czeka jeszcze na sprawdzenie przez rodzimego użytkownika.',
+
+  moonNew: 'Nów',
+  moonWaxingCrescent: 'Przybywający sierp',
+  moonFirstQuarter: 'Pierwsza kwadra',
+  moonWaxingGibbous: 'Przybywający garb',
+  moonFull: 'Pełnia',
+  moonWaningGibbous: 'Ubywający garb',
+  moonLastQuarter: 'Ostatnia kwadra',
+  moonWaningCrescent: 'Ubywający sierp',
+
+  prFajr: 'Fadżr',
+  prSunrise: 'Wschód słońca',
+  prDhuhr: 'Zuhr',
+  prAsr: 'Asr',
+  prMaghrib: 'Maghrib',
+  prIsha: 'Isza',
+
+  settingsTitle: 'Ustawienia',
+  settingsSub: 'Twoje alarmy, twoje miejsce',
+  adhanAlarms: 'Alarmy adhanu',
+  alarmFor: 'alarm',
+  notificationsOff: 'Powiadomienia są wyłączone — włącz je w ustawieniach systemu, aby dostawać alarmy adhanu.',
+  place: 'Miejsce',
+  location: 'Lokalizacja',
+  change: 'Zmień',
+  calcMethod: 'Metoda obliczeń',
+  theme: 'Wygląd',
+  themeHint: 'Podąża za słońcem: noc i dzień',
+  about: 'O Athar',
+  aboutText: 'Athar — za darmo, bez reklam, bez śledzenia. Zbudowany jako sadaka dżarija · openathar.org',
+  creditLabel: 'Tekstury słońca i księżyca',
+  credit: 'Solar System Scope · dane NASA · CC BY 4.0',
+
+  qiblaTitle: 'Kibla',
+  from: 'z',
+  direction: 'Kierunek',
+  fromNorth: 'od północy geograficznej',
+  kmToKaaba: 'km do Kaaby',
+  kaabaLies: (deg) => `Kaaba leży ${deg}° zgodnie z ruchem wskazówek zegara od północy — kompas na żywo potrzebuje czujnika telefonu.`,
+  holdFlat: 'Połóż telefon płasko, żeby obudzić kompas.',
+  facing: 'Jesteś zwrócony w stronę kibli.',
+  turnRight: (deg) => `Obróć się w prawo o ${deg}°`,
+  turnLeft: (deg) => `Obróć się w lewo o ${deg}°`,
+  heading: 'kierunek',
+  trueNorth: 'północ geograficzna',
+  magnetic: 'magnetyczny — może się mylić o kilka °',
+
+  locationTitle: 'Lokalizacja',
+  currently: 'Teraz',
+  searchCity: 'Szukaj miasta…',
+  useCurrent: 'Użyj mojej obecnej lokalizacji',
+  results: 'Wyniki',
+  close: 'Zamknij',
+  cities: 'Miasta',
+  times: 'Czasy',
+  display: 'Wyświetlanie',
+  automatic: 'Automatycznie',
+  methodTitle: 'Metoda obliczeń',
+  methodLead: 'Czasy liczone są na urządzeniu. Wybierz konwencję, której trzyma się twoja wspólnota.',
+  methodNote: 'Fadżr to głębokość słońca pod horyzontem; Isza to kąt albo stały czas po Maghribie. Jeden wybór tutaj zmienia każdy ekran, każdy alarm i każde miasto.',
+  methodMWL: 'Muzułmańska Liga Świata',
+  methodISNA: 'Islamskie Stowarzyszenie Ameryki Północnej',
+  methodEGYPT: 'Egipski Generalny Urząd Pomiarów',
+  methodMAKKAH: 'Uniwersytet Umm al-Kura, Mekka',
+  methodKARACHI: 'Uniwersytet Nauk Islamskich, Karaczi',
+  methodTEHRAN: 'Instytut Geofizyki, Uniwersytet Teherański',
+  language: 'Język',
+  languageTitle: 'Język',
+  languageLead: 'Aplikacja mówi w języku, który tu wybierzesz, niezależnie od ustawień telefonu.',
+  languageDevice: 'Jak w telefonie',
+  contentInEnglish: 'Tego tekstu nie ma jeszcze po polsku, dlatego jest po angielsku.',
+};
+
+const tr: Dict = {
+  tabPrayer: 'Namaz',
+  tabQibla: 'Kıble',
+  tabSettings: 'Ayarlar',
+  tabSky: 'Gökyüzü',
+  tabFeelings: 'Duygular',
+  skyTitle: 'Gökyüzü',
+  illumination: 'Aydınlanma',
+  moonAge: 'Yaş',
+  daysShort: 'gün',
+  nextNew: 'Sonraki yeni ay',
+  nextFull: 'Sonraki dolunay',
+  facesTitle: 'Tek bir ayın sekiz yüzü',
+  facesHint: 'Birine dokun: ne zaman geri gelir?',
+  returnsIn: (n) => (n === 0 ? 'Bu gece' : `${n} gün sonra geri gelir`),
+  calendarTitle: 'Takvim',
+  upcoming: 'Yaklaşanlar',
+  inDays: (n) => (n === 0 ? 'Bugün' : n === 1 ? 'Yarın' : `${n} gün sonra`),
+  feelingsTitle: 'Duygular',
+  feelingsLead: 'Kökler karında, dallar göğüste, kalp ortada. Bir duyguya dokun.',
+  feelingsSource: 'Araştırmacı Amin Sabry’nin modeline göre.',
+
+  nextPrayer: 'Sıradaki namaz',
+  at: 'saat',
+  today: 'Bugün',
+  anywhere: 'Her yerde',
+  anywhereLead: 'Bir şehir seç, gününü gör.',
+  anywhereHint: 'Şehir ara',
+  anywhereNoResult: 'Şehir bulunamadı. Yazımı kontrol et ya da İngilizce adını dene.',
+  anywhereOffline: 'Arama için bağlantı gerekiyor. Baktığın şehirler aşağıda kalır.',
+  recent: 'Son bakılanlar',
+  forget: 'Kaldır',
+  books: 'İki kitap',
+  booksLead: 'Ayet indirildiği gibi, dünya ölçüldüğü gibi.',
+  revelation: 'Vahiy',
+  creation: 'Gözlem',
+  anotherSign: 'Başka bir ayet',
+  provenance: 'Gözlem metni yapay zekâ yardımıyla taslak olarak yazıldı ve bir editör tarafından kontrol edildi. Ayet Kur’an’dan alıntıdır.',
+  arabicPending: 'Arapça metin henüz anadili Arapça olan biri tarafından kontrol edilmedi.',
+
+  moonNew: 'Yeni ay',
+  moonWaxingCrescent: 'Büyüyen hilal',
+  moonFirstQuarter: 'İlk dördün',
+  moonWaxingGibbous: 'Büyüyen şişkin ay',
+  moonFull: 'Dolunay',
+  moonWaningGibbous: 'Küçülen şişkin ay',
+  moonLastQuarter: 'Son dördün',
+  moonWaningCrescent: 'Küçülen hilal',
+
+  prFajr: 'Sabah',
+  prSunrise: 'Güneş',
+  prDhuhr: 'Öğle',
+  prAsr: 'İkindi',
+  prMaghrib: 'Akşam',
+  prIsha: 'Yatsı',
+
+  settingsTitle: 'Ayarlar',
+  settingsSub: 'Alarmların, yerin',
+  adhanAlarms: 'Ezan alarmları',
+  alarmFor: 'alarmı',
+  notificationsOff: 'Bildirimler kapalı — ezan alarmlarını almak için sistem ayarlarından aç.',
+  place: 'Yer',
+  location: 'Konum',
+  change: 'Değiştir',
+  calcMethod: 'Hesaplama yöntemi',
+  theme: 'Görünüm',
+  themeHint: 'Güneşi takip eder: gece ve gündüz',
+  about: 'Athar hakkında',
+  aboutText: 'Athar — ücretsiz, reklamsız, takipsiz. Sadaka-i câriye olarak yapıldı · openathar.org',
+  creditLabel: 'Güneş ve ay dokuları',
+  credit: 'Solar System Scope · NASA verisi · CC BY 4.0',
+
+  qiblaTitle: 'Kıble',
+  from: 'konum:',
+  direction: 'Yön',
+  fromNorth: 'coğrafi kuzeyden',
+  kmToKaaba: 'km Kâbe’ye',
+  kaabaLies: (deg) => `Kâbe kuzeyden saat yönünde ${deg}° uzaklıkta — canlı pusula için telefonunun sensörü gerekiyor.`,
+  holdFlat: 'Pusulayı başlatmak için telefonu düz tut.',
+  facing: 'Kıbleye dönüksün.',
+  turnRight: (deg) => `${deg}° sağa dön`,
+  turnLeft: (deg) => `${deg}° sola dön`,
+  heading: 'yön',
+  trueNorth: 'coğrafi kuzey',
+  magnetic: 'manyetik — birkaç derece sapabilir',
+
+  locationTitle: 'Konum',
+  currently: 'Şu an',
+  searchCity: 'Şehir ara…',
+  useCurrent: 'Şu anki konumumu kullan',
+  results: 'Sonuçlar',
+  close: 'Kapat',
+  cities: 'Şehirler',
+  times: 'Vakitler',
+  display: 'Görünüm',
+  automatic: 'Otomatik',
+  methodTitle: 'Hesaplama yöntemi',
+  methodLead: 'Vakitler cihazında hesaplanır. Topluluğunun uyduğu yöntemi seç.',
+  methodNote: 'Sabah, güneşin ufkun altındaki derinliğidir; Yatsı ya bir açı ya da Akşam’dan sonra sabit bir süredir. Buradaki tek seçim her ekranı, her alarmı ve her şehri değiştirir.',
+  methodMWL: 'Dünya Müslüman Birliği',
+  methodISNA: 'Kuzey Amerika İslam Cemiyeti',
+  methodEGYPT: 'Mısır Genel Harita Kurumu',
+  methodMAKKAH: 'Ümmü’l-Kurâ Üniversitesi, Mekke',
+  methodKARACHI: 'İslami Bilimler Üniversitesi, Karaçi',
+  methodTEHRAN: 'Tahran Üniversitesi Jeofizik Enstitüsü',
+  language: 'Dil',
+  languageTitle: 'Dil',
+  languageLead: 'Uygulama, telefon hangi dilde olursa olsun burada seçtiğin dili konuşur.',
+  languageDevice: 'Telefonla aynı',
+  contentInEnglish: 'Bu metin henüz Türkçe değil, bu yüzden İngilizce gösteriliyor.',
+};
+
+const DICTS: Record<Locale, Dict> = { en, de, ar, pl, tr };
+
+export const LOCALES: readonly Locale[] = ['en', 'de', 'ar', 'pl', 'tr'];
+
+/** Each language in its own name — the picker shows these, never translated. */
+export const LOCALE_NAMES: Record<Locale, string> = {
+  en: 'English',
+  de: 'Deutsch',
+  ar: 'العربية',
+  pl: 'Polski',
+  tr: 'Türkçe',
+};
 
 export function deviceLocale(): Locale {
   try {
     const tag = Intl.DateTimeFormat().resolvedOptions().locale.slice(0, 2).toLowerCase();
-    return tag === 'de' || tag === 'ar' ? tag : 'en';
+    return (LOCALES as readonly string[]).includes(tag) ? (tag as Locale) : 'en';
   } catch {
     return 'en';
   }
 }
 
-export const LOCALE: Locale = deviceLocale();
-export const IS_RTL = LOCALE === 'ar';
+/*
+ * The current language as live bindings: `applyLocale` reassigns them and
+ * the root re-mounts the tree (keyed by locale), so every screen reads the
+ * new values on its next render. Never copy `t.x` into a module-level
+ * constant — it would keep the language the app started with.
+ */
+export let LOCALE: Locale = deviceLocale();
+export let IS_RTL = LOCALE === 'ar';
+export let CONTENT_LOCALE: ContentLocale = toContent(LOCALE);
+/** All strings for the current language. */
+export let t: Dict = DICTS[LOCALE];
 
-/** All strings for the device language. Static for the session. */
-export const t: Dict = DICTS[LOCALE];
+function toContent(locale: Locale): ContentLocale {
+  return locale === 'pl' || locale === 'tr' ? 'en' : locale;
+}
+
+export function applyLocale(locale: Locale) {
+  LOCALE = locale;
+  IS_RTL = locale === 'ar';
+  CONTENT_LOCALE = toContent(locale);
+  t = DICTS[locale];
+}
 
 export const PRAYER_KEYS = {
   fajr: 'prFajr',

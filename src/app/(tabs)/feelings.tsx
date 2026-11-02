@@ -8,9 +8,35 @@ import { usePhase } from '@/context/phase';
 import copyJson from '@/data/emotions-copy.json';
 import { HEART, MAP_H, MAP_W, NAVEL, TEXT_IDS, clusters, counterpartOf, placed } from '@/data/emotion-map';
 import { useScreenWidth } from '@/hooks/use-screen-width';
-import { IS_RTL, LOCALE, t } from '@/lib/i18n';
+import { CONTENT_LOCALE, IS_RTL, LOCALE, t, type Locale } from '@/lib/i18n';
 
-const COPY = copyJson[LOCALE];
+type Labels = Pick<(typeof copyJson)['en'], 'counterpart' | 'chest' | 'belly' | 'sideStrong' | 'sideWeak' | 'sideMid' | 'count'>;
+
+/**
+ * The tree's labels in Polish and Turkish. The feelings themselves (names and
+ * texts) stay in English there until the research copy has an editorially
+ * reviewed translation — the screen says so.
+ */
+const LABELS: Partial<Record<Locale, Labels>> = {
+  pl: {
+    counterpart: 'Jego przeciwieństwo',
+    chest: 'Pierś · gałęzie',
+    belly: 'Brzuch · korzenie',
+    sideStrong: 'Prawa strona ciała · silniejsza',
+    sideWeak: 'Lewa strona ciała · słabsza',
+    sideMid: 'Środek',
+    count: 'Mapa liczy 135 uczuć i czujników. {n} z nich jest tutaj.',
+  },
+  tr: {
+    counterpart: 'Karşıtı',
+    chest: 'Göğüs · dallar',
+    belly: 'Karın · kökler',
+    sideStrong: 'Vücudun sağ tarafı · daha güçlü',
+    sideWeak: 'Vücudun sol tarafı · daha zayıf',
+    sideMid: 'Orta',
+    count: 'Harita 135 duygu ve algıyı sayar. Bunların {n} tanesi burada.',
+  },
+};
 const VIEW = { x: -170, w: MAP_W + 340 };
 
 /**
@@ -22,6 +48,9 @@ const VIEW = { x: -170, w: MAP_W + 340 };
 export default function FeelingsScreen() {
   const { colors } = usePhase();
   const width = useScreenWidth();
+  // Read per render: the language can change while the app runs.
+  const COPY = { ...copyJson[CONTENT_LOCALE], ...LABELS[LOCALE] };
+  const fallback = CONTENT_LOCALE !== LOCALE;
   const [shown, setShown] = useState(0);
   const [sel, setSel] = useState<string>('love');
   const w = Math.min(width - 24, 560);
@@ -40,7 +69,7 @@ export default function FeelingsScreen() {
   const byId = useMemo(() => new Map(placed.map((p) => [p.id, p])), []);
   const nameOf = (id: string) => {
     const i = (TEXT_IDS as readonly string[]).indexOf(id);
-    return i >= 0 ? COPY.items[i].name : byId.get(id)![LOCALE];
+    return i >= 0 ? COPY.items[i].name : byId.get(id)![CONTENT_LOCALE];
   };
   const cur = byId.get(sel)!;
   const ti = (TEXT_IDS as readonly string[]).indexOf(sel);
@@ -102,6 +131,7 @@ export default function FeelingsScreen() {
         <Text style={[styles.name, { color: colors.text, fontFamily: Fonts.display }]}>{nameOf(sel)}</Text>
         {LOCALE !== 'ar' && <Text style={[styles.ar, { color: colors.text, fontFamily: Fonts.arabic }]}>{cur.ar}</Text>}
         {ti >= 0 && <Text style={[styles.body, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{COPY.items[ti].body}</Text>}
+        {fallback && <Text style={[styles.fallback, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.contentInEnglish}</Text>}
         {counter && (
           <Pressable onPress={() => setSel(counter)} style={({ pressed }) => pressed && styles.pressed}>
             <Text style={[styles.link, { color: colors.accent, fontFamily: Fonts.sansSemiBold }]}>
@@ -126,6 +156,7 @@ const styles = StyleSheet.create({
   ar: { fontSize: 30, lineHeight: 46 },
   body: { fontSize: 16, lineHeight: 24 },
   link: { fontSize: 16, marginTop: 4 },
+  fallback: { fontSize: 13, lineHeight: 19 },
   pressed: { opacity: 0.7 },
   source: { fontSize: 13, lineHeight: 19 },
 });

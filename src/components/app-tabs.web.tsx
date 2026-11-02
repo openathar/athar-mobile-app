@@ -5,7 +5,8 @@ import { Fonts, MaxContentWidth } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import { t } from '@/lib/i18n';
 
-const TABS = [
+/** Read at render time — the language can change while the app runs. */
+const tabs = () => [
   { name: 'index', label: t.tabPrayer },
   { name: 'qibla', label: t.tabQibla },
   { name: 'sky', label: t.tabSky },
@@ -23,7 +24,7 @@ export default function AppTabs() {
       <TabSlot style={{ flex: 1 }} />
       <TabList asChild>
         <CustomTabList>
-          {TABS.map(({ name, label }) => (
+          {tabs().map(({ name, label }) => (
             <TabTrigger key={name} name={name} href={`/${name === 'index' ? '' : name}`} asChild>
               <TabButton>{label}</TabButton>
             </TabTrigger>

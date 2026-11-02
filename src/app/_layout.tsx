@@ -6,21 +6,14 @@ import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { I18nManager, Platform, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 
 import { AlarmsProvider } from '@/context/alarms';
 import { LocationProvider } from '@/context/location';
 import { PhaseProvider } from '@/context/phase';
 import { SettingsProvider } from '@/context/settings';
 import { configureNotifications } from '@/lib/alarms';
-import { IS_RTL, LOCALE } from '@/lib/i18n';
-
-// Arabic mirrors the layout: native follows the system direction; web gets it from the document.
-I18nManager.allowRTL(true);
-if (Platform.OS === 'web' && typeof document !== 'undefined') {
-  document.documentElement.dir = IS_RTL ? 'rtl' : 'ltr';
-  document.documentElement.lang = LOCALE;
-}
+import { LanguageProvider, LocaleBoundary } from '@/context/language';
 
 SplashScreen.preventAutoHideAsync();
 configureNotifications();
@@ -46,19 +39,24 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <LanguageProvider>
       <LocationProvider>
         <SettingsProvider>
           <PhaseProvider>
             <AlarmsProvider>
+              <LocaleBoundary>
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen name="location" options={{ presentation: 'modal' }} />
                 <Stack.Screen name="method" options={{ presentation: 'modal' }} />
+                <Stack.Screen name="language" options={{ presentation: 'modal' }} />
               </Stack>
+              </LocaleBoundary>
             </AlarmsProvider>
           </PhaseProvider>
         </SettingsProvider>
       </LocationProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

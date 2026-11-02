@@ -1,5 +1,5 @@
 import { BUNDLED_CITIES, type BundledCity } from '@/data/cities';
-import { LOCALE } from '@/lib/i18n';
+import { CONTENT_LOCALE } from '@/lib/i18n';
 
 /**
  * City lookup for the whole app (home "Anywhere" and the location screen).
@@ -25,7 +25,7 @@ const fold = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').t
 
 export function placeFromCity(city: BundledCity): Place {
   return {
-    name: city.name[LOCALE],
+    name: city.name[CONTENT_LOCALE],
     country: city.country,
     latitude: city.latitude,
     longitude: city.longitude,
