@@ -88,10 +88,8 @@ export function DuaNow() {
 
       {/* JetBrains Mono has no Arabic glyphs: the Arabic source line uses the text face. */}
       <Text style={[styles.source, { color: colors.textSecondary, fontFamily: LOCALE === 'ar' ? Fonts.sans : Fonts.mono }]}>
-        {collectionName(dua.collection)} {num(dua.number)}
-        {dua.grade && !['bukhari', 'muslim'].includes(dua.collection) ? ` · ${gradeLabel(dua.grade)}` : ''}
+        {collectionName(dua.collection)} {num(dua.number)}{dua.grade && !['bukhari', 'muslim'].includes(dua.collection) ? ` · ${gradeLabel(dua.grade)}` : ''}
       </Text>
-      <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.duaMeaningNote}</Text>
 
       <Pressable onPress={() => setStep((s) => s + 1)} style={({ pressed }) => [styles.more, pressed && styles.pressed]}>
         <Text style={[styles.moreText, { color: colors.accent, fontFamily: Fonts.sansSemiBold }]}>{t.duaAnother}</Text>
@@ -223,7 +221,7 @@ const styles = StyleSheet.create({
   beadFill: { width: 11, height: 11, borderRadius: 5.5 },
   beadsLabel: { fontSize: 12, flexShrink: 1 },
   source: { fontSize: 11, marginTop: 8 },
-  note: { fontSize: 11, lineHeight: 16, marginTop: 2 },
+  note: { fontSize: 10, lineHeight: 14, marginTop: 2, opacity: 0.7 },
   more: { paddingVertical: 6, alignSelf: 'flex-start' },
   moreText: { fontSize: 14 },
   pressed: { opacity: 0.7 },

@@ -12,7 +12,7 @@ import { centralMeridian, declinationDeg } from '@/lib/globe';
 /** Tilt of the moon's orbit plane against the view — the same slanted look as the website's scene. */
 const TILT = (30 * Math.PI) / 180;
 /** One orbit in four minutes, like the website: strongly sped up, the real direction. */
-const ORBIT_SECONDS = 240;
+const ORBIT_SECONDS = 180;
 
 /**
  * The website's Earth-and-Moon scene: the Earth with its day/night line, and
@@ -29,7 +29,7 @@ export function EarthMoon({ width }: { width: number }) {
   const { now } = usePhase();
   const reduced = useReducedMotion();
   const earth = Math.round(width * 0.46);
-  const moon = Math.round((earth / 3.67) * 1.15);
+  const moon = Math.round((earth / 3.67) * 1.25);
   const orbit = width * 0.4;
   const height = Math.round(earth + orbit * Math.sin(TILT) * 2 + moon);
   const cx = width / 2;

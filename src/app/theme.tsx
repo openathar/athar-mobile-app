@@ -7,6 +7,7 @@ import { usePhase } from '@/context/phase';
 import { FIXED_THEME_COLOR, THEME_KEYS, useSettingsContext, type ThemeKey } from '@/context/settings';
 import { IS_RTL, t } from '@/lib/i18n';
 import { daySwatches } from '@/lib/sky';
+import { withAlpha } from '@/lib/color';
 
 /** Name and one-line description per theme — read at render time (the language can change). */
 const labels = (): Record<ThemeKey, { name: string; hint: string }> => ({
@@ -53,7 +54,9 @@ export default function ThemeScreen() {
                   <Text style={[styles.hint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{names[key].hint}</Text>
                   <View style={styles.stones}>
                     {stones.map((c, j) => (
-                      <View key={j} style={[fixed ? styles.stoneLarge : styles.stone, { backgroundColor: c, borderColor: colors.rule }]} />
+                      <View key={j} style={[fixed ? styles.stoneLarge : styles.stone, { backgroundColor: c }]}>
+                        <View style={[styles.stoneHighlight, { backgroundColor: withAlpha('#ffffff', 0.35) }]} />
+                      </View>
                     ))}
                   </View>
                 </View>
@@ -74,8 +77,9 @@ const styles = StyleSheet.create({
   hint: { fontSize: 13 },
   // Stones overlap slightly, like beads on a string — the day as a sequence.
   stones: { flexDirection: 'row', marginTop: 8 },
-  stone: { width: 26, height: 26, borderRadius: 13, borderWidth: StyleSheet.hairlineWidth, marginEnd: -6 },
-  stoneLarge: { width: 26, height: 26, borderRadius: 13, borderWidth: StyleSheet.hairlineWidth },
+  stone: { width: 30, height: 30, borderRadius: 15, marginEnd: -8, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.18)' },
+  stoneLarge: { width: 30, height: 30, borderRadius: 15, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.18)' },
+  stoneHighlight: { position: 'absolute', top: 3, left: 5, width: 9, height: 5, borderRadius: 3 },
   mark: { fontSize: 16 },
   pressed: { opacity: 0.6 },
 });
