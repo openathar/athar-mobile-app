@@ -76,10 +76,9 @@ iOS simulator smoke (macos-15: pod install, xcodebuild Debug-iphonesimulator,
 simctl install/launch, liveness assert, screenshot). Screenshots land as
 workflow artifacts.
 
-SDK 58 (RN 0.88): the former `expo-modules-jsi` 57.1.1 pin and its
-patch-package patch are gone — upstream fixed the Xcode 26 / Swift 6.2
-errors (`SWIFT_RETURNS_RETAINED` constructors, `sending` captures) in 58.x.
-`patch-package` stays in `postinstall` for future patches.
+SDK 58 (RN 0.88): upstream fixed most Xcode 26 / Swift 6.2 errors in
+`expo-modules-jsi`, one `sending` capture is left — pinned to 58.0.21 and
+patched (`patches/README.md`, applied on `postinstall`).
 
 Requires the repo secret **`CORE_TS_TOKEN`**: a fine-grained PAT with
 read-only Contents access on `openathar/athan-core-ts`. (Historically both

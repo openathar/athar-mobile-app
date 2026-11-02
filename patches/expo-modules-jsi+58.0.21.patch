@@ -1,0 +1,32 @@
+diff --git a/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift b/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
+index de76b97..0b5b30f 100644
+--- a/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
++++ b/node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
+@@ -933,19 +933,21 @@ private func withEncodedValue(
+   _ body: (borrowing facebook.jsi.Value) -> Void
+ ) rethrows {
+   try withUnsafeTemporaryAllocation(of: facebook.jsi.Value.self, capacity: 1) { buffer in
+-    // The isolated closure below runs synchronously on this thread.
+-    nonisolated(unsafe) let slot = buffer.baseAddress!
+-    expo.emplaceUndefined(slot)
++    // The isolated closure below runs synchronously on this thread. Boxed in `UncheckedSendable`:
++    // Xcode 26.2 (Swift 6.2) rejects the `nonisolated(unsafe) let` capture with "sending 'slot'
++    // risks causing data races" (athar patch, see patches/README).
++    let slot = UncheckedSendable(buffer.baseAddress!)
++    expo.emplaceUndefined(slot.value)
+     defer {
+-      expo.destroyValues(slot, 1)
++      expo.destroyValues(slot.value, 1)
+     }
+     // The runtime can't be deallocated during a call on its JavaScript thread, so it's borrowed without
+     // a retain.
+     try runtime._withUnsafeGuaranteedRef { runtime in
+       try JavaScriptActor.assumeIsolated {
+-        try encode(JavaScriptValue.Slot(slot), runtime)
++        try encode(JavaScriptValue.Slot(slot.value), runtime)
+       }
+     }
+-    body(slot.pointee)
++    body(slot.value.pointee)
+   }
+ }
