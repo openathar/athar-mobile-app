@@ -74,8 +74,8 @@ const styles = StyleSheet.create({
   hint: { fontSize: 13 },
   // Stones overlap slightly, like beads on a string — the day as a sequence.
   stones: { flexDirection: 'row', marginTop: 8 },
-  stone: { width: 22, height: 22, borderRadius: 11, borderWidth: StyleSheet.hairlineWidth, marginEnd: -4 },
-  stoneLarge: { width: 22, height: 22, borderRadius: 11, borderWidth: StyleSheet.hairlineWidth },
+  stone: { width: 26, height: 26, borderRadius: 13, borderWidth: StyleSheet.hairlineWidth, marginEnd: -6 },
+  stoneLarge: { width: 26, height: 26, borderRadius: 13, borderWidth: StyleSheet.hairlineWidth },
   mark: { fontSize: 16 },
   pressed: { opacity: 0.6 },
 });
