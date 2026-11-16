@@ -57,12 +57,23 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
 
 ## Phase 3 — Reliable on a device (blocks release)
 
+Code (done 2026-11-16, checked in the web preview; the sheets themselves need a device):
+
+- [x] Notification permission explainer **before** the system prompt
+      (`requestNotificationsWithExplainer` in `lib/alarms.ts`): only asked while the
+      system can still ask; otherwise Settings points to the app settings.
+- [x] Android guidance card in Settings (battery limits + "Alarms & reminders" for
+      Android 12+) with an "Open app settings" button (`Linking.openSettings`, no new dependency).
+- [x] Qibla: magnetometer calibration hint (figure of eight) under the compass.
+- [x] Strings in all five languages (AR/PL/TR still need the native proofread).
+
+Device (blocks release, needs a phone):
+
 - Real-device test matrix (Android 12–15 incl. Doze and exact-alarm
   permission; iOS 17+): location permission flows, notifications scheduled 7
   days ahead, rescheduling on timezone/DST change and after reboot
-- Battery-optimisation guidance screen (Android), notification permission
-  explainer before the system prompt
-- Qibla compass on hardware (magnetometer calibration hint)
+- Does the alarm fire on the minute with the screen off and battery saver on?
+- Qibla compass on hardware (magnetometer calibration)
 
 ## Phase 4 — Adhan audio
 

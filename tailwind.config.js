@@ -1,5 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // The app follows the sun (usePhase), not the OS setting, and uses no `dark:` variants.
+  // The default 'media' makes NativeWind's web runtime throw "Cannot manually set color
+  // scheme" at start-up (css-interop calls colorScheme.set('system') under 'media').
+  darkMode: 'class',
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {

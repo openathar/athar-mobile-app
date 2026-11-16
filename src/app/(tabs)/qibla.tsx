@@ -183,6 +183,10 @@ export default function QiblaScreen() {
           </>
         )}
       </Card>
+      {/* Phones' magnetometers drift near metal and magnets; a figure-of-eight resets them. */}
+      {heading && (
+        <Text style={[styles.calibrate, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.qiblaCalibrate}</Text>
+      )}
     </Screen>
   );
 }
@@ -196,4 +200,5 @@ const styles = StyleSheet.create({
   big: { fontSize: 30, lineHeight: 36 },
   small: { fontSize: 12 },
   sensorRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12 },
+  calibrate: { fontSize: 13, lineHeight: 19, marginTop: 14 },
 });

@@ -8,7 +8,7 @@ import type { PrayerKey } from '@/hooks/use-prayer';
 import {
   ALL_ALARMS_ON,
   checkNotificationPermission,
-  ensureNotificationPermission,
+  requestNotificationsWithExplainer,
   schedulePrayerAlarms,
   type AlarmSettings,
 } from '@/lib/alarms';
@@ -89,8 +89,8 @@ export function AlarmsProvider({ children }: { children: ReactNode }) {
     async (key: PrayerKey) => {
       setEnabled((prev) => ({ ...prev, [key]: !prev[key] }));
       if (permission !== 'granted') {
-        const granted = await ensureNotificationPermission();
-        setPermission(granted ? 'granted' : 'denied');
+        const result = await requestNotificationsWithExplainer();
+        setPermission(result === 'granted' ? 'granted' : 'denied');
       }
     },
     [permission]

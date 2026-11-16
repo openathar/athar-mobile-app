@@ -1,8 +1,9 @@
 import { Methods, PrayerTimes, type Method } from '@openathar/athan-core-ts';
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 
 import { ALARM_PRAYERS, PRAYER_ORDER, type PrayerKey } from '@/hooks/use-prayer';
+import { t } from '@/lib/i18n';
 
 export type AlarmSettings = Record<PrayerKey, boolean>;
 
@@ -39,12 +40,40 @@ export function configureNotifications() {
   }).catch(() => {});
 }
 
-export async function ensureNotificationPermission(): Promise<boolean> {
-  if (Platform.OS === 'web') return false;
+/**
+ * Says in plain words what the permission is for BEFORE the system dialog.
+ * A system prompt can be answered "don't allow" only once on iOS (and twice on
+ * Android) — after that the app can no longer ask, so the first ask must be
+ * understood. Resolves true on "Continue", false on "Not now".
+ */
+function explainAlarms(): Promise<boolean> {
+  return new Promise((resolve) => {
+    Alert.alert(
+      t.alarmsExplainTitle,
+      t.alarmsExplainBody,
+      [
+        { text: t.alarmsExplainLater, style: 'cancel', onPress: () => resolve(false) },
+        { text: t.alarmsExplainContinue, onPress: () => resolve(true) },
+      ],
+      { cancelable: true, onDismiss: () => resolve(false) },
+    );
+  });
+}
+
+/**
+ * Permission flow with an explainer in front of the system prompt.
+ * - already granted → 'granted' (no dialog at all)
+ * - the system will not ask again → 'blocked' (the screen then points to the settings)
+ * - otherwise explain first; only on "Continue" does the system prompt appear.
+ */
+export async function requestNotificationsWithExplainer(): Promise<'granted' | 'declined' | 'blocked'> {
+  if (Platform.OS === 'web') return 'declined';
   const current = await Notifications.getPermissionsAsync();
-  if (current.granted) return true;
+  if (current.granted) return 'granted';
+  if (!current.canAskAgain) return 'blocked';
+  if (!(await explainAlarms())) return 'declined';
   const requested = await Notifications.requestPermissionsAsync();
-  return requested.granted;
+  return requested.granted ? 'granted' : 'declined';
 }
 
 /** Read-only permission check (no prompt). */

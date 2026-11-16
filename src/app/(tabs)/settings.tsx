@@ -1,6 +1,6 @@
 import { formatLocalTime } from '@openathar/athan-core-ts';
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { Switch } from '@/components/switch';
@@ -40,6 +40,19 @@ const methodNames = (): Record<MethodKey, string> => ({
   KARACHI: t.methodKARACHI,
   TEHRAN: t.methodTEHRAN,
 });
+
+/** Opens the system page of this app (permissions, battery, "Alarms & reminders"). */
+function SettingsLink() {
+  const { colors } = usePhase();
+  return (
+    <Pressable
+      onPress={() => Linking.openSettings().catch(() => {})}
+      accessibilityRole="button"
+      style={({ pressed }) => [styles.settingsLink, pressed && styles.pressed]}>
+      <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.openSettings}</Text>
+    </Pressable>
+  );
+}
 
 export default function SettingsScreen() {
   const { colors, times, now } = usePhase();
@@ -88,9 +101,21 @@ export default function SettingsScreen() {
             <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
               {t.notificationsOff}
             </Text>
+            <SettingsLink />
           </>
         )}
       </Card>
+
+      {/* Android only: battery limits and the exact-alarm permission decide whether an alarm is on time. */}
+      {Platform.OS === 'android' && permission === 'granted' && (
+        <>
+          <SectionLabel>{t.reliabilityTitle}</SectionLabel>
+          <Card>
+            <Text style={[styles.note, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.reliabilityBody}</Text>
+            <SettingsLink />
+          </Card>
+        </>
+      )}
 
       <SectionLabel>{t.place}</SectionLabel>
       <Card>
@@ -205,6 +230,10 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.6,
+  },
+  settingsLink: {
+    paddingBottom: 14,
+    alignSelf: 'flex-start',
   },
   about: {
     paddingVertical: 16,
