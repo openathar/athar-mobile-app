@@ -10,46 +10,21 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# Both jobs embed @openathar/athan-core-ts (file:../core-ts). The package
-# lives in its own (private) repo, so checking it out needs a fine-grained
-# PAT with read-only Contents access on openathar/athan-core-ts, stored as
-# the CORE_TS_TOKEN secret. GITHUB_TOKEN cannot cross repos.
-env:
-  CORE_TS_REPO: openathar/athan-core-ts
+# @openathar/athan-core-ts is consumed from npm (published 0.1.0, ADR-001:
+# one calculation source). No CORE_TS_TOKEN / cross-repo checkout needed.
 
 jobs:
   typecheck:
-    name: Typecheck + core-ts tests
+    name: Typecheck
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
-      - name: Checkout athan-core-ts
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.CORE_TS_REPO }}
-          token: ${{ secrets.CORE_TS_TOKEN }}
-          path: core-ts-src
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      # package.json wires @openathar/athan-core-ts as file:../core-ts,
-      # so the package must sit one level above the workspace. The in-tree
-      # checkout copy is removed afterwards — tsc would otherwise pick up
-      # core-ts's test files (they need @types/node).
-      - name: Place core-ts at ../core-ts
-        run: |
-          mkdir -p ../core-ts
-          cp -R core-ts-src/. ../core-ts/
-          rm -rf core-ts-src
-
-      - name: Build + test core-ts
-        working-directory: ../core-ts
-        run: npm ci && npm run build && npm test
 
       - run: npm ci
 
@@ -73,13 +48,6 @@ jobs:
             /usr/share/swift /var/lib/docker
           df -h /
 
-      - name: Checkout athan-core-ts
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.CORE_TS_REPO }}
-          token: ${{ secrets.CORE_TS_TOKEN }}
-          path: core-ts-src
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -91,16 +59,6 @@ jobs:
           java-version: '21'
 
       - uses: gradle/actions/setup-gradle@v4
-
-      - name: Place core-ts at ../core-ts
-        run: |
-          mkdir -p ../core-ts
-          cp -R core-ts-src/. ../core-ts/
-          rm -rf core-ts-src
-
-      - name: Build core-ts
-        working-directory: ../core-ts
-        run: npm ci && npm run build
 
       - run: npm ci
 
@@ -167,27 +125,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Checkout athan-core-ts
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.CORE_TS_REPO }}
-          token: ${{ secrets.CORE_TS_TOKEN }}
-          path: core-ts-src
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Place core-ts at ../core-ts
-        run: |
-          mkdir -p ../core-ts
-          cp -R core-ts-src/. ../core-ts/
-          rm -rf core-ts-src
-
-      - name: Build core-ts
-        working-directory: ../core-ts
-        run: npm ci && npm run build
 
       - run: npm ci
 

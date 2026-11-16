@@ -17,11 +17,11 @@ Optional sync only for Khatma progress/Tasbeeh (no mandatory account).
   "Mobile constraints" section).
 - Framework decision: **React Native / Expo** (SDK 58, expo-router native
   tabs). The shared calculation logic lives in `@openathar/athan-core-ts`
-  (wired as `file:../core-ts`), which is also used by `athar-web`.
-- `@openathar/athan-core-ts` is a **file dependency** (`file:../core-ts`),
-  not a git/npm dependency. Reason: npm 11.19's allow-scripts feature
-  breaks git-dep preparation and npx-spawned installs (EALLOWSCRIPTS).
-  Keep it that way until npm is fixed or the package is published.
+  (published to npm, pinned `0.1.0`), which is also used by `athar-web`.
+- `@openathar/athan-core-ts` comes from **npm** (`0.1.0`, exact-pinned), no
+  longer a `file:` dependency. ADR-001 (one calculation source) is enforced
+  by consuming the published package; it is built + tested in its own repo
+  and published on tag (`v*`).
 
 ## Design and plan
 
@@ -69,8 +69,8 @@ Adhan audio, store submission.
 
 ## CI
 
-`.github/workflows/ci.yml` — three jobs on push/PR: typecheck (incl. build
-+ tests of the embedded `athan-core-ts`), Android emulator smoke (API 34
+`.github/workflows/ci.yml` — three jobs on push/PR: typecheck, Android
+emulator smoke (API 34
 with KVM: assembleDebug, boot, install, launch, liveness assert, screenshot),
 iOS simulator smoke (macos-15: pod install, xcodebuild Debug-iphonesimulator,
 simctl install/launch, liveness assert, screenshot). Screenshots land as
@@ -80,11 +80,8 @@ SDK 58 (RN 0.88): upstream fixed most Xcode 26 / Swift 6.2 errors in
 `expo-modules-jsi`, one `sending` capture is left — pinned to 58.0.21 and
 patched (`patches/README.md`, applied on `postinstall`).
 
-Requires the repo secret **`CORE_TS_TOKEN`**: a fine-grained PAT with
-read-only Contents access on `openathar/athan-core-ts`. (Historically both
-repos were private and `GITHUB_TOKEN` could not check the package repo out
-cross-repo; the PAT is still used and keeps the checkout working regardless
-of visibility.)
+`@openathar/athan-core-ts` is installed from npm — no `CORE_TS_TOKEN` or
+cross-repo checkout needed anymore (it used to be a `file:` dependency).
 
 ## APM (Agent Package Manager)
 
