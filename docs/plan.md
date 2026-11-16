@@ -66,8 +66,9 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
 
 ## Phase 4 — Adhan audio
 
-- A **licence-clean** recording (needs a decision: commission, public-domain
-  source, or none at launch — notification default sound only)
+- **Decided (2026-11-16): launch without a custom adhan** — the default
+  notification sound only. A licence-clean recording (commission,
+  public-domain source) is a post-launch enhancement.
 - iOS: custom notification sounds are limited to 30 s; Android: one channel
   per sound; per-prayer choice later
 - Never push for timing (project rule)
@@ -90,9 +91,11 @@ to a store release. Constraints are in `AGENTS.md` and `redesign-status.md`.
 - Qur'an/Adhkar reading — blocked on a licence-clean text source (same as the
   API's last roadmap item)
 
-## Decisions needed from you
+## Decisions (settled)
 
-1. Adhan audio: which source, or launch without?
-2. Bundle id / store account owner (individual vs. association)
-3. Languages at launch: all three or EN + AR first?
-4. Keep the armillary sphere as the home hero (current design) or the moon?
+1. Adhan audio: **launch without a custom adhan** — default sound (2026-11-16).
+2. Bundle id / owner: **Individual**, Jordanien, `org.openathar.mobile` — siehe
+   `harness/docs/mobile-release.md`.
+3. Languages at launch: **all five** (EN/DE/AR/PL/TR; PL/TR content falls back
+   to English). Arabic/PL/TR need a native proofread before release.
+4. Home hero: **the moon** (2026-11-16) — the earth stays in the Sky tab.
