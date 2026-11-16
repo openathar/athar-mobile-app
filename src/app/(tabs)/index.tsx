@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Anywhere } from '@/components/anywhere';
+import { BigMoon } from '@/components/celestial';
 import { DuaNow } from '@/components/dua-now';
-import { Earth } from '@/components/earth';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { TwoBooks } from '@/components/two-books';
 import { Fonts } from '@/constants/theme';
@@ -13,7 +13,6 @@ import { useLocation } from '@/hooks/use-location';
 import { useScreenWidth } from '@/hooks/use-screen-width';
 import { useNow } from '@/hooks/use-now';
 import { PRAYER_ORDER, formatCountdown, getNextPrayer } from '@/hooks/use-prayer';
-import { centralMeridian, declinationDeg, sunSideFor } from '@/lib/globe';
 import { LOCALE, PRAYER_KEYS, t } from '@/lib/i18n';
 
 const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
@@ -39,8 +38,7 @@ export default function PrayerScreen() {
   const { location } = useLocation();
   const { colors, times } = usePhase();
   const width = useScreenWidth();
-  const globeSize = Math.min(width - 60, 330);
-  const side = sunSideFor(location.lng, now);
+  const heroSize = Math.min(width - 60, 330);
   const minuteMs = Math.floor(now.getTime() / 60000) * 60000;
   const offsetHours = -now.getTimezoneOffset() / 60;
   const next = getNextPrayer(now, times);
@@ -61,15 +59,9 @@ export default function PrayerScreen() {
     <Screen>
       <ScreenHeader titleAr={header.hijri} subtitle={`${header.gregorian} · ${location.label}`} />
 
-      {/* The sky itself — today's sun path over this place */}
+      {/* Tonight's real moon — the phase computed on the device */}
       <View style={styles.stage}>
-        <Earth
-          size={globeSize}
-          centralLon={centralMeridian(now, side)}
-          decl={declinationDeg(now)}
-          side={side}
-          pins={[{ lat: location.lat, lon: location.lng, color: colors.accent, size: 4.5, ring: true }]}
-        />
+        <BigMoon size={heroSize} />
       </View>
 
       <View style={styles.next}>
