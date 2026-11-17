@@ -2,9 +2,8 @@ import { gregorianToHijri, hijriMonthNames, hijriToGregorian } from '@openathar/
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Card, Divider, SectionLabel } from '@/components/screen';
+import { SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
-import { OBSERVANCES } from '@/data/observances';
 import { usePhase } from '@/context/phase';
 import { CONTENT_LOCALE, LOCALE, t } from '@/lib/i18n';
 
@@ -31,26 +30,10 @@ function buildMonth(year: number, month: number): { cells: Cell[]; length: numbe
   return { cells, length: days.length };
 }
 
-/** Next occurrence of each observance on or after today, soonest first. */
-function upcoming(now: Date, count: number) {
-  const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  const year = gregorianToHijri(today, 'en').year;
-  const out: { key: string; name: string; note: string; days: number; greg: Date }[] = [];
-  for (const o of OBSERVANCES) {
-    for (const y of [year, year + 1]) {
-      const greg = hijriToGregorian(y, o.month, o.day, 'en');
-      if (greg && greg.getTime() >= today.getTime()) {
-        out.push({ key: o.key, name: o.name[LOCALE], note: o.note[LOCALE], days: Math.round((greg.getTime() - today.getTime()) / DAY_MS), greg });
-        break;
-      }
-    }
-  }
-  return out.sort((a, b) => a.days - b.days).slice(0, count);
-}
-
 /**
- * The Hijri month and the next observances — all computed on the device
- * (Umm al-Qura via ICU), so it needs no connection and nothing to sync.
+ * The Hijri month — computed on the device (Umm al-Qura via ICU), so it needs no
+ * connection and nothing to sync. The coming observances are announced by the
+ * Fanous (`components/fanous.tsx`) on the same screen.
  */
 export function HijriCalendar() {
   const { colors, now } = usePhase();
@@ -66,7 +49,6 @@ export function HijriCalendar() {
     const base = new Date(Date.UTC(2024, 0, 1)); // a Monday
     return Array.from({ length: 7 }, (_, i) => new Date(base.getTime() + i * DAY_MS).toLocaleDateString(LOCALE, { weekday: 'narrow', timeZone: 'UTC' }));
   }, []);
-  const events = useMemo(() => upcoming(now, 4), [now.toDateString()]);
   const isCurrent = view.year === todayH.year && view.month === todayH.month;
 
   return (
@@ -104,22 +86,6 @@ export function HijriCalendar() {
           );
         })}
       </View>
-
-      <SectionLabel>{t.upcoming}</SectionLabel>
-      <Card>
-        {events.map((e, i) => (
-          <View key={e.key}>
-            {i > 0 && <Divider />}
-            <View style={styles.eventRow}>
-              <View style={styles.eventText}>
-                <Text style={[styles.eventName, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{e.name}</Text>
-                <Text style={[styles.eventNote, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{e.note}</Text>
-              </View>
-              <Text style={[styles.eventDays, { color: colors.accent, fontFamily: Fonts.mono }]}>{t.inDays(e.days)}</Text>
-            </View>
-          </View>
-        ))}
-      </Card>
     </View>
   );
 }
@@ -134,9 +100,4 @@ const styles = StyleSheet.create({
   dayWrap: { width: 40, height: 46, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   day: { fontSize: 16 },
   greg: { fontSize: 10 },
-  eventRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, paddingVertical: 14 },
-  eventText: { flex: 1, gap: 2 },
-  eventName: { fontSize: 17 },
-  eventNote: { fontSize: 13, lineHeight: 18 },
-  eventDays: { fontSize: 13 },
 });

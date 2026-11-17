@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { EarthMoon } from '@/components/earth-moon';
+import { FanousUpcoming } from '@/components/fanous';
 import { HijriCalendar } from '@/components/hijri-calendar';
 import { YourMoon } from '@/components/your-moon';
 import { PhaseDisc } from '@/components/phase-disc';
@@ -37,6 +38,8 @@ export default function SkyScreen() {
   return (
     <Screen>
       <ScreenHeader title={IS_RTL ? undefined : t.skyTitle} titleAr={IS_RTL ? t.skyTitle : 'السماء'} subtitle={t[MOON_KEYS[moon.key] ?? 'moonNew']} />
+
+      <FanousUpcoming />
 
       <View style={styles.moon}>
         <EarthMoon width={Math.min(width - 24, 460)} />
