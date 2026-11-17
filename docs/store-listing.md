@@ -143,7 +143,8 @@ Grundlage ist der Code, nicht eine Wunschvorstellung (Stand 2026-11-16):
 Das Traefik-Access-Log des Clusters enthält die volle Anfragezeile samt Query-String, also auch
 `?q=<Suchtext>`, und wird per Promtail nach Loki gesammelt. Die Client-Adresse im Log ist die
 interne Tunnel-/LAN-Adresse, **nicht** die IP des Besuchers. Loki hat `retention_period: 168h`,
-aber `retention_deletes_enabled: false` — die Aufbewahrung wird also **nicht erzwungen**.
+aber `retention_deletes_enabled: false` — die Aufbewahrung wurde also **nicht erzwungen**.
+**Behoben am 2026-11-17:** Loki erzwingt jetzt 30 Tage (`retention_enabled: true`, `platform`-Repo, Commit 635b94f).
 
 Empfehlung für die ehrliche Angabe:
 
@@ -151,8 +152,8 @@ Empfehlung für die ehrliche Angabe:
   Alle übrigen Kategorien: nicht erhoben. Passt zur Marke ("kein Tracking") und bleibt wahr, auch wenn
   die Logs länger liegen als gedacht.
 - **Google:** "App activity → In-app search history" als erhoben deklarieren, *nicht geteilt*, *Zweck:
-  App-Funktionalität*, solange die Loki-Retention nicht erzwungen wird. Wird sie erzwungen (7 Tage) und der
-  Suchtext aus dem Log entfernt, ist "kurzlebig verarbeitet / nicht erhoben" vertretbar.
+  App-Funktionalität*. Die Retention ist jetzt auf 30 Tage erzwungen; weil der Suchtext bis dahin im Server-Log
+  steht, ist "kurzlebig verarbeitet" nicht zutreffend, die Deklaration bleibt also richtig.
 - Die Datenschutzseite beschreibt diesen Log wahrheitsgemäß ("Technische Protokolle").
 
 ## Screenshots (noch offen)
@@ -167,4 +168,4 @@ Gefühle, Einstellungen/Alarme. Aufnahme auf Gerät oder Simulator (iOS-Build l�
 2. Native Proofread Arabisch (PL/TR nur, falls diese Store-Sprachen gewünscht sind).
 3. Real-Device-Test (`docs/plan.md`, Phase 3).
 4. Google: geschlossener Test mit mindestens 12 Testern über 14 Tage.
-5. Datenschutz-Angaben final festlegen (hängt an der Loki-Entscheidung).
+5. Datenschutz-Angaben wie oben eintragen (Loki-Retention ist entschieden: 30 Tage).
