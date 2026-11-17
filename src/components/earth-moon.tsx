@@ -5,7 +5,7 @@ import Animated, { useAnimatedStyle, useDerivedValue } from 'react-native-reanim
 
 import { BigMoon } from '@/components/celestial';
 import { Earth } from '@/components/earth';
-import { useLoop, useReducedMotion } from '@/components/sprite';
+import { useLoop, useReducedMotion } from '@/hooks/use-motion';
 import { usePhase } from '@/context/phase';
 import { centralMeridian, declinationDeg } from '@/lib/globe';
 import { physicalLeft } from '@/lib/rtl';

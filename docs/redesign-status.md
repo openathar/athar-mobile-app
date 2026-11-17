@@ -25,11 +25,11 @@ Living hand-off for the app-wide redesign. Read this before continuing.
   day; dawn and dusk differ. Text colours follow sky brightness, stars fade
   with daylight.
 - **Sun/moon** (`src/components/celestial.tsx`): textured spheres from the
-  website's Solar System Scope/NASA textures (CC BY 4.0), pre-rendered to
-  sprite sheets (`scripts/render-celestial.mjs`, `assets/images/celestial/`).
+  website's Solar System Scope/NASA textures (CC BY 4.0), lit live by a Skia
+  shader (`sphere.tsx`, `assets/images/textures/`).
 - **Earth** (`src/components/earth.tsx`) and **Earth + Moon**
   (`earth-moon.tsx`): the website's textured globe with the real day/night
-  line, drag to turn; sprites from `scripts/render-*.mjs`.
+  line, drag to turn; live Skia shader, no sprites.
 - **Kaaba** (`src/components/kaaba3d.tsx`, in the repo history) and the
   **Mataf** marble ellipse: a native 3D box spun on the UI thread. Web
   gotcha: react-native-web maps the `matrix` transform key to the 2D CSS
@@ -95,4 +95,4 @@ Living hand-off for the app-wide redesign. Read this before continuing.
 - `react-native-svg` on web: don't use `rotation`/`origin` on SVG elements
   (invalid `transform-origin` DOM prop, dev error toast) — use
   `transform="rotate(deg x y)"`.
-- Sprite sheets ≤ 2048 px per side (older Android GPUs).
+- Textures ≤ 2048 px per side (older Android GPUs).

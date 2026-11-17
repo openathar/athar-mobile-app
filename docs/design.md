@@ -148,7 +148,16 @@ bare moon (Sky) are gone. All three now use the website's planet:
 - **Sky** — the website's Earth-and-Moon scene: the Moon on a slanted orbit,
   lit by the same sun, starting at tonight's real phase and passing through
   every phase in four minutes, in front of and behind the Earth.
-Pre-rendered sprites, no GL (`assets/images/earth/README.md`).
+Live Skia shaders (`src/components/sphere.tsx`) sample the website's own 2048 px
+textures per pixel (`assets/images/textures/`, CC BY 4.0): sharp at any size, a
+true angle at every moment, no sprite sheets. The moon turns under its light at
+the website's 0.02 rad/s with the website's lighting (warm sun, blue earthshine,
+ACES). Earlier rounds pre-rendered 36 to 64 frames per sphere; that was soft
+(256 px frames) and only ever crossfaded between neighbours.
+
+Meteors (`src/components/meteor-field.tsx`) are Skia too: a hairline whose
+gradient fades to nothing behind a bright head, a faint wide body under it, a
+white core on the leading third. Three lanes, random pace, angle and length.
 
 ### Round 4 — controls and the two modals (2026-11-01)
 - **Switch** (`src/components/switch.tsx`): a flat pill from the palette.

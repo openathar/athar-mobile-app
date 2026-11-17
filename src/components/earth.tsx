@@ -13,30 +13,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
-import { SpriteView, type Sprite } from '@/components/sprite';
-import { greatCircle, nearestSheet, wrap180, type GlobeSide, type SheetDecl } from '@/lib/globe';
-
-const SHEETS: Record<SheetDecl, number> = {
-  [-23]: require('../../assets/images/earth/earth-d-23.jpg'),
-  [-12]: require('../../assets/images/earth/earth-d-12.jpg'),
-  0: require('../../assets/images/earth/earth-d0.jpg'),
-  12: require('../../assets/images/earth/earth-d12.jpg'),
-  23: require('../../assets/images/earth/earth-d23.jpg'),
-};
-const SHEETS_LEFT: Record<SheetDecl, number> = {
-  [-23]: require('../../assets/images/earth/earth-L-d-23.jpg'),
-  [-12]: require('../../assets/images/earth/earth-L-d-12.jpg'),
-  0: require('../../assets/images/earth/earth-L-d0.jpg'),
-  12: require('../../assets/images/earth/earth-L-d12.jpg'),
-  23: require('../../assets/images/earth/earth-L-d23.jpg'),
-};
-const PLAIN: number = require('../../assets/images/earth/earth-plain.jpg');
-// Day/night sheets: 36 frames, 10° apart. The plain (Qibla) sheet has 64 frames, 5.6° apart and no
-// clouds: neighbouring frames are closer, so the crossfade while it turns ghosts less.
-const sprite = (d: SheetDecl, side: GlobeSide): Sprite =>
-  side === 'plain'
-    ? { source: PLAIN, frames: 64, cols: 8, rows: 8 }
-    : { source: side === 'left' ? SHEETS_LEFT[d] : SHEETS[d], frames: 36, cols: 6, rows: 6 };
+import { EarthSphere } from '@/components/sphere';
+import { greatCircle, wrap180, type GlobeSide } from '@/lib/globe';
 
 const DEG = Math.PI / 180;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -58,9 +36,10 @@ export type Pin = { lat: number; lon: number; color: string; size?: number; ring
 
 /**
  * The website's Earth, in the pocket: real NASA textures, city lights on the
- * night side, a computed day/night line that leans with the season. The
- * sheet is pre-rendered (scripts/render-earth.mjs) and the frame follows the
- * actual time of day, so the planet turns as the day goes by.
+ * night side, a computed day/night line that leans with the season. It is a
+ * live Skia shader (components/sphere.tsx) sampling the 2048 px maps per
+ * pixel, so it is sharp, and the central meridian follows the actual time
+ * of day.
  *
  * Drag to turn it: the gesture and the rotation run on the UI thread, the
  * surface under the finger stays under the finger (1:1 at the centre), and
@@ -90,7 +69,6 @@ export function Earth({
   arcColor?: string;
   draggable?: boolean;
 }) {
-  const sheet = nearestSheet(decl);
   // The axis leans toward the sun: right for a sun on the right, left for a sun on the left.
   const lean = side === 'plain' ? 0 : side === 'left' ? -decl : decl;
   const r = size / 2;
@@ -131,16 +109,13 @@ export function Earth({
   });
 
   const lon = useDerivedValue(() => base.value + drag.value);
-  // Frame n shows central meridian n·step − 180; the sprite layers wrap the index.
-  const degPerFrame = side === 'plain' ? 360 / 64 : 10;
-  const frame = useDerivedValue(() => (lon.value + 180) / degPerFrame);
 
   const arcPoints = useMemo(() => (arc ? greatCircle(arc[0], arc[1]) : []), [arc]);
 
   return (
     <GestureDetector gesture={pan}>
       <View style={{ width: size, height: size }} accessible accessibilityRole="image" accessibilityLabel={side === 'plain' ? 'The Earth' : 'The Earth, with the day and night line'}>
-        <SpriteView sprite={sprite(sheet, side)} width={size} frame={frame} style={{ borderRadius: r }} />
+        <EarthSphere size={size} lon={lon} lean={lean} side={side} />
         <Svg width={size} height={size} style={StyleSheet.absoluteFill} pointerEvents="none">
           {arcPoints.length ? <ArcLine points={arcPoints} lon={lon} lean={lean} r={r} color={arcColor ?? '#d4a95f'} /> : null}
           {pins.map((p, i) => (

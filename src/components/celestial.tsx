@@ -1,47 +1,26 @@
 import { moonPhaseAt } from '@openathar/athan-core-ts';
 import { useEffect, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useDerivedValue, useSharedValue, type SharedValue } from 'react-native-reanimated';
+import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 
-import { SpriteView, useLoop, useReducedMotion, type Sprite } from '@/components/sprite';
+import { MoonSphere } from '@/components/sphere';
 import { usePhase } from '@/context/phase';
-import { physicalLeft } from '@/lib/rtl';
 
 /*
- * The moon, drawn like the website's: a lit sphere, not a texture with a translucent shadow, and it
- * MOVES. The website's 3D moon turns its surface under a fixed light; here two pre-rendered layers
- * give the same effect without a GL context:
- *
- *   surface  24 frames of the near side along a closed libration path (+-10 deg / +-5 deg), unlit.
- *            It loops slowly while the screen is in focus, so craters drift the way the real moon's
- *            face wobbles.
- *   shade    30 phases of the shadow (a navy overlay whose alpha is the darkness, with the website's
- *            lighting: warm sun, blue earthshine, ACES). It stays where the sun puts it.
- *
- * Both layers crossfade their two neighbouring frames on the UI thread, so every minute in between is
- * a real in-between phase. Shade frame k shows lunation fraction k/30: 0 new moon, 15 full moon,
- * waxing lit on the right. (The sun used to sit next to it; the website knows only the moon.)
+ * The moon, drawn like the website's: a live-lit sphere (components/sphere.tsx), the same 2048 px
+ * texture and the same lighting (warm sun, blue earthshine, ACES), and it turns under the light the
+ * way the website's moon does. Lunation fraction 0 is new moon, 0.5 full moon, waxing lit on the right.
  */
-const SURFACE: Sprite = { source: require('../../assets/images/celestial/moon-libration.jpg'), frames: 24, cols: 6, rows: 4 };
-const SHADE: Sprite = { source: require('../../assets/images/celestial/moon-shade.png'), frames: 30, cols: 6, rows: 5 };
-/** One libration cycle. Slow enough to read as the moon's own, quick enough to be seen on the start page. */
-const LIBRATION_MS = 40_000;
-
 function Moon({ diameter, now, fraction }: { diameter: number; now: Date; /** Lunation fraction 0..1 on the UI thread — overrides `now` (the orbiting moon). */ fraction?: SharedValue<number> }) {
   const phase = useMemo(() => moonPhaseAt(now), [now]);
-  const reduced = useReducedMotion();
-  const wobble = useLoop(LIBRATION_MS, SURFACE.frames, reduced);
-  const own = useSharedValue((phase.phaseAngle / 360) * SHADE.frames);
+  const own = useSharedValue(phase.phaseAngle / 360);
   useEffect(() => {
-    own.value = (phase.phaseAngle / 360) * SHADE.frames;
+    own.value = phase.phaseAngle / 360;
   }, [phase.phaseAngle, own]);
-  const orbit = useDerivedValue(() => (fraction ? fraction.value * SHADE.frames : 0));
-  const shadeFrame = fraction ? orbit : own;
 
   return (
-    <View style={[styles.center, { width: diameter, height: diameter, borderRadius: diameter / 2, overflow: 'hidden' }]}>
-      <SpriteView sprite={SURFACE} width={diameter} frame={wobble} />
-      <SpriteView sprite={SHADE} width={diameter} frame={shadeFrame} style={[styles.layer, physicalLeft]} />
+    <View style={{ width: diameter, height: diameter }}>
+      <MoonSphere size={diameter} fraction={fraction ?? own} />
     </View>
   );
 }
@@ -70,7 +49,6 @@ export function Celestial({ size = 104 }: { size?: number }) {
 }
 
 const styles = StyleSheet.create({
-  layer: { position: 'absolute', top: 0 },
   center: {
     alignItems: 'center',
     justifyContent: 'center',

@@ -99,9 +99,14 @@ Project-local skills/agents/commands are managed via `apm.yaml`
 - **Check on the simulator, not only on web.** Three real bugs only showed up there: a Hijri date of
   "NaN" (Hermes returns Arabic-Indic digits), the invisible switches (above), and an endless reload at
   start-up in Arabic.
-- **Right-to-left:** React Native swaps `left`/`right` in RTL. Sprite sheets, meteors and the moon orbit
+- **Right-to-left:** React Native swaps `left`/`right` in RTL. Meteors and the moon orbit
   are positioned from the physical left edge, so use `physicalLeft` (`src/lib/rtl.ts`), never `left: 0`.
   Direction changes reload the app at most once (`syncDirection`); `<DirectionRoot>` lays the screens
   out RTL itself when the native side does not take the forced direction (Expo Go).
 - **Design (2026-11-17):** default theme is the website's night (`obsidian`, `#0b0f17`); background is
   meteors only; the moon is the only sky body (no sun); the Qibla globe has no clouds.
+- **Skia (`@shopify/react-native-skia`, pinned to the version Expo Go bundles) draws the sky:** planets as
+  shaders, meteors as gradient strokes. Pinned exact, no install scripts. Worklet gotcha: inside
+  `useDerivedValue` only plain numbers and worklets exist; read `image.width()` and call helpers
+  *outside* and capture the numbers, or the UI thread throws and the app aborts (a `SIGABRT` with a
+  Hermes `throwPendingError` frame in the crash report).

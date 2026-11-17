@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming, type SharedValue } from 'react-native-reanimated';
 
 import { SectionLabel } from '@/components/screen';
-import { useReducedMotion } from '@/components/sprite';
+import { useReducedMotion } from '@/hooks/use-motion';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 import { DUAS, DUAS_BY_PHASE, type Collection, type Dua } from '@/data/duas';
