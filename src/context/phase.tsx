@@ -1,5 +1,6 @@
 import type { PrayerTimesResult } from '@openathar/athan-core-ts';
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import { Appearance } from 'react-native';
 
 import { FIXED_THEME_COLOR, useSettingsContext } from '@/context/settings';
 
@@ -77,10 +78,17 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
       sunAltitude: altitude,
       sunHeight: Math.min(1, Math.max(0, altitude / 45)),
       daylight: d,
-      starOpacity: starOpacity(altitude),
+      // A fixed dark theme keeps its stars all day, like the website; the sun themes fade them with daylight.
+      starOpacity: FIXED_THEME_COLOR[theme] && !dayInk ? 1 : starOpacity(altitude),
       now,
     };
   }, [now, times, location.lat, theme]);
+
+  // Native chrome (iOS glass tab bar, alerts, date pickers) follows the OS appearance, not our palette:
+  // a dark page with a light glass bar looked wrong. Make the OS appearance match the page tone.
+  useEffect(() => {
+    Appearance.setColorScheme(value.daylight > 0.5 ? 'light' : 'dark');
+  }, [value.daylight]);
 
   return <PhaseContext.Provider value={value}>{children}</PhaseContext.Provider>;
 }

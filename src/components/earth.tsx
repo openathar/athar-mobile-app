@@ -31,12 +31,12 @@ const SHEETS_LEFT: Record<SheetDecl, number> = {
   23: require('../../assets/images/earth/earth-L-d23.jpg'),
 };
 const PLAIN: number = require('../../assets/images/earth/earth-plain.jpg');
-const sprite = (d: SheetDecl, side: GlobeSide): Sprite => ({
-  source: side === 'plain' ? PLAIN : side === 'left' ? SHEETS_LEFT[d] : SHEETS[d],
-  frames: 36,
-  cols: 6,
-  rows: 6,
-});
+// Day/night sheets: 36 frames, 10° apart. The plain (Qibla) sheet has 64 frames, 5.6° apart and no
+// clouds: neighbouring frames are closer, so the crossfade while it turns ghosts less.
+const sprite = (d: SheetDecl, side: GlobeSide): Sprite =>
+  side === 'plain'
+    ? { source: PLAIN, frames: 64, cols: 8, rows: 8 }
+    : { source: side === 'left' ? SHEETS_LEFT[d] : SHEETS[d], frames: 36, cols: 6, rows: 6 };
 
 const DEG = Math.PI / 180;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -131,14 +131,15 @@ export function Earth({
   });
 
   const lon = useDerivedValue(() => base.value + drag.value);
-  // Frame n shows central meridian n·10 − 180; the sprite layers wrap the index.
-  const frame = useDerivedValue(() => (lon.value + 180) / 10);
+  // Frame n shows central meridian n·step − 180; the sprite layers wrap the index.
+  const degPerFrame = side === 'plain' ? 360 / 64 : 10;
+  const frame = useDerivedValue(() => (lon.value + 180) / degPerFrame);
 
   const arcPoints = useMemo(() => (arc ? greatCircle(arc[0], arc[1]) : []), [arc]);
 
   return (
     <GestureDetector gesture={pan}>
-      <View style={{ width: size, height: size }} accessible accessibilityRole="image" accessibilityLabel="The Earth, with the day and night line">
+      <View style={{ width: size, height: size }} accessible accessibilityRole="image" accessibilityLabel={side === 'plain' ? 'The Earth' : 'The Earth, with the day and night line'}>
         <SpriteView sprite={sprite(sheet, side)} width={size} frame={frame} style={{ borderRadius: r }} />
         <Svg width={size} height={size} style={StyleSheet.absoluteFill} pointerEvents="none">
           {arcPoints.length ? <ArcLine points={arcPoints} lon={lon} lean={lean} r={r} color={arcColor ?? '#d4a95f'} /> : null}

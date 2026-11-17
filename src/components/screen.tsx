@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Celestial } from '@/components/celestial';
-import { StarField } from '@/components/star-field';
+import { MeteorField } from '@/components/meteor-field';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
 
@@ -41,7 +41,7 @@ export function Screen({
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       {starOpacity > 0 && (
         <Animated.View pointerEvents="none" style={[styles.stars, { opacity: Animated.multiply(fade, starOpacity) }]}>
-          <StarField colors={colors.stars} />
+          <MeteorField colors={colors.stars} />
         </Animated.View>
       )}
       <SafeAreaView style={styles.fill} edges={['top']}>
@@ -72,11 +72,14 @@ export function ScreenHeader({
   titleAr,
   subtitle,
   subtitleLines = 1,
+  celestial = true,
 }: {
   title?: string;
   titleAr?: string;
   subtitle?: string;
   subtitleLines?: number;
+  /** The small sun/moon in the corner. Off where a large moon already carries the screen. */
+  celestial?: boolean;
 }) {
   const { colors } = usePhase();
   return (
@@ -102,9 +105,11 @@ export function ScreenHeader({
           </Text>
         ) : null}
       </View>
-      <View style={styles.celestial}>
-        <Celestial size={104} />
-      </View>
+      {celestial ? (
+        <View style={styles.celestial}>
+          <Celestial size={104} />
+        </View>
+      ) : null}
     </View>
   );
 }

@@ -60,7 +60,7 @@ export function EarthMoon({ width }: { width: number }) {
         <Earth size={earth} centralLon={centralMeridian(now)} decl={declinationDeg(now)} />
       </View>
       <Animated.View pointerEvents="none" style={[styles.abs, styles.moon, { width: moon, height: moon }, moonStyle]}>
-        <BigMoon size={moon / 0.6} fraction={fraction} />
+        <BigMoon size={moon} fraction={fraction} />
       </Animated.View>
     </View>
   );

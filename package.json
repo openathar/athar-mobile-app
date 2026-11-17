@@ -8,7 +8,7 @@
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
     "@expo/ui": "~58.0.26",
     "@expo/vector-icons": "^15.0.2",
-    "@openathar/athan-core-ts": "0.1.0",
+    "@openathar/athan-core-ts": "0.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.22",
     "expo-constants": "~58.0.14",

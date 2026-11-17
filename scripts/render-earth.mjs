@@ -70,9 +70,9 @@ function frame(S, lc, a, sign = 1, plain = false) {
       if (plain) {
         // No day/night line: an evenly lit globe for the Qibla map, light from the upper left.
         const sh = 0.5 + 0.5 * Math.max(0, -0.3 * nx + 0.5 * ny + 0.82 * nz);
-        const cm = Math.min(0.8, cl * 0.85);
+        // No clouds on the Qibla globe: the land and the sea are what the compass points across.
         const rimp = Math.pow(1 - nz, 3.2) * 0.45;
-        for (let k = 0; k < 3; k++) acc[k] += (d[k] * (1 - cm) + 242 * cm) * sh + [90, 150, 255][k] * rimp * 0.5;
+        for (let k = 0; k < 3; k++) acc[k] += d[k] * sh + [90, 150, 255][k] * rimp * 0.5;
         continue;
       }
       const lit = smooth(-0.12, 0.30, sux);          // soft terminator
@@ -98,13 +98,16 @@ function frame(S, lc, a, sign = 1, plain = false) {
   return out;
 }
 
-const S = 340, N = 36, cols = 6, rows = 6;
 const t0 = Date.now();
+/** One sheet. Day/night sheets: 36 frames of 340 px (6x6). Plain (Qibla): 64 frames of 256 px (8x8) —
+ *  5.6 degrees apart instead of 10, so the crossfade between neighbouring frames ghosts less when it turns. */
 function sheet(name, decl, sign, plain) {
+  const S = plain ? 256 : 340, N = plain ? 64 : 36, cols = plain ? 8 : 6, rows = Math.ceil(N / cols);
+  const step = 360 / N;
   const W = cols * S, H = rows * S, rgb = new Uint8ClampedArray(W * H * 3);
   for (let n = 0; n < N; n++) {
     // the axis leans toward the sun: right for sign +1, left for -1
-    const f = frame(S, ((n * 10) - 180) * DEG, sign * decl * DEG, sign, plain);
+    const f = frame(S, ((n * step) - 180) * DEG, sign * decl * DEG, sign, plain);
     const ox = (n % cols) * S, oy = Math.floor(n / cols) * S;
     for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) for (let k = 0; k < 3; k++) rgb[((oy + y) * W + ox + x) * 3 + k] = f[(y * S + x) * 3 + k];
   }

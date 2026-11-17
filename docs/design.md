@@ -30,8 +30,12 @@ long until it** — offline, instantly. Everything else is a calm second layer.
   one colour that moves with the real sun (`daylight()` in `lib/sky.ts`:
   night → day across the twilight band, about twenty minutes either side of
   sunrise and sunset). Text and accent flip at the midpoint.
+  **Since 2026-11-17 this is an option, not the default:** the default theme is
+  the website's night, a fixed `#0b0f17` (theme `obsidian`), and the system
+  appearance (iOS glass tab bar, dialogs) follows the page tone. The sun
+  themes remain in Settings → Display.
 - **One accent**, a single palette entry. Never per-phase accents.
-- Stars exist only over the header and the sphere, never behind text.
+- The background is **meteors only** (`components/meteor-field.tsx`): no stars, no dots. Three lanes of tapered streaks at random intervals; nothing at all with reduced motion. (Decided 2026-11-17: the earlier star field, even as gem-like sparkles, was rejected.)
 
 ## Type
 
@@ -84,7 +88,7 @@ app where growth is the content (Khatma, Tasbeeh — see plan).
 
 One orchestrated thing: the sphere and the live countdown. No fade-and-slide
 on sections, no hover/press flourishes beyond a 0.7 opacity press. Reduced
-motion is respected (stars and the signet stand still).
+motion is respected (no meteors, the signet stands still).
 
 ## Review against the defaults
 
@@ -114,8 +118,8 @@ One flat colour moves with the real sun (`skyColor()` in `lib/sky.ts`),
 morning and evening differ: deep navy → cold blue-grey before Fajr → pale warm
 paper at sunrise → day paper → amber paper at Asr → dusky rose-brown at
 Maghrib → navy at Isha. Light or dark ink is picked from the colour's
-luminance, so text is always readable. Stars sit at the top of the page and
-fade as you scroll away from it. No gradient, no glow.
+luminance, so text is always readable. The meteors cross the top of the page
+and fade as you scroll away from it. No gradient, no glow.
 
 ### Five tabs
 Today · Qibla · Sky · Feelings · Settings. (Sleek drew a sixth tab, Calendar;

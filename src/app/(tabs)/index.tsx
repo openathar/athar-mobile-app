@@ -38,7 +38,8 @@ export default function PrayerScreen() {
   const { location } = useLocation();
   const { colors, times } = usePhase();
   const width = useScreenWidth();
-  const heroSize = Math.min(width - 60, 330);
+  // The moon is the hero, but it must leave the header room to breathe.
+  const heroSize = Math.min(width - 110, 290);
   const minuteMs = Math.floor(now.getTime() / 60000) * 60000;
   const offsetHours = -now.getTimezoneOffset() / 60;
   const next = getNextPrayer(now, times);
@@ -57,7 +58,7 @@ export default function PrayerScreen() {
 
   return (
     <Screen>
-      <ScreenHeader titleAr={header.hijri} subtitle={`${header.gregorian} · ${location.label}`} />
+      <ScreenHeader titleAr={header.hijri} subtitle={`${header.gregorian} · ${location.label}`} celestial={false} />
 
       {/* Tonight's real moon — the phase computed on the device */}
       <View style={styles.stage}>

@@ -19,7 +19,7 @@ export type ThemeKey = (typeof THEME_KEYS)[number];
 export const FIXED_THEME_COLOR: Record<ThemeKey, string | null> = {
   sunGarnet: null,
   sunEmerald: null,
-  obsidian: '#0a0d14',
+  obsidian: '#0b0f17', // exactly the website's night (--lp-bg)
   lapis: '#152457',
   porcelain: '#f6f6f3',
 };
@@ -64,7 +64,7 @@ const SettingsContext = createContext<SettingsValue | null>(null);
  */
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [method, setMethodState] = useState<MethodKey>(defaultMethod);
-  const [theme, setThemeState] = useState<ThemeKey>('sunGarnet');
+  const [theme, setThemeState] = useState<ThemeKey>('obsidian');
   // Both choices live in one stored object; keep the latest to write it whole.
   const stored = useRef<Stored>({});
 
