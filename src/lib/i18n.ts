@@ -367,7 +367,7 @@ const ar: Dict = {
   nameOfDay: 'اسم اليوم',
   nameOfN: (n: string) => `${n} من ٩٩`,
   yourMoon: 'قمرك',
-  yourMoonHint: 'اختر تاريخًا: يوم ميلادك أو أي يوم يهمّك.',
+  yourMoonHint: 'اختر تاريخًا — يوم ميلادك أو أي يوم يهمّك.',
   hijriDate: 'التاريخ الهجري',
   dayShort: 'اليوم',
   monthShort: 'الشهر',
