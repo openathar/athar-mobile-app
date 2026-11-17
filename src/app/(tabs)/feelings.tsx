@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { Easing, useAnimatedProps, useSharedValue, withRepeat, withTiming, type SharedValue } from 'react-native-reanimated';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
 import { Screen, ScreenHeader, SectionLabel } from '@/components/screen';
@@ -8,6 +9,7 @@ import { usePhase } from '@/context/phase';
 import copyJson from '@/data/emotions-copy.json';
 import { HEART, MAP_H, MAP_W, NAVEL, TEXT_IDS, clusters, counterpartOf, placed } from '@/data/emotion-map';
 import { useScreenWidth } from '@/hooks/use-screen-width';
+import { useReducedMotion } from '@/hooks/use-motion';
 import { CONTENT_LOCALE, IS_RTL, LOCALE, t, type Locale } from '@/lib/i18n';
 
 type Labels = Pick<(typeof copyJson)['en'], 'counterpart' | 'chest' | 'belly' | 'sideStrong' | 'sideWeak' | 'sideMid' | 'count'>;
@@ -38,6 +40,30 @@ const LABELS: Partial<Record<Locale, Labels>> = {
   },
 };
 const VIEW = { x: -170, w: MAP_W + 340 };
+const AnimatedG = Animated.createAnimatedComponent(G);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+/** A faint dashed arc between a feeling and its counterpart, bowing gently off the straight line. */
+function linkPath(a: { x: number; y: number }, b: { x: number; y: number }): string {
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const bow = Math.min(64, len * 0.32);
+  const px = (-dy / len) * bow;
+  const py = (dx / len) * bow;
+  return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${(mx + px).toFixed(1)} ${(my + py).toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+}
+
+/** A breathing halo around the chosen feeling and its counterpart. */
+function Halo({ cx, cy, color, breathe }: { cx: number; cy: number; color: string; breathe: SharedValue<number> }) {
+  const props = useAnimatedProps(() => ({
+    r: 10 + 5 * breathe.value,
+    opacity: 0.55 - 0.4 * breathe.value,
+  }));
+  return <AnimatedCircle animatedProps={props} cx={cx} cy={cy} fill="none" stroke={color} strokeWidth={2} />;
+}
 
 /**
  * The website's feelings tree, drawn for the phone: branches in the chest,
@@ -53,6 +79,18 @@ export default function FeelingsScreen() {
   const fallback = CONTENT_LOCALE !== LOCALE;
   const [shown, setShown] = useState(0);
   const [sel, setSel] = useState<string>('love');
+  const reduced = useReducedMotion();
+  const breathe = useSharedValue(0);
+  useEffect(() => {
+    if (reduced) {
+      breathe.value = 0.5;
+      return;
+    }
+    breathe.value = withRepeat(withTiming(1, { duration: 2400, easing: Easing.inOut(Easing.sin) }), -1, true);
+    return () => {
+      breathe.value = 0;
+    };
+  }, [reduced, breathe]);
   const w = Math.min(width - 24, 560);
   const h = (w * MAP_H) / VIEW.w;
 
@@ -75,6 +113,11 @@ export default function FeelingsScreen() {
   const ti = (TEXT_IDS as readonly string[]).indexOf(sel);
   const counter = counterpartOf(sel);
   const petals = useMemo(() => Array.from({ length: 16 }, (_, i) => i * 22.5), []);
+  const heartProps = useAnimatedProps(() => {
+    const s = 1 + 0.05 * breathe.value;
+    return { transform: `translate(${HEART.x} ${HEART.y - 6}) scale(${s} ${s})` };
+  });
+  const counterTip = counter ? byId.get(counter)?.tip : null;
 
   return (
     <Screen>
@@ -83,6 +126,7 @@ export default function FeelingsScreen() {
       <View style={styles.figure}>
         <Svg width={w} height={h} viewBox={`${VIEW.x} 0 ${VIEW.w} ${MAP_H}`}>
           <Path d={`M${NAVEL.x} ${NAVEL.y}V${HEART.y}`} stroke={colors.text} strokeWidth={9} strokeLinecap="round" opacity={shown > 0 ? 1 : 0} />
+          {counterTip ? <Path d={linkPath(cur.tip, counterTip)} stroke={colors.accent} strokeWidth={1.4} strokeDasharray="4 6" fill="none" opacity={0.45} /> : null}
           {clusters.map((c, ci) => {
             if (ci >= shown) return null;
             const ink = c.zone === 'belly' ? colors.green : colors.text;
@@ -94,6 +138,7 @@ export default function FeelingsScreen() {
                   const on = p.id === sel || p.id === counter;
                   return (
                     <G key={p.id}>
+                      {on ? <Halo cx={p.tip.x} cy={p.tip.y} color={colors.accent} breathe={breathe} /> : null}
                       <Path d={p.d} stroke={on ? colors.accent : ink} strokeWidth={on ? 3.4 : 1.7} strokeLinecap="round" fill="none" opacity={on ? 1 : 0.8} />
                       <Circle cx={p.tip.x} cy={p.tip.y} r={on ? 8 : 4} fill={on ? colors.accent : ink} />
                     </G>
@@ -102,12 +147,12 @@ export default function FeelingsScreen() {
               </G>
             );
           })}
-          <G transform={`translate(${HEART.x} ${HEART.y - 6})`} opacity={shown > clusters.length / 2 ? 1 : 0}>
+          <AnimatedG animatedProps={heartProps} opacity={shown > clusters.length / 2 ? 1 : 0}>
             {petals.map((a) => (
               <Path key={a} d="M0 -30 m-8 0 a8 23 0 1 0 16 0 a8 23 0 1 0 -16 0" transform={`rotate(${a})`} fill={colors.accent} fillOpacity={0.2} stroke={colors.accent} strokeWidth={1.4} />
             ))}
             <Circle r={9} fill={colors.accent} />
-          </G>
+          </AnimatedG>
           <Circle cx={NAVEL.x} cy={NAVEL.y} r={8} fill={colors.text} />
         </Svg>
         {/* Tap targets sit above the drawing (SVG press handlers are unreliable on web). */}
