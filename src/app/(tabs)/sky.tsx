@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { EarthMoon } from '@/components/earth-moon';
 import { HijriCalendar } from '@/components/hijri-calendar';
+import { YourMoon } from '@/components/your-moon';
 import { PhaseDisc } from '@/components/phase-disc';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
@@ -65,6 +66,8 @@ export default function SkyScreen() {
       <Text style={[styles.hint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
         {face === null ? t.facesHint : `${t[MOON_KEYS[FACES[face].key]]} · ${t.returnsIn(daysUntilFraction(minute, FACES[face].fraction))}`}
       </Text>
+
+      <YourMoon />
 
       <HijriCalendar />
     </Screen>

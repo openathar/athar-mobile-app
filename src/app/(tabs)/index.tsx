@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Anywhere } from '@/components/anywhere';
 import { BigMoon } from '@/components/celestial';
+import { NameOfDay } from '@/components/name-of-day';
 import { DuaNow } from '@/components/dua-now';
 import { Card, Divider, Screen, ScreenHeader, SectionLabel } from '@/components/screen';
 import { TwoBooks } from '@/components/two-books';
@@ -113,6 +114,7 @@ export default function PrayerScreen() {
       </Card>
 
       <DuaNow />
+      <NameOfDay />
       <Anywhere />
       <TwoBooks />
     </Screen>
