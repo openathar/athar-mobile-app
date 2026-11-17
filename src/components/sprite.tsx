@@ -1,4 +1,6 @@
 import { useFocusEffect } from 'expo-router';
+
+import { physicalLeft } from '@/lib/rtl';
 import { useCallback, useEffect, useState } from 'react';
 import { AccessibilityInfo, Image, StyleSheet, View, type ImageSourcePropType, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
@@ -105,7 +107,7 @@ export function SpriteView({
 const styles = StyleSheet.create({
   sheet: {
     position: 'absolute',
-    left: 0,
+    ...physicalLeft,
     top: 0,
   },
 });

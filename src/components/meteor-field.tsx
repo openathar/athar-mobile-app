@@ -3,6 +3,8 @@ import { AccessibilityInfo, StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withSequence, withTiming } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
 
+import { physicalLeft } from '@/lib/rtl';
+
 /**
  * The background is meteors, nothing else: no stars, no dots, no ornaments.
  *
@@ -75,7 +77,7 @@ function Meteor({ width, height, lane, colors }: { width: number; height: number
   const H = 12;
   const mid = H / 2;
   return (
-    <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: 0, top: 0, width: L + 6, height: H }, style]}>
+    <Animated.View pointerEvents="none" style={[{ position: 'absolute', ...physicalLeft, top: 0, width: L + 6, height: H }, style]}>
       <Svg width={L + 6} height={H}>
         {/* head on the left; the tail thins to the right in three fading slivers */}
         <Path d={`M3 ${mid}L${L + 3} ${mid - 1.1}L${L + 3} ${mid + 1.1}Z`} fill={color} fillOpacity={0.5} />

@@ -8,6 +8,7 @@ import { Earth } from '@/components/earth';
 import { useLoop, useReducedMotion } from '@/components/sprite';
 import { usePhase } from '@/context/phase';
 import { centralMeridian, declinationDeg } from '@/lib/globe';
+import { physicalLeft } from '@/lib/rtl';
 
 /** Tilt of the moon's orbit plane against the view — the same slanted look as the website's scene. */
 const TILT = (30 * Math.PI) / 180;
@@ -68,5 +69,5 @@ export function EarthMoon({ width }: { width: number }) {
 
 const styles = StyleSheet.create({
   abs: { position: 'absolute' },
-  moon: { left: 0, top: 0, alignItems: 'center', justifyContent: 'center' },
+  moon: { ...physicalLeft, top: 0, alignItems: 'center', justifyContent: 'center' },
 });

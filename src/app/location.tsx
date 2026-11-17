@@ -54,7 +54,8 @@ export default function LocationScreen() {
       <ModalHeader
         title={IS_RTL ? undefined : t.locationTitle}
         titleAr={IS_RTL ? t.locationTitle : 'الموقع'}
-        subtitle={`${t.currently} ${location.label}`}
+        // The auto-detected place already reads "Current location"; a "Currently" in front doubled it.
+        subtitle={location.label === t.currentLocation ? t.currentLocation : `${t.currently} ${location.label}`}
       />
 
       <TextInput

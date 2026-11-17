@@ -14,8 +14,7 @@ import { LocationProvider } from '@/context/location';
 import { PhaseProvider } from '@/context/phase';
 import { SettingsProvider } from '@/context/settings';
 import { configureNotifications } from '@/lib/alarms';
-import '../global.css';
-import { LanguageProvider, LocaleBoundary } from '@/context/language';
+import { DirectionRoot, LanguageProvider, LocaleBoundary } from '@/context/language';
 
 SplashScreen.preventAutoHideAsync();
 configureNotifications();
@@ -43,6 +42,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={StyleSheet.absoluteFill}>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <LanguageProvider>
+      <DirectionRoot>
       <LocationProvider>
         <SettingsProvider>
           <PhaseProvider>
@@ -60,6 +60,7 @@ export default function RootLayout() {
           </PhaseProvider>
         </SettingsProvider>
       </LocationProvider>
+      </DirectionRoot>
       </LanguageProvider>
     </ThemeProvider>
     </GestureHandlerRootView>

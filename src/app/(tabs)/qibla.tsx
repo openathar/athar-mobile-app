@@ -94,10 +94,10 @@ function Ring({ size, bearing, heading, aligned }: { size: number; bearing: numb
       <G rotation={rot}>
         <Circle r={R} fill="none" stroke={colors.rule} strokeWidth={1} />
         <Path d={ticks} stroke={colors.textSecondary} strokeOpacity={0.55} strokeWidth={1} />
-        {[['N', 0], ['E', 90], ['S', 180], ['W', 270]].map(([l, d]) => {
-          const [x, y] = polar(R - 26, d as number);
+        {([[t.compassN, 0], [t.compassE, 90], [t.compassS, 180], [t.compassW, 270]] as const).map(([l, d]) => {
+          const [x, y] = polar(R - 26, d);
           return (
-            <SvgText key={l} x={x} y={y + 5} fontSize={14} fontFamily={Fonts.sansMedium} fill={l === 'N' ? colors.accent : colors.textSecondary} textAnchor="middle" transform={`rotate(${-rot} ${x} ${y})`}>
+            <SvgText key={d} x={x} y={y + 5} fontSize={14} fontFamily={Fonts.sansMedium} fill={d === 0 ? colors.accent : colors.textSecondary} textAnchor="middle" transform={`rotate(${-rot} ${x} ${y})`}>
               {l}
             </SvgText>
           );
@@ -118,7 +118,9 @@ export default function QiblaScreen() {
 
   const bearing = qiblaBearing(location.lat, location.lng);
   const km = distanceKm(location, KAABA);
-  const wind = WINDS[Math.round(bearing / 22.5) % 16];
+  // N/E/S/W inside the abbreviation follow the language (O in German, ش ق ج غ in Arabic).
+  const letters: Record<string, string> = { N: t.compassN, E: t.compassE, S: t.compassS, W: t.compassW };
+  const wind = WINDS[Math.round(bearing / 22.5) % 16].replace(/[NESW]/g, (c) => letters[c]);
   const ring = Math.max(0, Math.min(width - 24, 400));
   const globe = Math.round(ring * 0.72);
   const aligned = heading !== null && Math.abs(shortest(heading.deg, bearing)) <= ALIGNED_DEG;
@@ -135,7 +137,7 @@ export default function QiblaScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={IS_RTL ? undefined : t.qiblaTitle} titleAr="القبلة" subtitle={`${t.from} ${location.label}`} />
+      <ScreenHeader title={IS_RTL ? undefined : t.qiblaTitle} titleAr="القبلة" subtitle={location.label === t.currentLocation ? t.currentLocation : `${t.from} ${location.label}`} />
 
       <View style={styles.stage}>
         <View style={{ width: ring, height: ring, alignItems: 'center', justifyContent: 'center' }}>

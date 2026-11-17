@@ -89,3 +89,19 @@ Project-local skills/agents/commands are managed via `apm.yaml`
 (registry source: `~/Development/harness/registry/`).
 - `apm install --local` — installs the packages listed in `apm.yaml`
 - `apm status --local` — checks install state against the registry
+
+## Lessons (verified in the iOS simulator, 2026-11-17)
+
+- **No NativeWind / Tailwind.** It was added on 2026-11-02 with zero `className` uses. Its JSX transform
+  wrapped every component and silently dropped the style of every `Pressable` with a function style
+  (`style={({ pressed }) => …}`): the alarm switches collapsed to 20×20 px and were invisible on iOS,
+  while the web preview looked fine. Removed. Do not bring it back without fixing that.
+- **Check on the simulator, not only on web.** Three real bugs only showed up there: a Hijri date of
+  "NaN" (Hermes returns Arabic-Indic digits), the invisible switches (above), and an endless reload at
+  start-up in Arabic.
+- **Right-to-left:** React Native swaps `left`/`right` in RTL. Sprite sheets, meteors and the moon orbit
+  are positioned from the physical left edge, so use `physicalLeft` (`src/lib/rtl.ts`), never `left: 0`.
+  Direction changes reload the app at most once (`syncDirection`); `<DirectionRoot>` lays the screens
+  out RTL itself when the native side does not take the forced direction (Expo Go).
+- **Design (2026-11-17):** default theme is the website's night (`obsidian`, `#0b0f17`); background is
+  meteors only; the moon is the only sky body (no sun); the Qibla globe has no clouds.

@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { reloadAppAsync } from 'expo';
 import { Fragment, createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { I18nManager, Platform } from 'react-native';
+import { I18nManager, Platform, View } from 'react-native';
 
 import { IS_RTL, LOCALE, LOCALES, applyLocale, deviceLocale, type Locale } from '@/lib/i18n';
+
+const isRtlLocale = (l: Locale) => l === 'ar';
 
 const STORAGE_KEY = 'athar.language.v1';
 
@@ -21,13 +23,20 @@ const LanguageContext = createContext<LanguageValue | null>(null);
 
 const resolve = (pref: LanguagePreference): Locale => (pref === 'device' ? deviceLocale() : pref);
 
+const GUARD_KEY = 'athar.direction-reload.v1';
+
 /**
  * Text direction. Web flips with the document; native layout direction is
  * fixed when the JS starts, so a change between Arabic and a left-to-right
  * language forces the new direction and reloads the bundle once.
- * Returns true when a reload is under way.
+ *
+ * The reload happens at most ONCE per direction. Expo Go and some builds on the new architecture never
+ * report the forced direction after the reload (`I18nManager.isRTL` stays as it was), and without this
+ * guard the app reloaded forever and sat on the splash screen. After one failed attempt it carries on
+ * and <DirectionRoot> lays the screens out in the right direction itself.
+ * Resolves true when a reload is under way.
  */
-function syncDirection(): boolean {
+async function syncDirection(): Promise<boolean> {
   if (Platform.OS === 'web') {
     if (typeof document !== 'undefined') {
       document.documentElement.dir = IS_RTL ? 'rtl' : 'ltr';
@@ -36,10 +45,26 @@ function syncDirection(): boolean {
     return false;
   }
   I18nManager.allowRTL(IS_RTL);
-  if (I18nManager.isRTL === IS_RTL) return false;
+  if (I18nManager.isRTL === IS_RTL) {
+    await AsyncStorage.removeItem(GUARD_KEY).catch(() => {});
+    return false;
+  }
+  const tried = await AsyncStorage.getItem(GUARD_KEY).catch(() => null);
+  if (tried === String(IS_RTL)) return false;
+  await AsyncStorage.setItem(GUARD_KEY, String(IS_RTL)).catch(() => {});
   I18nManager.forceRTL(IS_RTL);
   reloadAppAsync('language direction changed').catch(() => {});
   return true;
+}
+
+/**
+ * Lays everything below out in the language's direction. Normally the native direction already matches
+ * and this changes nothing; when the native side did not take the forced direction (see syncDirection)
+ * it is what keeps Arabic right-to-left.
+ */
+export function DirectionRoot({ children }: { children: ReactNode }) {
+  const { locale } = useLanguage();
+  return <View style={{ flex: 1, direction: isRtlLocale(locale) ? 'rtl' : 'ltr' }}>{children}</View>;
 }
 
 /**
@@ -68,7 +93,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         applyLocale(next);
         setPref(pref);
         setLocale(next);
-        if (!syncDirection()) setReady(true);
+        syncDirection().then((reloading) => {
+          if (!cancelled && !reloading) setReady(true);
+        });
       });
     return () => {
       cancelled = true;
@@ -81,7 +108,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     applyLocale(next);
     setPref(pref);
     setLocale(next);
-    syncDirection();
+    // A new language choice earns a new attempt at the native direction.
+    AsyncStorage.removeItem(GUARD_KEY)
+      .catch(() => {})
+      .then(() => syncDirection());
   }, []);
 
   const value = useMemo<LanguageValue>(() => ({ preference, locale, setPreference }), [preference, locale, setPreference]);

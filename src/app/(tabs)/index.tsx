@@ -48,7 +48,9 @@ export default function PrayerScreen() {
   const dayKey = now.toDateString();
   const header = useMemo(() => {
     const hijri = gregorianToHijri(now, 'ar');
-    const gregorian = now.toLocaleDateString(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
+    const gregorianRaw = now.toLocaleDateString(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
+    // Hermes prints Latin digits for Arabic; the Hijri date next to it uses Arabic-Indic ones.
+    const gregorian = LOCALE === 'ar' ? gregorianRaw.replace(/\d/g, (d) => ARABIC_DIGITS[Number(d)]) : gregorianRaw;
     return {
       hijri: `${toArabicDigits(hijri.day)} ${hijri.monthName} ${toArabicDigits(hijri.year)}`,
       gregorian,

@@ -12,7 +12,8 @@ const STORAGE_KEY = 'athar.settings.v1';
  * Page colour themes. The two sun themes follow the real sun through the
  * day (lib/sky.ts) and differ only at Maghrib; the others hold one stone.
  */
-export const THEME_KEYS = ['sunGarnet', 'sunEmerald', 'obsidian', 'lapis', 'porcelain'] as const;
+// Order of the picker: the website's night first (the default), the sun themes last.
+export const THEME_KEYS = ['obsidian', 'lapis', 'porcelain', 'sunGarnet', 'sunEmerald'] as const;
 export type ThemeKey = (typeof THEME_KEYS)[number];
 
 /** The fixed colour of a one-stone theme, or null for the sun themes. */
