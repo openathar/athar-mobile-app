@@ -49,7 +49,7 @@ const en = {
   inDays: (n: number) => (n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : `in ${n} days`),
   feelingsTitle: 'Feelings',
   feelingsLead: 'Roots in the belly, branches in the chest, the heart in the middle. Tap a feeling.',
-  feelingsSource: 'After the research model of Amin Sabry.',
+  feelingsSource: 'Amin Sabry’s research map (alhosna.net) — 135 feelings and sensors, many of them states of devotion.',
 
   nextPrayer: 'Next prayer',
   at: 'at',
@@ -218,7 +218,7 @@ const de: Dict = {
   inDays: (n) => (n === 0 ? 'Heute' : n === 1 ? 'Morgen' : `in ${n} Tagen`),
   feelingsTitle: 'Gefühle',
   feelingsLead: 'Wurzeln im Bauch, Äste in der Brust, in der Mitte das Herz. Tipp ein Gefühl an.',
-  feelingsSource: 'Nach dem Modell des Forschers Amin Sabry.',
+  feelingsSource: 'Amin Sabrys Forschungskarte (alhosna.net) — 135 Gefühle und Sensoren, viele davon andächtige Zustände.',
 
   nextPrayer: 'Nächstes Gebet',
   at: 'um',
@@ -385,7 +385,7 @@ const ar: Dict = {
   inDays: (n) => (n === 0 ? 'اليوم' : n === 1 ? 'غدًا' : `بعد ${n} يومًا`),
   feelingsTitle: 'المشاعر',
   feelingsLead: 'الجذور في البطن، والأغصان في الصدر، والقلب في الوسط. المس شعورًا.',
-  feelingsSource: 'عن نموذج الباحث أمين صبري.',
+  feelingsSource: 'خريطة أمين صبري البحثية (alhosna.net) — ١٣٥ شعورًا وحاسّة، كثير منها حالات تعبّد.',
 
   nextPrayer: 'الصلاة التالية',
   at: 'عند',
@@ -553,7 +553,7 @@ const pl: Dict = {
   inDays: (n) => (n === 0 ? 'Dziś' : n === 1 ? 'Jutro' : `za ${n} dni`),
   feelingsTitle: 'Uczucia',
   feelingsLead: 'Korzenie w brzuchu, gałęzie w piersi, serce pośrodku. Dotknij uczucia.',
-  feelingsSource: 'Według modelu badacza Amina Sabry’ego.',
+  feelingsSource: 'Mapa badawcza Amina Sabry’ego (alhosna.net) — 135 uczuć i czujników, wiele z nich to stany pobożności.',
 
   nextPrayer: 'Następna modlitwa',
   at: 'o',
@@ -720,7 +720,7 @@ const tr: Dict = {
   inDays: (n) => (n === 0 ? 'Bugün' : n === 1 ? 'Yarın' : `${n} gün sonra`),
   feelingsTitle: 'Duygular',
   feelingsLead: 'Kökler karında, dallar göğüste, kalp ortada. Bir duyguya dokun.',
-  feelingsSource: 'Araştırmacı Amin Sabry’nin modeline göre.',
+  feelingsSource: 'Amin Sabry’nin araştırma haritası (alhosna.net) — 135 duygu ve algı, çoğu birer ibadet hâlidir.',
 
   nextPrayer: 'Sıradaki namaz',
   at: 'saat',
