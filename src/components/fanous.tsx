@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
-import Svg, { Circle, Defs, LinearGradient, Path, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { Card, Divider, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
@@ -12,43 +12,32 @@ import { upcomingObservances } from '@/lib/observances';
 
 /**
  * The Ramadan lantern (fanous): it is lowered on its rope into the screen, settles, then sways and
- * glows. Drawn in SVG (no asset), gold on the night palette, with a warm core. It announces the
- * coming observances — Ramadan first when it is near — below it.
+ * glows. A real lantern photo (background removed), warmed from inside by a radial glow. It
+ * announces the coming observances — Ramadan first when it is near — below it.
+ *
+ * Photo: "Fanous Ramadan (cropped)" by Ibrahim.ID, CC BY-SA 3.0, via Wikimedia Commons.
  */
 
-function FanousBody({ gold }: { gold: string }) {
+const FANOUS = require('../../assets/images/fanous.jpg');
+const LANTERN_W = 88;
+const LANTERN_H = Math.round((LANTERN_W * 1244) / 618); // source aspect, ~177
+
+function FanousBody() {
   return (
-    <Svg width={108} height={150} viewBox="0 0 120 168">
-      <Defs>
-        <LinearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor="#f3d9a4" stopOpacity="0.95" />
-          <Stop offset="0.55" stopColor="#d4a95f" stopOpacity="0.85" />
-          <Stop offset="1" stopColor="#8a6a3a" stopOpacity="0.92" />
-        </LinearGradient>
-        <RadialGradient id="core" cx="0.5" cy="0.5" r="0.5">
-          <Stop offset="0" stopColor="#fff3d6" stopOpacity="1" />
-          <Stop offset="0.45" stopColor="#f5c66e" stopOpacity="0.6" />
-          <Stop offset="1" stopColor="#f5c66e" stopOpacity="0" />
-        </RadialGradient>
-      </Defs>
-      {/* hanging ring */}
-      <Circle cx="60" cy="12" r="6" stroke={gold} strokeWidth="2.5" fill="none" />
-      {/* top cap */}
-      <Circle cx="60" cy="15" r="3" fill={gold} />
-      <Path d="M46 22 L74 22 L70 38 L50 38 Z" fill={gold} />
-      {/* glass body */}
-      <Path d="M50 38 C 18 56, 18 104, 46 124 L 74 124 C 102 104, 102 56, 70 38 Z" fill="url(#glass)" stroke={gold} strokeWidth="2" />
-      {/* warm core */}
-      <Circle cx="60" cy="86" r="42" fill="url(#core)" />
-      {/* ribs */}
-      {[36, 48, 60, 72, 84].map((x) => (
-        <Path key={x} d={`M${x} 40 C ${x - 5} 64, ${x - 5} 100, ${x} 122`} stroke={gold} strokeWidth="1.5" fill="none" opacity="0.8" />
-      ))}
-      <Path d="M26 86 C 44 98, 76 98, 94 86" stroke={gold} strokeWidth="1.5" fill="none" opacity="0.7" />
-      {/* bottom cap + finial */}
-      <Path d="M46 124 L74 124 L70 136 L50 136 Z" fill={gold} />
-      <Circle cx="60" cy="142" r="4" fill={gold} />
-    </Svg>
+    <View style={{ width: LANTERN_W, height: LANTERN_H }}>
+      <Image source={FANOUS} style={{ width: LANTERN_W, height: LANTERN_H }} resizeMode="contain" />
+      {/* warm light from inside, layered over the photo's own glow */}
+      <Svg width={LANTERN_W} height={LANTERN_H} style={StyleSheet.absoluteFill} pointerEvents="none">
+        <Defs>
+          <RadialGradient id="fanous-glow" cx="0.5" cy="0.6" r="0.55">
+            <Stop offset="0" stopColor="#ffd98a" stopOpacity="0.5" />
+            <Stop offset="0.45" stopColor="#f5a94e" stopOpacity="0.2" />
+            <Stop offset="1" stopColor="#f5a94e" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect x="0" y="0" width={LANTERN_W} height={LANTERN_H} fill="url(#fanous-glow)" />
+      </Svg>
+    </View>
   );
 }
 
@@ -83,7 +72,7 @@ export function Fanous({ height = 250 }: { height?: number }) {
       <Animated.View style={[styles.hang, descend]}>
         <View style={[styles.rope, { backgroundColor: colors.rule }]} />
         <Animated.View style={[styles.lantern, swing]}>
-          <FanousBody gold={colors.accent} />
+          <FanousBody />
         </Animated.View>
       </Animated.View>
     </View>
