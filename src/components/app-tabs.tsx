@@ -18,7 +18,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>{t.tabPrayer}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="clock-outline" />}
+          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="mosque-outline" />}
         />
       </NativeTabs.Trigger>
 
@@ -39,7 +39,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="feelings">
         <NativeTabs.Trigger.Label>{t.tabFeelings}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="tree-outline" />}
+          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="heart-outline" />}
         />
       </NativeTabs.Trigger>
 
