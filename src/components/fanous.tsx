@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
 import { Card, Divider, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
@@ -10,9 +10,10 @@ import { LOCALE, t } from '@/lib/i18n';
 import { upcomingObservances } from '@/lib/observances';
 
 /**
- * The Ramadan lantern (fanous): it is lowered on its rope into the screen, settles, then sways and
- * glows. A real lantern photo (background removed, flattened onto the night palette). It
- * announces the coming observances — Ramadan first when it is near — below it.
+ * The Ramadan lantern (fanous): it rises from below the page into view, settles, then sways —
+ * rope and lantern together, like a pendulum. A real lantern photo (background removed, flattened
+ * onto the night palette). It announces the coming observances — Ramadan first when it is near —
+ * below it; the next one blinks gently so it catches the eye.
  *
  * Photo: "Fanous Ramadan (cropped)" by Ibrahim.ID, CC BY-SA 3.0, via Wikimedia Commons.
  */
@@ -27,38 +28,36 @@ function FanousBody() {
   );
 }
 
-/** The lantern lowered on its rope, then swaying. */
+/** The lantern rising from below, then swaying — rope and lantern as one. */
 export function Fanous({ height = 230 }: { height?: number }) {
   const { colors } = usePhase();
   const reduced = useReducedMotion();
-  const drop = useSharedValue(0); // 0 = still above, 1 = landed
+  const rise = useSharedValue(0); // 0 = below, 1 = landed
   const sway = useSharedValue(0); // 0..1 loop for the gentle swing
 
   useEffect(() => {
     if (reduced) {
-      drop.value = 1;
+      rise.value = 1;
       return;
     }
-    // Drop immediately (no delay) so the lantern is visible right away.
-    drop.value = withTiming(1, { duration: 900, easing: Easing.out(Easing.cubic) });
-    sway.value = withDelay(900, withRepeat(withTiming(1, { duration: 3800, easing: Easing.inOut(Easing.sin) }), -1, true));
+    rise.value = withTiming(1, { duration: 1100, easing: Easing.out(Easing.cubic) });
+    sway.value = withDelay(1100, withRepeat(withTiming(1, { duration: 2600, easing: Easing.inOut(Easing.sin) }), -1, true));
     return () => {
-      drop.value = 0;
+      rise.value = 0;
       sway.value = 0;
     };
-  }, [reduced, drop, sway]);
+  }, [reduced, rise, sway]);
 
-  // The whole assembly is lowered, then the lantern swings around its hook like a pendulum.
-  const descend = useAnimatedStyle(() => ({ transform: [{ translateY: (1 - drop.value) * -height }] }));
-  const swing = useAnimatedStyle(() => ({ transform: [{ rotate: `${Math.sin(sway.value * Math.PI * 2) * 4}deg` }], transformOrigin: 'top center' }));
+  const ascend = useAnimatedStyle(() => ({ transform: [{ translateY: (1 - rise.value) * height }] }));
+  const swing = useAnimatedStyle(() => ({ transform: [{ rotate: `${sway.value * 8}deg` }] }));
 
   return (
     <View style={{ height, alignItems: 'center', overflow: 'hidden' }}>
-      <Animated.View style={[styles.hang, descend]}>
+      <Animated.View style={[styles.hang, ascend, swing]}>
         <View style={[styles.rope, { backgroundColor: colors.rule }]} />
-        <Animated.View style={[styles.lantern, swing]}>
+        <View style={styles.lantern}>
           <FanousBody />
-        </Animated.View>
+        </View>
       </Animated.View>
     </View>
   );
@@ -68,6 +67,16 @@ export function Fanous({ height = 230 }: { height?: number }) {
 export function FanousUpcoming() {
   const { colors, now } = usePhase();
   const events = useMemo(() => upcomingObservances(now, 4), [now.toDateString()]);
+  const reduced = useReducedMotion();
+  const blink = useSharedValue(1);
+
+  useEffect(() => {
+    if (reduced) return;
+    blink.value = withRepeat(withSequence(withTiming(0.45, { duration: 900, easing: Easing.inOut(Easing.sin) }), withTiming(1, { duration: 900, easing: Easing.inOut(Easing.sin) })), -1, false);
+    return () => { blink.value = 1; };
+  }, [reduced, blink]);
+
+  const blinkStyle = useAnimatedStyle(() => ({ opacity: blink.value }));
 
   return (
     <View>
@@ -82,7 +91,11 @@ export function FanousUpcoming() {
                 <Text style={[styles.eventName, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{e.name}</Text>
                 <Text style={[styles.eventNote, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{e.note}</Text>
               </View>
-              <Text style={[styles.eventDays, { color: colors.accent, fontFamily: LOCALE === 'ar' ? Fonts.sans : Fonts.mono }]}>{t.inDays(e.days)}</Text>
+              {i === 0 ? (
+                <Animated.Text style={[styles.eventDays, { color: colors.accent, fontFamily: LOCALE === 'ar' ? Fonts.sans : Fonts.mono }, blinkStyle]}>{t.inDays(e.days)}</Animated.Text>
+              ) : (
+                <Text style={[styles.eventDays, { color: colors.accent, fontFamily: LOCALE === 'ar' ? Fonts.sans : Fonts.mono }]}>{t.inDays(e.days)}</Text>
+              )}
             </View>
           </View>
         ))}
