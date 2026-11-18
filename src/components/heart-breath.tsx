@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import Animated, { Easing, FadeIn, useAnimatedProps, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
-import Svg, { Circle, Defs, Ellipse, Path, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, Ellipse, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { Card, SectionLabel } from '@/components/screen';
 import { Fonts } from '@/constants/theme';
@@ -174,9 +174,38 @@ export function HeartBreath() {
         <Text style={[styles.zoneProgress, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{Math.round(zoneProgress * 100)}%</Text>
       </View>
 
-      {/* Progress bar */}
-      <View style={[styles.progressTrack, { backgroundColor: colors.rule }]}>
-        <View style={[styles.progressFill, { backgroundColor: ZONE_COLOR[currentZone], width: `${((idx + 1) / filtered.length) * 100}%` }]} />
+      {/* Body region + progress */}
+      <View style={styles.bodyRow}>
+        <Svg width={60} height={100} viewBox="0 0 60 100">
+          {/* Head */}
+          <Circle cx={30} cy={14} r={10} fill={cur.zone === 'face' ? ZONE_COLOR.face : colors.rule} stroke={colors.textSecondary} strokeWidth="1" />
+          {/* Neck */}
+          <Rect x={27} y={24} width={6} height={6} fill={colors.rule} />
+          {/* Torso */}
+          <Path d="M18 30 Q14 30 14 36 L14 70 Q14 76 18 76 L42 76 Q46 76 46 70 L46 36 Q46 30 42 30 Z"
+            fill={cur.zone === 'chest' ? ZONE_COLOR.chest + '66' : (cur.zone === 'core' ? ZONE_COLOR.core + '66' : colors.rule)} stroke={colors.textSecondary} strokeWidth="1" />
+          {/* Belly highlight */}
+          {cur.zone === 'belly' && <Ellipse cx={30} cy={62} rx={12} ry={8} fill={ZONE_COLOR.belly} fillOpacity={0.5} />}
+          {/* Chest highlight */}
+          {cur.zone === 'chest' && <Ellipse cx={30} cy={42} rx={14} ry={10} fill={ZONE_COLOR.chest} fillOpacity={0.5} />}
+          {/* Core highlight */}
+          {cur.zone === 'core' && <Circle cx={30} cy={52} r={8} fill={ZONE_COLOR.core} fillOpacity={0.5} />}
+          {/* Face highlight */}
+          {cur.zone === 'face' && <Circle cx={30} cy={14} r={10} fill={ZONE_COLOR.face} fillOpacity={0.5} />}
+          {/* Arms */}
+          <Path d="M14 36 L8 58 L10 60" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <Path d="M46 36 L52 58 L50 60" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          {/* Legs */}
+          <Path d="M22 76 L20 96" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <Path d="M38 76 L40 96" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        </Svg>
+        <View style={styles.bodyInfo}>
+          <Text style={[styles.bodyZone, { color: ZONE_COLOR[cur.zone], fontFamily: Fonts.sansMedium }]}>{ZONE_NAME[cur.zone][CONTENT_LOCALE] || ZONE_NAME[cur.zone].en}</Text>
+          <View style={[styles.progressTrack, { backgroundColor: colors.rule }]}>
+            <View style={[styles.progressFill, { backgroundColor: ZONE_COLOR[cur.zone], width: `${((idx + 1) / filtered.length) * 100}%` }]} />
+          </View>
+          <Text style={[styles.bodyProgress, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{idx + 1} / {filtered.length}</Text>
+        </View>
       </View>
 
       {/* Feeling card */}
@@ -184,6 +213,7 @@ export function HeartBreath() {
         <Text style={[styles.arabic, { color: colors.text, fontFamily: Fonts.arabic }]}>{cur.text.replace(/\n/g, ' ')}</Text>
         <Text style={[styles.zone, { color: ZONE_COLOR[cur.zone], fontFamily: Fonts.sansMedium }]}>{ZONE_NAME[cur.zone][CONTENT_LOCALE] || ZONE_NAME[cur.zone].en}</Text>
         <Text style={[styles.verse, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{ZONE_VERSE[cur.zone]}</Text>
+        <Text style={[styles.counterpart, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.heartBreathCounterpart}</Text>
       </Animated.View>
 
       {/* Navigation */}
@@ -191,7 +221,6 @@ export function HeartBreath() {
         <Pressable accessibilityRole="button" accessibilityLabel={t.heartBreathPrev} onPress={() => step(-1)} style={({ pressed }) => [styles.navBtn, { borderColor: colors.rule }, pressed && styles.pressed]}>
           <Text style={[styles.navArrow, { color: colors.accent }]}>{IS_RTL ? '›' : '‹'}</Text>
         </Pressable>
-        <Text style={[styles.counter, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{idx + 1} / {filtered.length}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel={t.heartBreathNext} onPress={() => step(1)} style={({ pressed }) => [styles.navBtn, { borderColor: colors.rule }, pressed && styles.pressed]}>
           <Text style={[styles.navArrow, { color: colors.accent }]}>{IS_RTL ? '‹' : '›'}</Text>
         </Pressable>
@@ -226,4 +255,9 @@ const styles = StyleSheet.create({
   counter: { fontSize: 14 },
   pressed: { opacity: 0.6 },
   source: { fontSize: 13, lineHeight: 19, marginTop: 16 },
+  bodyRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8, marginBottom: 8 },
+  bodyInfo: { flex: 1, gap: 4 },
+  bodyZone: { fontSize: 14 },
+  bodyProgress: { fontSize: 12 },
+  counterpart: { fontSize: 13, marginTop: 8, fontStyle: 'italic' },
 });
