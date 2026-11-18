@@ -66,22 +66,7 @@ export function HeartBreath() {
   const warm = ['chest', 'core'].includes(cur.zone);
 
   // Flame breathes; pulses when a new feeling arrives.
-  const breathe = useSharedValue(0);
-  const intensity = useSharedValue(0.5);
-  const pulse = useSharedValue(1);
-  useEffect(() => {
-    if (reduced) { breathe.value = 0.5; return; }
-    breathe.value = withRepeat(withTiming(1, { duration: 2600, easing: Easing.inOut(Easing.sin) }), -1, true);
-  }, [reduced, breathe]);
-  useEffect(() => {
-    intensity.value = withTiming(warm ? 1 : 0.35, { duration: 500, easing: Easing.out(Easing.cubic) });
-    pulse.value = withSequence(withTiming(1.3, { duration: 200, easing: Easing.out(Easing.cubic) }), withTiming(1, { duration: 400, easing: Easing.inOut(Easing.sin) }));
-  }, [cur, warm, intensity, pulse]);
-
-  const flameProps = useAnimatedProps(() => ({
-    opacity: 0.6 + 0.4 * intensity.value,
-    transform: [{ scale: (1 + 0.08 * breathe.value * intensity.value) * pulse.value }],
-  }));
+  // No flame animation needed — the body figure shows the zone directly.
 
   const size = Math.min(width - 40, 200);
   const cx = size / 2;
@@ -130,38 +115,33 @@ export function HeartBreath() {
         <Text style={[styles.count, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{filtered.length}</Text>
       </View>
 
-      {/* Lamp */}
-      <View style={[styles.lampStage, { width: size, height: size + 20 }]}>
-        <Svg width={size} height={size + 20} viewBox={`0 0 ${size} ${size + 20}`}>
-          <Defs>
-            <RadialGradient id="breath-glow" cx="0.5" cy="0.4" r="0.5">
-              <Stop offset="0" stopColor={warm ? '#ffd98a' : '#9aa0b0'} stopOpacity="0.35" />
-              <Stop offset="0.6" stopColor={warm ? '#d4a95f' : '#5c6156'} stopOpacity="0.12" />
-              <Stop offset="1" stopColor={warm ? '#d4a95f' : '#5c6156'} stopOpacity="0" />
-            </RadialGradient>
-            <RadialGradient id="breath-flame" cx="0.5" cy="0.5" r="0.5">
-              <Stop offset="0" stopColor="#fff3d6" stopOpacity="1" />
-              <Stop offset="0.4" stopColor={warm ? '#f5c66e' : '#9aa0b0'} stopOpacity="0.8" />
-              <Stop offset="1" stopColor={warm ? '#d4a95f' : '#5c6156'} stopOpacity="0" />
-            </RadialGradient>
-          </Defs>
-
-          {/* Niche */}
-          <Path d={`M${cx - 36} ${cy + 42} L${cx - 36} ${cy - 16} Q${cx - 36} ${cy - 58} ${cx} ${cy - 64} Q${cx + 36} ${cy - 58} ${cx + 36} ${cy - 16} L${cx + 36} ${cy + 42} Z`}
-            fill={colors.background} stroke={colors.rule} strokeWidth="1.2" />
-
-          {/* Glow */}
-          <Circle cx={cx} cy={cy} r={56} fill="url(#breath-glow)" />
-
-          {/* Lamp body */}
-          <Ellipse cx={cx} cy={cy + 14} rx={18} ry={8} fill={colors.rule} stroke={colors.accent} strokeWidth="1" />
-          <Path d={`M${cx - 18} ${cy + 14} Q${cx - 22} ${cy + 24} ${cx - 14} ${cy + 28} L${cx + 14} ${cy + 28} Q${cx + 22} ${cy + 24} ${cx + 18} ${cy + 14} Z`}
-            fill={colors.background} stroke={colors.rule} strokeWidth="1" />
-
-          {/* Flame */}
-          <AnimatedPath animatedProps={flameProps}
-            d={`M${cx} ${cy - 32} Q${cx - 8} ${cy - 16} ${cx - 5} ${cy - 3} Q${cx} ${cy + 3} ${cx + 5} ${cy - 3} Q${cx + 8} ${cy - 16} ${cx} ${cy - 32} Z`}
-            fill="url(#breath-flame)" origin={`${cx}, ${cy - 4}`} />
+      {/* Body figure — abstract, minimal */}
+      <View style={[styles.bodyStage, { width: size, height: size + 40 }]}>
+        <Svg width={size} height={size + 40} viewBox="0 0 80 160">
+          {/* Head */}
+          <Circle cx={40} cy={16} r={12} fill={cur.zone === 'face' ? ZONE_COLOR.face : colors.rule} fillOpacity={cur.zone === 'face' ? 0.6 : 0.3} stroke={colors.textSecondary} strokeWidth="1" />
+          {/* Neck */}
+          <Rect x={36} y={28} width={8} height={6} fill={colors.rule} fillOpacity={0.3} />
+          {/* Torso outline */}
+          <Path d="M24 34 C 20 34 18 40 18 48 L18 100 C 18 108 22 112 28 112 L52 112 C 58 112 62 108 62 100 L62 48 C 62 40 60 34 56 34 Z"
+            fill={colors.rule} fillOpacity={0.15} stroke={colors.textSecondary} strokeWidth="1" />
+          {/* Chest glow */}
+          <Ellipse cx={40} cy={56} rx={16} ry={12}
+            fill={cur.zone === 'chest' ? ZONE_COLOR.chest : 'transparent'} fillOpacity={0.5} />
+          {/* Core glow */}
+          <Circle cx={40} cy={72} r={8}
+            fill={cur.zone === 'core' ? ZONE_COLOR.core : 'transparent'} fillOpacity={0.5} />
+          {/* Belly glow */}
+          <Ellipse cx={40} cy={90} rx={14} ry={10}
+            fill={cur.zone === 'belly' ? ZONE_COLOR.belly : 'transparent'} fillOpacity={0.5} />
+          {/* Face glow */}
+          {cur.zone === 'face' && <Circle cx={40} cy={16} r={12} fill={ZONE_COLOR.face} fillOpacity={0.35} />}
+          {/* Arms (minimal) */}
+          <Path d="M18 48 L10 75" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
+          <Path d="M62 48 L70 75" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
+          {/* Legs (minimal) */}
+          <Path d="M32 112 L30 150" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
+          <Path d="M48 112 L50 150" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
         </Svg>
       </View>
 
@@ -231,14 +211,15 @@ export function HeartBreath() {
   );
 }
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+
 
 const styles = StyleSheet.create({
   lead: { fontSize: 15, lineHeight: 22, marginTop: 4, marginBottom: 12 },
   searchRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 8, marginTop: 8, marginBottom: 4 },
   searchInput: { flex: 1, fontSize: 16, paddingVertical: 4 },
   count: { fontSize: 13, marginLeft: 8 },
-  lampStage: { alignSelf: 'center', marginBottom: 8 },
+  bodyStage: { alignSelf: 'center', marginBottom: 8 },
+  bodyZoneLabel: { fontSize: 14, textAlign: 'center', marginBottom: 4 },
   zoneRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 4 },
   zoneDot: { width: 6, height: 6, borderRadius: 3 },
   zoneName: { fontSize: 13, marginLeft: 4 },
