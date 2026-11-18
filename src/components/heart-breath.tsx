@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+
+const TREE_IMG = require('../../assets/images/tree-body.png');
 import Animated, { Easing, FadeIn, useAnimatedProps, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import Svg, { Circle, Defs, Ellipse, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
@@ -115,44 +117,13 @@ export function HeartBreath() {
         <Text style={[styles.count, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{filtered.length}</Text>
       </View>
 
-      {/* Body figure — elegant silhouette */}
+      {/* Tree body image */}
       <View style={[styles.bodyStage, { width: size, height: size + 40 }]}>
-        <Svg width={size} height={size + 40} viewBox="0 0 100 180">
-          <Defs>
-            <RadialGradient id="zone-glow" cx="0.5" cy="0.5" r="0.5">
-              <Stop offset="0" stopColor={ZONE_COLOR[cur.zone]} stopOpacity="0.5" />
-              <Stop offset="1" stopColor={ZONE_COLOR[cur.zone]} stopOpacity="0" />
-            </RadialGradient>
-          </Defs>
-          {/* Head */}
-          <Ellipse cx={50} cy={18} rx={11} ry={13}
-            fill={cur.zone === 'face' ? ZONE_COLOR.face : colors.rule} fillOpacity={cur.zone === 'face' ? 0.4 : 0.1}
-            stroke={colors.textSecondary} strokeWidth="1" />
-          {/* Neck */}
-          <Rect x={46} y={31} width={8} height={6} rx={2} fill={colors.rule} fillOpacity={0.2} />
-          {/* Torso */}
-          <Path d="M30 37 Q22 37 20 48 L18 95 Q18 105 24 108 L30 108 L30 140 Q30 145 34 145 L40 145 L40 112 L60 112 L60 145 L66 145 Q70 145 70 140 L70 108 L76 108 Q82 105 82 95 L80 48 Q80 37 70 37 Z"
-            fill={colors.rule} fillOpacity={0.1} stroke={colors.textSecondary} strokeWidth="1.2" />
-          {/* Chest glow */}
-          <Ellipse cx={50} cy={58} rx={18} ry={14}
-            fill={cur.zone === 'chest' ? ZONE_COLOR.chest : 'transparent'} fillOpacity={0.4} />
-          {/* Core glow */}
-          <Circle cx={50} cy={74} r={10}
-            fill={cur.zone === 'core' ? ZONE_COLOR.core : 'transparent'} fillOpacity={0.4} />
-          {/* Belly glow */}
-          <Ellipse cx={50} cy={92} rx={14} ry={10}
-            fill={cur.zone === 'belly' ? ZONE_COLOR.belly : 'transparent'} fillOpacity={0.4} />
-          {/* Face glow */}
-          {cur.zone === 'face' && <Ellipse cx={50} cy={18} rx={11} ry={13} fill={ZONE_COLOR.face} fillOpacity={0.3} />}
-          {/* Arms */}
-          <Path d="M20 48 Q12 65 14 85" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
-          <Path d="M80 48 Q88 65 86 85" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
-          {/* Legs */}
-          <Path d="M34 112 Q32 140 30 170" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
-          <Path d="M66 112 Q68 140 70 170" stroke={colors.textSecondary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity={0.4} />
-        </Svg>
+        <Image source={TREE_IMG} style={{ width: size, height: size + 40 }} resizeMode="contain" />
+        <View style={[styles.zoneBadge, { backgroundColor: ZONE_COLOR[cur.zone] + '33', borderColor: ZONE_COLOR[cur.zone] }]}>
+          <Text style={[styles.zoneBadgeText, { color: ZONE_COLOR[cur.zone], fontFamily: Fonts.sansMedium }]}>{ZONE_NAME[cur.zone][CONTENT_LOCALE] || ZONE_NAME[cur.zone].en}</Text>
+        </View>
       </View>
-
 
       {/* Zone indicator */}
       <View style={styles.zoneRow}>
@@ -227,7 +198,9 @@ const styles = StyleSheet.create({
   searchRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 8, marginTop: 8, marginBottom: 4 },
   searchInput: { flex: 1, fontSize: 16, paddingVertical: 4 },
   count: { fontSize: 13, marginLeft: 8 },
-  bodyStage: { alignSelf: 'center', marginBottom: 8 },
+  bodyStage: { alignSelf: 'center', marginBottom: 8, position: 'relative' },
+  zoneBadge: { position: 'absolute', bottom: 4, right: 4, borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
+  zoneBadgeText: { fontSize: 12 },
   bodyZoneLabel: { fontSize: 14, textAlign: 'center', marginBottom: 4 },
   zoneRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 4 },
   zoneDot: { width: 6, height: 6, borderRadius: 3 },
