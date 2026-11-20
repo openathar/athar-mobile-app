@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import { formatLocalTime } from '@openathar/athan-core-ts';
 import { Link } from 'expo-router';
 import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -189,6 +190,11 @@ export default function SettingsScreen() {
           </Text>
           <Text style={[styles.creditLabel, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.creditLabel}</Text>
           <Text style={[styles.credit, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{t.credit}</Text>
+          <Text style={[styles.creditLabel, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.creditFanousLabel}</Text>
+          <Text style={[styles.credit, { color: colors.textSecondary, fontFamily: Fonts.mono }]}>{t.creditFanous}</Text>
+          <Text style={[styles.credit, { color: colors.textSecondary, fontFamily: Fonts.mono, marginTop: 10 }]}>
+            v{Constants.expoConfig?.version ?? '1.0.0'} · MIT · github.com/openathar
+          </Text>
         </View>
       </Card>
     </Screen>

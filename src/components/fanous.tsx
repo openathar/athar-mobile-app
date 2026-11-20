@@ -64,7 +64,7 @@ export function Fanous({ height = 230 }: { height?: number }) {
 }
 
 /** The lantern plus the coming observances it announces (Ramadan first when it is near). */
-export function FanousUpcoming() {
+export function FanousUpcoming({ n }: { n?: number } = {}) {
   const { colors, now } = usePhase();
   const events = useMemo(() => upcomingObservances(now, 4), [now.toDateString()]);
   const reduced = useReducedMotion();
@@ -80,7 +80,7 @@ export function FanousUpcoming() {
 
   return (
     <View>
-      <SectionLabel>{t.upcoming}</SectionLabel>
+      <SectionLabel n={n}>{t.upcoming}</SectionLabel>
       <Fanous />
       <Card>
         {events.map((e, i) => (

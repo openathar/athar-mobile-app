@@ -20,7 +20,7 @@ export const nameSize = (arabic: string, base = 54) => (arabic.length <= 14 ? ba
  * under it. The list is read in rotation, so each day brings the next card; "All 99 names" opens the whole
  * mosaic with today's card first. English and German meanings are drafts until approved (`TRANSLATIONS_APPROVED`).
  */
-export function NameOfDay() {
+export function NameOfDay({ n: chapter }: { n?: number } = {}) {
   const { colors } = usePhase();
   const index = todayNameIndex();
   const name = DIVINE_NAMES[index];
@@ -29,7 +29,7 @@ export function NameOfDay() {
 
   return (
     <View>
-      <SectionLabel>{`${t.nameOfDay} · ${t.nameOfN(n)}`}</SectionLabel>
+      <SectionLabel n={chapter}>{`${t.nameOfDay} · ${t.nameOfN(n)}`}</SectionLabel>
       <View accessible accessibilityLabel={`${t.nameOfDay}: ${name.arabic}${meaning ? `, ${meaning}` : ''}`}>
         <Text style={[styles.arabic, { color: colors.text, fontFamily: Fonts.arabic, fontSize: nameSize(name.arabic), lineHeight: nameSize(name.arabic) * 1.7 }]}>{name.arabic}</Text>
         {meaning ? <Text style={[styles.meaning, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{meaning}</Text> : null}

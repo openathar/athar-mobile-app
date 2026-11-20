@@ -21,7 +21,7 @@ const MAX_YEAR = 2100;
  * north up, lit by that day's real phase (`moonPhaseAt`, the same engine as the website's). The date is
  * read at local noon. It stands still, unlike the start page's moon, so you can look at it.
  */
-export function YourMoon() {
+export function YourMoon({ n }: { n?: number } = {}) {
   const { colors, now } = usePhase();
   const width = useScreenWidth();
   const [day, setDay] = useState(now.getDate());
@@ -46,7 +46,7 @@ export function YourMoon() {
 
   return (
     <View>
-      <SectionLabel>{t.yourMoon}</SectionLabel>
+      <SectionLabel n={n}>{t.yourMoon}</SectionLabel>
       <Text style={[styles.hint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.yourMoonHint}</Text>
 
       <View style={styles.stage} pointerEvents="none">

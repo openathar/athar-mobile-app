@@ -20,7 +20,7 @@ function dayIndex(d: Date): number {
  * `data/reflections.json`); the sign of the day is deterministic per day and
  * "another sign" steps to the next one. The provenance line is always shown.
  */
-export function TwoBooks() {
+export function TwoBooks({ n }: { n?: number } = {}) {
   const { colors } = usePhase();
   const [step, setStep] = useState(0);
   const entry = useMemo(() => ENTRIES[(dayIndex(new Date()) + step) % ENTRIES.length], [step]);
@@ -34,7 +34,7 @@ export function TwoBooks() {
 
   return (
     <View>
-      <SectionLabel>{t.books}</SectionLabel>
+      <SectionLabel n={n}>{t.books}</SectionLabel>
       <Text style={[styles.lead, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.booksLead}</Text>
 
       <View style={[styles.block, { borderTopColor: colors.rule }]}>

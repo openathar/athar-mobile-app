@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useRef, type ReactNode } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef, type ReactNode } from 'react';
 import {
   Animated,
   Pressable,
@@ -15,6 +15,7 @@ import { Celestial } from '@/components/celestial';
 import { MeteorField } from '@/components/meteor-field';
 import { Fonts } from '@/constants/theme';
 import { usePhase } from '@/context/phase';
+import { IS_RTL } from '@/lib/i18n';
 
 /**
  * Every screen's frame: one flat colour that follows the sun (night navy,
@@ -36,6 +37,18 @@ export function Screen({
   // The stars belong to the top of the page: they fade as you scroll away from it.
   const scrollY = useRef(new Animated.Value(0)).current;
   const fade = scrollY.interpolate({ inputRange: [0, 240], outputRange: [1, 0], extrapolate: 'clamp' });
+  // Dev only, like `?at=HH:MM`: `?y=1200` opens the screen scrolled, for simulator screenshots.
+  const { y } = useLocalSearchParams<{ y?: string }>();
+  const scroller = useRef<any>(null);
+  useEffect(() => {
+    if (!__DEV__ || !y) return;
+    const id = setTimeout(() => {
+      const node = scroller.current;
+      const target = node?.scrollTo ? node : node?.getNode?.();
+      target?.scrollTo?.({ y: Number(y), animated: false });
+    }, 900);
+    return () => clearTimeout(id);
+  }, [y]);
 
   return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
@@ -47,6 +60,7 @@ export function Screen({
       <SafeAreaView style={styles.fill} edges={['top']}>
         {scroll ? (
           <Animated.ScrollView
+            ref={scroller}
             style={styles.fill}
             onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
             scrollEventThrottle={16}
@@ -168,10 +182,49 @@ export function ModalHeader({
   );
 }
 
-/** Section label: plain sentence case, quiet, like the landing page's list headers. */
-export function SectionLabel({ children }: { children: ReactNode }) {
+const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+/**
+ * A chapter opener, as on openathar.org: a small mono line "01 · Name" and the
+ * chapter's sentence set large and light under it. Arabic gets Arabic-Indic
+ * digits and Amiri, like the website's `lp-chap-n`.
+ */
+export function ChapterHead({ n, name, title }: { n: number; name: string; title?: string }) {
+  const arabic = IS_RTL;
   const { colors } = usePhase();
-  return <Text style={[styles.section, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>{children}</Text>;
+  const nn = String(n).padStart(2, '0');
+  const label = arabic ? nn.replace(/\d/g, (d) => ARABIC_DIGITS[Number(d)]) : nn;
+  return (
+    <View style={styles.chapter}>
+      <Text style={[styles.chapterN, { color: colors.accent, fontFamily: arabic ? Fonts.arabic : Fonts.mono }]}>
+        {label} · {name}
+      </Text>
+      {title ? (
+        <Text style={[arabic ? styles.chapterTitleAr : styles.chapterTitle, { color: colors.text, fontFamily: arabic ? Fonts.arabic : Fonts.display }]}>
+          {title}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
+/**
+ * Section label: plain sentence case, quiet. With `n` it becomes a chapter
+ * line like the website's ("01 · Calculation"): mono number, gold, the label
+ * after it — so a long screen reads as numbered chapters.
+ */
+export function SectionLabel({ children, n }: { children: ReactNode; n?: number }) {
+  const { colors } = usePhase();
+  if (n == null) {
+    return <Text style={[styles.section, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>{children}</Text>;
+  }
+  const nn = String(n).padStart(2, '0');
+  return (
+    <Text style={[styles.section, styles.sectionChapter, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>
+      <Text style={{ fontFamily: Fonts.mono }}>{IS_RTL ? nn.replace(/\d/g, (d) => ARABIC_DIGITS[Number(d)]) : nn} · </Text>
+      {children}
+    </Text>
+  );
 }
 
 /**
@@ -282,6 +335,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 32,
     marginBottom: 6,
+  },
+  sectionChapter: {
+    marginTop: 44,
+    marginBottom: 10,
+  },
+  chapter: {
+    marginTop: 44,
+    marginBottom: 14,
+    gap: 6,
+  },
+  chapterN: {
+    fontSize: 13,
+    letterSpacing: 0.4,
+  },
+  chapterTitle: {
+    fontSize: 30,
+    lineHeight: 36,
+    letterSpacing: -0.6,
+  },
+  chapterTitleAr: {
+    fontSize: 28,
+    lineHeight: 46,
   },
   card: {
     borderTopWidth: StyleSheet.hairlineWidth,

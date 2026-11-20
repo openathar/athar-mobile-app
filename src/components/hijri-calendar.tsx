@@ -35,7 +35,7 @@ function buildMonth(year: number, month: number): { cells: Cell[]; length: numbe
  * connection and nothing to sync. The coming observances are announced by the
  * Fanous (`components/fanous.tsx`) on the same screen.
  */
-export function HijriCalendar() {
+export function HijriCalendar({ n }: { n?: number } = {}) {
   const { colors, now } = usePhase();
   const todayH = useMemo(() => gregorianToHijri(now, 'en'), [now.toDateString()]);
   const [offset, setOffset] = useState(0);
@@ -53,7 +53,7 @@ export function HijriCalendar() {
 
   return (
     <View>
-      <SectionLabel>{t.calendarTitle}</SectionLabel>
+      <SectionLabel n={n}>{t.calendarTitle}</SectionLabel>
       <View style={styles.head}>
         <Pressable onPress={() => setOffset((o) => o - 1)} hitSlop={14} accessibilityRole="button">
           <Text style={[styles.step, { color: colors.textSecondary, fontFamily: Fonts.sansMedium }]}>‹</Text>

@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 
 import { DEFAULT_LOCATION } from '@/constants/location';
 import { hasDrifted } from '@/lib/geo';
+import { hasBeenWelcomed } from '@/lib/welcome';
 
 export type GeoLocation = { lat: number; lng: number; label: string };
 export type LocationStatus = 'loading' | 'ready' | 'denied';
@@ -16,6 +17,8 @@ type LocationContextValue = {
   status: LocationStatus;
   /** Persist a manually chosen location; `null` falls back to auto-detect. */
   setCustom: (loc: GeoLocation | null) => void;
+  /** Let auto-detect ask for the permission (the welcome calls this after explaining why). */
+  allowPrompt: () => void;
 };
 
 const LocationContext = createContext<LocationContextValue | null>(null);
@@ -34,6 +37,15 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [auto, setAuto] = useState<GeoLocation | null>(null);
   const [status, setStatus] = useState<LocationStatus>('loading');
   const [foregroundCount, setForegroundCount] = useState(0);
+  // The system prompt waits until the welcome has said what the location is for.
+  const [mayPrompt, setMayPrompt] = useState(false);
+  const asked = useRef(false);
+
+  useEffect(() => {
+    hasBeenWelcomed().then((yes) => {
+      if (yes) setMayPrompt(true);
+    });
+  }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
@@ -65,12 +77,13 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        // Prompt only on the first attempt; on later foregrounds just read the
-        // current grant so a returning user is never nagged again.
-        const { status: perm } =
-          foregroundCount === 0
-            ? await Location.requestForegroundPermissionsAsync()
-            : await Location.getForegroundPermissionsAsync();
+        // Prompt at most once per launch, and only after the welcome; otherwise
+        // just read the current grant so a returning user is never nagged.
+        const ask = mayPrompt && !asked.current;
+        if (ask) asked.current = true;
+        const { status: perm } = ask
+          ? await Location.requestForegroundPermissionsAsync()
+          : await Location.getForegroundPermissionsAsync();
         if (perm !== 'granted') {
           if (!cancelled) setStatus('denied');
           return;
@@ -89,7 +102,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [custom, foregroundCount]);
+  }, [custom, foregroundCount, mayPrompt]);
 
   const setCustom = useCallback((loc: GeoLocation | null) => {
     setCustomState(loc);
@@ -97,9 +110,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     else AsyncStorage.removeItem(STORAGE_KEY).catch(() => {});
   }, []);
 
+  const allowPrompt = useCallback(() => setMayPrompt(true), []);
+
   const value = useMemo<LocationContextValue>(
-    () => ({ location: custom ?? auto ?? DEFAULT_LOCATION, status, setCustom }),
-    [custom, auto, status, setCustom]
+    () => ({ location: custom ?? auto ?? DEFAULT_LOCATION, status, setCustom, allowPrompt }),
+    [custom, auto, status, setCustom, allowPrompt]
   );
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;

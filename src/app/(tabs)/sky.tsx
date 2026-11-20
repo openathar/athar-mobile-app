@@ -39,8 +39,6 @@ export default function SkyScreen() {
     <Screen>
       <ScreenHeader title={IS_RTL ? undefined : t.skyTitle} titleAr={IS_RTL ? t.skyTitle : 'السماء'} subtitle={t[MOON_KEYS[moon.key] ?? 'moonNew']} />
 
-      <FanousUpcoming />
-
       <View style={styles.moon}>
         <EarthMoon width={Math.min(width - 24, 460)} />
       </View>
@@ -57,7 +55,7 @@ export default function SkyScreen() {
         ))}
       </Card>
 
-      <SectionLabel>{t.facesTitle}</SectionLabel>
+      <SectionLabel n={1}>{t.facesTitle}</SectionLabel>
       <View style={styles.faces}>
         {FACES.map((f, i) => (
           <Pressable key={f.key} onPress={() => setFace(i)} style={({ pressed }) => [styles.face, pressed && styles.pressed]} accessibilityRole="button" accessibilityLabel={t[MOON_KEYS[f.key]]}>
@@ -70,9 +68,11 @@ export default function SkyScreen() {
         {face === null ? t.facesHint : `${t[MOON_KEYS[FACES[face].key]]} · ${t.returnsIn(daysUntilFraction(minute, FACES[face].fraction))}`}
       </Text>
 
-      <YourMoon />
+      <YourMoon n={2} />
 
-      <HijriCalendar />
+      <HijriCalendar n={3} />
+
+      <FanousUpcoming n={4} />
     </Screen>
   );
 }

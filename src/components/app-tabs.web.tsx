@@ -11,7 +11,7 @@ const tabs = () => [
   { name: 'index', label: t.tabPrayer },
   { name: 'qibla', label: t.tabQibla },
   { name: 'sky', label: t.tabSky },
-  { name: 'feelings', label: t.tabFeelings },
+  { name: 'tree', label: t.tabTree },
   { name: 'settings', label: t.tabSettings },
 ] as const;
 

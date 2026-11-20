@@ -36,10 +36,10 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="feelings">
-        <NativeTabs.Trigger.Label>{t.tabFeelings}</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="tree">
+        <NativeTabs.Trigger.Label>{t.tabTree}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="heart-outline" />}
+          src={<NativeTabs.Trigger.VectorIcon family={MaterialCommunityIcons} name="sprout-outline" />}
         />
       </NativeTabs.Trigger>
 

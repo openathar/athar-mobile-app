@@ -8,6 +8,7 @@ import type { PrayerKey } from '@/hooks/use-prayer';
 import {
   ALL_ALARMS_ON,
   checkNotificationPermission,
+  requestNotifications,
   requestNotificationsWithExplainer,
   schedulePrayerAlarms,
   type AlarmSettings,
@@ -21,6 +22,8 @@ type AlarmsContextValue = {
   enabled: AlarmSettings;
   toggle: (key: PrayerKey) => Promise<void>;
   permission: AlarmPermission;
+  /** Ask for the notification permission once (the welcome's last page); the alarms are on by default. */
+  requestPermission: () => Promise<void>;
 };
 
 const AlarmsContext = createContext<AlarmsContextValue | null>(null);
@@ -96,9 +99,14 @@ export function AlarmsProvider({ children }: { children: ReactNode }) {
     [permission]
   );
 
+  const requestPermission = useCallback(async () => {
+    const result = await requestNotifications();
+    setPermission(result === 'granted' ? 'granted' : 'denied');
+  }, []);
+
   const value = useMemo<AlarmsContextValue>(
-    () => ({ enabled, toggle, permission }),
-    [enabled, toggle, permission]
+    () => ({ enabled, toggle, permission, requestPermission }),
+    [enabled, toggle, permission, requestPermission]
   );
 
   return <AlarmsContext.Provider value={value}>{children}</AlarmsContext.Provider>;

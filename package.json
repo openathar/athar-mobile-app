@@ -1,7 +1,7 @@
 {
   "name": "athar-mobile-app",
   "main": "expo-router/entry",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "dependencies": {
     "@expo-google-fonts/amiri": "^0.4.1",
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
@@ -60,7 +60,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "test": "node --no-warnings --import ./scripts/test/register.mjs --test 'test/**/*.test.ts'"
   },
   "private": true,
   "overrides": {

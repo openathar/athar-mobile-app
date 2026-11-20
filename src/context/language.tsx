@@ -21,7 +21,10 @@ type LanguageValue = {
 
 const LanguageContext = createContext<LanguageValue | null>(null);
 
-const resolve = (pref: LanguagePreference): Locale => (pref === 'device' ? deviceLocale() : pref);
+// Dev only: EXPO_PUBLIC_FORCE_LOCALE=ar pins the device language (Expo Go reports English whatever the simulator says).
+const FORCED = __DEV__ ? (process.env.EXPO_PUBLIC_FORCE_LOCALE as Locale | undefined) : undefined;
+const resolve = (pref: LanguagePreference): Locale =>
+  pref === 'device' ? (FORCED && LOCALES.includes(FORCED) ? FORCED : deviceLocale()) : pref;
 
 const GUARD_KEY = 'athar.direction-reload.v1';
 

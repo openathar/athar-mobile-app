@@ -84,7 +84,14 @@ export default function PrayerScreen() {
         </Text>
       </View>
 
-      <SectionLabel>{t.today}</SectionLabel>
+      {/* The verse the name comes from — as under the website's hero. */}
+      <View style={[styles.ayah, { borderColor: colors.rule }]}>
+        <Text style={[styles.ayahAr, { color: colors.text, fontFamily: Fonts.arabic }]}>وَنَكْتُبُ مَا قَدَّمُوا وَآثَارَهُمْ</Text>
+        {LOCALE !== 'ar' ? <Text style={[styles.ayahTr, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.ayahAthar}</Text> : null}
+        <Text style={[styles.ayahRef, { color: colors.accent, fontFamily: Fonts.mono }]}>{t.ayahAtharRef}</Text>
+      </View>
+
+      <SectionLabel n={1}>{t.today}</SectionLabel>
       <Card>
         {PRAYER_ORDER.map((key, i) => {
           const isNext = key === next.key;
@@ -113,10 +120,10 @@ export default function PrayerScreen() {
         })}
       </Card>
 
-      <DuaNow />
-      <NameOfDay />
-      <Anywhere />
-      <TwoBooks />
+      <DuaNow n={2} />
+      <NameOfDay n={3} />
+      <Anywhere n={4} />
+      <TwoBooks n={5} />
     </Screen>
   );
 }
@@ -159,6 +166,29 @@ const styles = StyleSheet.create({
   },
   at: {
     fontSize: 15,
+  },
+  ayah: {
+    marginTop: 36,
+    paddingVertical: 22,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 8,
+  },
+  ayahAr: {
+    fontSize: 28,
+    lineHeight: 50,
+    writingDirection: 'rtl',
+    textAlign: 'center',
+  },
+  ayahTr: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
+  },
+  ayahRef: {
+    fontSize: 12,
+    textAlign: 'center',
+    letterSpacing: 0.4,
   },
   row: {
     flexDirection: 'row',

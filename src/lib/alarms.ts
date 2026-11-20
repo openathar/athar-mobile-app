@@ -76,6 +76,16 @@ export async function requestNotificationsWithExplainer(): Promise<'granted' | '
   return requested.granted ? 'granted' : 'declined';
 }
 
+/** The system prompt without the in-app explainer — for the welcome, which has just explained it on its own page. */
+export async function requestNotifications(): Promise<'granted' | 'declined' | 'blocked'> {
+  if (Platform.OS === 'web') return 'declined';
+  const current = await Notifications.getPermissionsAsync();
+  if (current.granted) return 'granted';
+  if (!current.canAskAgain) return 'blocked';
+  const requested = await Notifications.requestPermissionsAsync();
+  return requested.granted ? 'granted' : 'declined';
+}
+
 /** Read-only permission check (no prompt). */
 export async function checkNotificationPermission(): Promise<boolean> {
   if (Platform.OS === 'web') return false;

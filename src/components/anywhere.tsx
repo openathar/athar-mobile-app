@@ -32,7 +32,7 @@ function timesFor(place: Place, method: Method) {
  * on the device with the same engine as the API. Cities you looked at are
  * kept for offline use.
  */
-export function Anywhere() {
+export function Anywhere({ n }: { n?: number } = {}) {
   const { colors } = usePhase();
   const { calculator } = useSettingsContext();
   const [query, setQuery] = useState('');
@@ -93,7 +93,7 @@ export function Anywhere() {
 
   return (
     <View>
-      <SectionLabel>{t.anywhere}</SectionLabel>
+      <SectionLabel n={n}>{t.anywhere}</SectionLabel>
       <Text style={[styles.lead, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{t.anywhereLead}</Text>
       <TextInput
         value={query}

@@ -49,7 +49,7 @@ function toLines(arabic: string): string[] {
  * as calligraphy, word by word, or in lines. Where the hadith gives a count,
  * beads let you keep it.
  */
-export function DuaNow() {
+export function DuaNow({ n }: { n?: number } = {}) {
   const { colors, phase, now } = usePhase();
   const reduced = useReducedMotion();
   const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86_400_000);
@@ -66,7 +66,7 @@ export function DuaNow() {
 
   return (
     <View>
-      <SectionLabel>{phaseTitle(phase)}</SectionLabel>
+      <SectionLabel n={n}>{phaseTitle(phase)}</SectionLabel>
       <Text style={[styles.occasion, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{occasion}</Text>
 
       <Pressable
