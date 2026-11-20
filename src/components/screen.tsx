@@ -87,17 +87,23 @@ export function ScreenHeader({
   subtitle,
   subtitleLines = 1,
   celestial = true,
+  style,
+  titleAccent,
 }: {
   title?: string;
   titleAr?: string;
+  /** A Latin line in the accent colour where the Arabic title would be (Today's Hijri date outside the Arabic UI). */
+  titleAccent?: string;
   subtitle?: string;
   subtitleLines?: number;
   /** The small sun/moon in the corner. Off where a large moon already carries the screen. */
   celestial?: boolean;
+  /** Extra spacing for one screen (Today sets the header lower, away from its moon). */
+  style?: StyleProp<ViewStyle>;
 }) {
   const { colors } = usePhase();
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, style]}>
       <View style={styles.headerText}>
         <View style={styles.titleRow}>
           {title ? (
@@ -111,6 +117,9 @@ export function ScreenHeader({
               ]}>
               {titleAr}
             </Text>
+          ) : null}
+          {titleAccent ? (
+            <Text style={[styles.titleAccent, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{titleAccent}</Text>
           ) : null}
         </View>
         {subtitle ? (
@@ -323,6 +332,10 @@ const styles = StyleSheet.create({
   titleArPrimary: {
     fontSize: 26,
     lineHeight: 38,
+  },
+  titleAccent: {
+    fontSize: 22,
+    lineHeight: 32,
   },
   titleArSecondary: {
     fontSize: 24,
