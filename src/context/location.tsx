@@ -7,7 +7,8 @@ import { DEFAULT_LOCATION } from '@/constants/location';
 import { hasDrifted } from '@/lib/geo';
 import { hasBeenWelcomed } from '@/lib/welcome';
 
-export type GeoLocation = { lat: number; lng: number; label: string };
+/** `country` (ISO code) is known for a chosen city, not for a GPS position. */
+export type GeoLocation = { lat: number; lng: number; label: string; country?: string };
 export type LocationStatus = 'loading' | 'ready' | 'denied';
 
 const STORAGE_KEY = 'athar.location.v1';

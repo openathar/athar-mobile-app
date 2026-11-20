@@ -39,7 +39,7 @@ export default function LocationScreen() {
 
   const pick = useCallback(
     (place: Place) => {
-      setCustom({ lat: place.latitude, lng: place.longitude, label: place.name });
+      setCustom({ lat: place.latitude, lng: place.longitude, label: place.name, country: place.country });
       setQuery('');
       router.back();
     },

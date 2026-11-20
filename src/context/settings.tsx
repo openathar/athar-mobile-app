@@ -2,8 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Methods, type Method } from '@openathar/athan-core-ts';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
+import { useLocationContext } from '@/context/location';
+import { methodForPlace, methodForZone } from '@/lib/method-for-place';
+
 /** The calculation methods the app offers, in the order the picker shows them. */
-export const METHOD_KEYS = ['MWL', 'ISNA', 'EGYPT', 'MAKKAH', 'KARACHI', 'TEHRAN'] as const;
+export const METHOD_KEYS = ['MWL', 'ISNA', 'EGYPT', 'MAKKAH', 'KARACHI', 'TEHRAN', 'MALAYSIA', 'SINGAPORE', 'FRANCE', 'RUSSIA'] as const;
 export type MethodKey = (typeof METHOD_KEYS)[number];
 
 const STORAGE_KEY = 'athar.settings.v1';
@@ -27,32 +30,15 @@ export const FIXED_THEME_COLOR: Record<ThemeKey, string | null> = {
 
 type Stored = { method?: MethodKey; theme?: ThemeKey };
 
-/**
- * A first guess from the device's time zone (no location prompt, no network):
- * a user in Riyadh starts on Umm al-Qura, in Cairo on the Egyptian method,
- * in North America on ISNA — everyone else on the Muslim World League
- * convention the site uses too.
- */
-function defaultMethod(): MethodKey {
-  try {
-    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (zone === 'Asia/Riyadh') return 'MAKKAH';
-    if (zone === 'Africa/Cairo') return 'EGYPT';
-    if (/^Asia\/(Karachi|Kolkata|Dhaka|Colombo|Kathmandu|Kabul)$/.test(zone)) return 'KARACHI';
-    if (zone === 'Asia/Tehran') return 'TEHRAN';
-    if (zone.startsWith('America/')) return 'ISNA';
-  } catch {
-    // no Intl zone data on this runtime
-  }
-  return 'MWL';
-}
-
 type SettingsValue = {
   /** Which convention the times are computed with. */
   method: MethodKey;
+  /** True while the method follows the place (nobody picked one by hand). */
+  methodIsAuto: boolean;
   /** The method's parameters, ready for the calculator. */
   calculator: Method;
-  setMethod: (key: MethodKey) => void;
+  /** A hand-picked method, or 'auto' to follow the place again. */
+  setMethod: (key: MethodKey | 'auto') => void;
   theme: ThemeKey;
   setTheme: (key: ThemeKey) => void;
 };
@@ -64,7 +50,9 @@ const SettingsContext = createContext<SettingsValue | null>(null);
  * all read it from here, so changing it once changes the whole app.
  */
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [method, setMethodState] = useState<MethodKey>(defaultMethod);
+  // null = automatic: the method that fits the place (lib/method-for-place.ts).
+  const [chosen, setChosen] = useState<MethodKey | null>(null);
+  const { location, status } = useLocationContext();
   const [theme, setThemeState] = useState<ThemeKey>('obsidian');
   // Both choices live in one stored object; keep the latest to write it whole.
   const stored = useRef<Stored>({});
@@ -76,7 +64,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (cancelled || !v) return;
         const data = JSON.parse(v) as Stored;
         stored.current = data;
-        if (data.method && METHOD_KEYS.includes(data.method)) setMethodState(data.method);
+        if (data.method && METHOD_KEYS.includes(data.method)) setChosen(data.method);
         if (data.theme && THEME_KEYS.includes(data.theme)) setThemeState(data.theme);
       })
       .catch(() => {});
@@ -85,9 +73,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const setMethod = useCallback((key: MethodKey) => {
-    setMethodState(key);
-    stored.current = { ...stored.current, method: key };
+  const setMethod = useCallback((key: MethodKey | 'auto') => {
+    const next = key === 'auto' ? null : key;
+    setChosen(next);
+    const { method: _old, ...rest } = stored.current;
+    stored.current = next ? { ...rest, method: next } : rest;
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(stored.current)).catch(() => {});
   }, []);
 
@@ -97,9 +87,24 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(stored.current)).catch(() => {});
   }, []);
 
+  // Without a real position (permission denied, Berlin fallback) the time zone is the better hint.
+  const auto = useMemo<MethodKey>(() => {
+    if (status === 'denied' && !location.country) {
+      let zone: string | undefined;
+      try {
+        zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      } catch {
+        // no Intl zone data on this runtime
+      }
+      return methodForZone(zone);
+    }
+    return methodForPlace(location);
+  }, [location, status]);
+  const method = chosen ?? auto;
+
   const value = useMemo<SettingsValue>(
-    () => ({ method, calculator: Methods[method], setMethod, theme, setTheme }),
-    [method, setMethod, theme, setTheme]
+    () => ({ method, methodIsAuto: chosen === null, calculator: Methods[method], setMethod, theme, setTheme }),
+    [method, chosen, setMethod, theme, setTheme]
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

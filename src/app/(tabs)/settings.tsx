@@ -8,11 +8,12 @@ import { Switch } from '@/components/switch';
 import { Fonts } from '@/constants/theme';
 import { useLanguage } from '@/context/language';
 import { usePhase } from '@/context/phase';
-import { useSettingsContext, type MethodKey, type ThemeKey } from '@/context/settings';
+import { useSettingsContext, type ThemeKey } from '@/context/settings';
 import { useAlarms } from '@/hooks/use-alarms';
 import { useLocation } from '@/hooks/use-location';
 import { ALARM_PRAYERS, PRAYER_ORDER } from '@/hooks/use-prayer';
 import { LOCALE, LOCALE_NAMES, PRAYER_KEYS, t } from '@/lib/i18n';
+import { methodNames } from '@/lib/method-names';
 
 const ARABIC_NAMES: Record<(typeof PRAYER_ORDER)[number], string> = {
   fajr: 'الفجر',
@@ -32,16 +33,6 @@ const themeNames = (): Record<ThemeKey, string> => ({
   porcelain: t.thPorcelain,
 });
 
-/** Read at render time — the language can change while the app runs. */
-const methodNames = (): Record<MethodKey, string> => ({
-  MWL: t.methodMWL,
-  ISNA: t.methodISNA,
-  EGYPT: t.methodEGYPT,
-  MAKKAH: t.methodMAKKAH,
-  KARACHI: t.methodKARACHI,
-  TEHRAN: t.methodTEHRAN,
-});
-
 /** Opens the system page of this app (permissions, battery, "Alarms & reminders"). */
 function SettingsLink() {
   const { colors } = usePhase();
@@ -59,7 +50,7 @@ export default function SettingsScreen() {
   const { colors, times, now } = usePhase();
   const { location } = useLocation();
   const { enabled, toggle, permission } = useAlarms();
-  const { method, theme } = useSettingsContext();
+  const { method, methodIsAuto, theme } = useSettingsContext();
   const { preference, locale } = useLanguage();
   const offsetHours = -now.getTimezoneOffset() / 60;
 
@@ -142,7 +133,7 @@ export default function SettingsScreen() {
             <View style={styles.row}>
               <View style={styles.rowText}>
                 <Text style={[styles.rowLabel, { color: colors.text, fontFamily: Fonts.sansMedium }]}>{t.calcMethod}</Text>
-                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{methodNames()[method]}</Text>
+                <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>{methodNames()[method]}{methodIsAuto ? ` · ${t.methodAuto}` : ''}</Text>
               </View>
               <Text style={[styles.action, { color: colors.accent, fontFamily: Fonts.sansMedium }]}>{t.change}</Text>
             </View>
@@ -185,6 +176,11 @@ export default function SettingsScreen() {
           <Text style={[styles.aboutAr, { color: colors.accent, fontFamily: Fonts.arabic }]}>
             وَنَكْتُبُ مَا قَدَّمُوا وَآثَارَهُمْ
           </Text>
+          {/* The verse the name comes from (it stood under Today's hero until 2026-11-20). */}
+          {LOCALE !== 'ar' ? (
+            <Text style={[styles.rowHint, { color: colors.text, fontFamily: Fonts.sans }]}>{t.ayahAthar}</Text>
+          ) : null}
+          <Text style={[styles.credit, { color: colors.accent, fontFamily: Fonts.mono, opacity: 1 }]}>{t.ayahAtharRef}</Text>
           <Text style={[styles.rowHint, { color: colors.textSecondary, fontFamily: Fonts.sans }]}>
             {t.aboutText}
           </Text>
