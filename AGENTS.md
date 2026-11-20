@@ -34,7 +34,7 @@ gradients/glass/glow/boxes). Work order: `docs/plan.md`. Screens use only
 
 MVP with the openathar.org design language (web palette Layl/Mushaf,
 Plus Jakarta Sans/JetBrains Mono/Amiri), five tabs: Today, Qibla, Sky,
-Feelings, Settings. The full list of what exists and what is open:
+Tree, Settings. Release 1.0 plan and scope: `docs/release-1.0.md`. The full list of what exists and what is open:
 `docs/redesign-status.md`; work order: `docs/plan.md`; the design contract:
 `docs/design.md`.
 
@@ -46,7 +46,16 @@ Feelings, Settings. The full list of what exists and what is open:
   face you; the needle tracks the magnetometer on native, static on web.
 - **Sky**: tonight's real moon, age, next new/full moon, the eight faces, the
   Hijri month grid, upcoming observances.
-- **Feelings**: the website's tree (chest branches, belly roots), tappable.
+- **Welcome** (`src/app/welcome.tsx`, first open only, `lib/welcome.ts`): the website hero
+  ("A trace that keeps going."), the four promises, then the location explained *before* the
+  system prompt — `LocationProvider` does not ask until the welcome is done (`allowPrompt`).
+- **Tree** (`src/app/(tabs)/tree.tsx`): 01 Tasbih — a dhikr tree drawn from code
+  (`lib/dhikr-tree.ts`, deterministic per seed, grows with every count, a gold blossom per round
+  of 100; count + seed in AsyncStorage `athar.tasbih.v1`, never sent), 33/33/34 round logic in
+  `lib/tasbih.ts`. 02 Feelings — the website's feelings tree (`components/feelings-tree.tsx`,
+  133 feelings, data identical to `web/lib/emotion-map.ts`).
+- **Chapters**: long screens read like the website — `SectionLabel n={…}` renders "01 · Name"
+  (mono number, gold), `ChapterHead` adds the large chapter sentence.
 - **Settings**: per-prayer adhan alarms (five prayers, never sunrise; one-shot
   DATE triggers computed 7 days ahead, rescheduled on settings/location change
   + foreground, persisted via AsyncStorage, never push), location picker,
@@ -67,9 +76,22 @@ Feelings, Settings. The full list of what exists and what is open:
 Next milestones: native builds to verify location + notifications on device,
 Adhan audio, store submission.
 
+## Tests
+
+`npm test` — Node's built-in test runner on the TypeScript sources (type stripping, Node ≥ 24),
+no test framework and no new dependency: `scripts/test/hooks.mjs` resolves the `@/` alias.
+Only pure modules are tested (`test/*.test.ts`: dhikr tree, tasbih, prayer order, i18n
+completeness, feelings data). Gate before every commit: `npm run typecheck && npm test`.
+
+Simulator checks without tapping (dev only): `?preview=650` on `/tree` draws the tree at that
+count, `?y=1200` opens any screen scrolled; Metro env `EXPO_PUBLIC_SKIP_WELCOME=1` skips the
+welcome, `EXPO_PUBLIC_FORCE_LOCALE=ar` pins the language (Expo Go always reports English).
+Deep links only apply warm: open `exp://…:8081` first, then `exp://…:8081/--/tree?preview=420`.
+Metro in a `t14-run` container does not see file changes — restart it after syncing.
+
 ## CI
 
-`.github/workflows/ci.yml` — three jobs on push/PR: typecheck, Android
+`.github/workflows/ci.yml` — three jobs on push/PR: typecheck + unit tests, Android
 emulator smoke (API 34
 with KVM: assembleDebug, boot, install, launch, liveness assert, screenshot),
 iOS simulator smoke (macos-15: pod install, xcodebuild Debug-iphonesimulator,
@@ -103,6 +125,10 @@ Project-local skills/agents/commands are managed via `apm.yaml`
   are positioned from the physical left edge, so use `physicalLeft` (`src/lib/rtl.ts`), never `left: 0`.
   Direction changes reload the app at most once (`syncDirection`); `<DirectionRoot>` lays the screens
   out RTL itself when the native side does not take the forced direction (Expo Go).
+- **No third-party or figurative images (2026-11-20):** the feelings tab briefly used a body/tree
+  picture from Amin Sabry's site — no licence, and a human figure (the website's rule: geometry,
+  no people). Replaced by the website's own drawn tree. Every image needs a licence line in
+  Settings → About (the lantern photo: CC BY-SA 3.0).
 - **Design (2026-11-17):** default theme is the website's night (`obsidian`, `#0b0f17`); background is
   meteors only; the moon is the only sky body (no sun); the Qibla globe has no clouds.
 - **Skia (`@shopify/react-native-skia`, pinned to the version Expo Go bundles) draws the sky:** planets as

@@ -15,20 +15,23 @@ concurrency:
 
 jobs:
   typecheck:
-    name: Typecheck
+    name: Typecheck & tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
+      # Node 24: the unit tests run TypeScript through Node's own type stripping.
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - run: npm ci
 
       - run: npm run typecheck
+
+      - run: npm test
 
   android:
     name: Android emulator smoke

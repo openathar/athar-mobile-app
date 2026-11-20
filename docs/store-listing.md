@@ -1,4 +1,4 @@
-# Store-Einträge — Entwurf (Stand 2026-11-16)
+# Store-Einträge — Entwurf (Stand 2026-11-20, Release 1.0)
 
 Alle Felder sind gegen die Store-Limits gezählt. Die Texte sind mit dem tatsächlichen
 Verhalten der App abgeglichen (siehe "Datenschutz-Angaben"). Arabisch braucht vor der
@@ -10,7 +10,7 @@ geschrieben (Plan: erst DE/EN/AR).
 | Feld | Wert |
 |---|---|
 | Bundle-ID / Paket | `org.openathar.mobile` |
-| Version | 0.1.0 (Store-Version beim ersten Release festlegen) |
+| Version | 1.0.0 (erstes Store-Release, Wochenende 21./22.11.2026) |
 | Kategorie | App Store: **Lifestyle** (Alternative: Reference) · Play: **Lifestyle** |
 | Preis | kostenlos, keine In-App-Käufe, keine Werbung |
 | Altersfreigabe | App Store **4+** · Play **Everyone** (Fragebogen: keine Gewalt, kein Glücksspiel, keine nutzergenerierten Inhalte, keine Käufe) |
@@ -33,7 +33,7 @@ geschrieben (Plan: erst DE/EN/AR).
 | App Store: Werbetext | Prayer times and Qibla that work offline. No ads, no accounts, no tracking — open source. | 89/170 |
 | Play: Kurzbeschreibung | Prayer times, Qibla and adhan alarms. Free, no ads, no tracking, works offline. | 79/80 |
 
-Ausführliche Beschreibung (App Store und Play, 1283/4000):
+Ausführliche Beschreibung (App Store und Play, 1432/4000):
 
 ```text
 Athar (أثر) means "the trace you leave". It is a prayer-times app built as a Sadaqah Jariyah: free for good, without ads, without accounts and without tracking. Open source.
@@ -44,6 +44,7 @@ WHAT YOU GET
 • Qibla compass with true-north correction.
 • Hijri date and the coming Islamic dates.
 • The real moon tonight: phase, age, next new and full moon.
+• Your tree: a tasbih counter (33 · 33 · 34) that grows a tree with every count — a gold blossom for every round of 100. Counted on your phone only.
 • A du'a for the part of the day, quoted from the hadith collections with its source.
 • Choose your calculation method (Muslim World League, ISNA, Egypt, Umm al-Qura, Karachi, Tehran).
 • English, Deutsch, العربية, Polski, Türkçe — with full right-to-left support.
@@ -67,7 +68,7 @@ Note: the du'a meanings were written for Athar and are being reviewed. Prayer ti
 | App Store: Werbetext | Gebetszeiten und Qibla, die offline funktionieren. Ohne Werbung, ohne Konto, ohne Tracking — Open Source. | 105/170 |
 | Play: Kurzbeschreibung | Gebetszeiten, Qibla, Adhan-Alarme. Gratis, ohne Werbung, ohne Tracking, offline. | 80/80 |
 
-Ausführliche Beschreibung (App Store und Play, 1370/4000):
+Ausführliche Beschreibung (App Store und Play, 1541/4000):
 
 ```text
 Athar (أثر) heißt „die Spur, die du hinterlässt“. Die App ist als Sadaqah Jariyah gebaut: dauerhaft kostenlos, ohne Werbung, ohne Konto und ohne Tracking. Open Source.
@@ -78,6 +79,7 @@ DAS BEKOMMST DU
 • Qibla-Kompass mit Korrektur auf geografisch Nord.
 • Hijri-Datum und die nächsten islamischen Daten.
 • Der echte Mond heute Nacht: Phase, Alter, nächster Neu- und Vollmond.
+• Dein Baum: ein Tasbih-Zähler (33 · 33 · 34), der mit jeder Zählung einen Baum wachsen lässt — eine goldene Blüte für jede Runde von 100. Gezählt nur auf deinem Telefon.
 • Ein Du'a zur Tageszeit, aus den Hadith-Sammlungen zitiert, mit Quelle.
 • Berechnungsmethode wählbar (Muslim World League, ISNA, Ägypten, Umm al-Qura, Karatschi, Teheran).
 • Deutsch, English, العربية, Polski, Türkçe — mit vollständiger Rechts-nach-links-Unterstützung.
@@ -101,7 +103,7 @@ Hinweis: Die Bedeutungen der Du'a wurden für Athar geschrieben und werden noch 
 | App Store: Werbetext | مواقيت وقبلة تعمل بلا إنترنت. بلا إعلانات ولا حسابات ولا تتبّع — مفتوح المصدر. | 78/170 |
 | Play: Kurzbeschreibung | مواقيت الصلاة والقبلة والأذان. مجاني بلا إعلانات ولا تتبّع ويعمل دون إنترنت. | 76/80 |
 
-Ausführliche Beschreibung (App Store und Play, 1057/4000):
+Ausführliche Beschreibung (App Store und Play, 1165/4000):
 
 ```text
 «أثر» هو الأثر الذي تتركه. تطبيق مواقيت صلاة مبنيّ صدقةً جارية: مجاني دائمًا، بلا إعلانات، بلا حسابات، وبلا تتبّع. مفتوح المصدر.
@@ -112,6 +114,7 @@ Ausführliche Beschreibung (App Store und Play, 1057/4000):
 • بوصلة القبلة مع تصحيح الشمال الحقيقي.
 • التاريخ الهجري والمناسبات الإسلامية القادمة.
 • القمر الحقيقي الليلة: طوره وعمره وموعد المحاق والبدر القادمين.
+• شجرتك: عدّاد تسبيح (٣٣ · ٣٣ · ٣٤) تنمو معه شجرة مع كل تسبيحة — زهرة ذهبية لكل مئة. يُعَدّ على هاتفك وحده.
 • دعاء لكل وقت من اليوم، منقول من كتب الحديث مع مصدره.
 • اختيار طريقة الحساب (رابطة العالم الإسلامي، ISNA، مصر، أم القرى، كراتشي، طهران).
 • العربية، English، Deutsch، Polski، Türkçe — مع دعم كامل للكتابة من اليمين إلى اليسار.
