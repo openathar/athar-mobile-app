@@ -1,5 +1,5 @@
 import json
-from extract import extract
+from extract import HADITH_DIR, extract
 C = [
  ('wake',      'bukhari',  'الحمد لله الذي احيانا', 'واليه النشور', 6312),
  ('afterFajr', 'ibnmajah', 'اللهم اني اسالك علما نافعا', 'وعملا متقبلا', None),
@@ -18,6 +18,12 @@ C = [
  ('sleep',     'bukhari',  'باسمك اموت واحيا', 'واحيا', 6312),
  ('qini',      'abudawud', 'اللهم قني عذابك', 'عبادك', 5045),
  ('afw',       'tirmidhi', 'اللهم انك عفو', 'فاعف عني', 3513),
+ ('afterSalah', 'muslim',  'اللهم انت السلام', 'والاكرام', 591),
+ ('subhan100', 'muslim',   'سبحان الله وبحمده', 'وبحمده', 2692),
+ ('tahlil100', 'bukhari',  'لا اله الا الله، وحده', 'قدير', 6403),
+ ('iftar',     'abudawud', 'ذهب الظما', 'ان شاء الله', 2357),
+ ('hilal',     'tirmidhi', 'اللهم اهلله علينا', 'ربي وربك الله', 3451),
+ ('arafah',    'tirmidhi', 'لا اله الا الله وحده لا شريك له', 'قدير', 3585),
 ]
 out = []
 for key, coll, s, e, n in C:
@@ -26,4 +32,4 @@ for key, coll, s, e, n in C:
     r['key'] = key
     out.append(r)
     print(f"{key:10} {coll} {r['no']:>6} | {'; '.join(r['grades'])[:120]}\n           {r['text']}")
-json.dump(out, open('/tmp/hadith/duas.json', 'w'), ensure_ascii=False, indent=1)
+json.dump(out, open(f'{HADITH_DIR}/duas.json', 'w'), ensure_ascii=False, indent=1)

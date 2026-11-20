@@ -365,6 +365,128 @@ export const DUAS: Record<string, Dua> = {
       "pl": "Nocą — nauczana na Lajlat al-Kadr",
       "tr": "Gece — Kadir Gecesi için öğretildi"
     }
+  },
+  "afterSalah": {
+    "key": "afterSalah",
+    "arabic": "اللَّهُمَّ أَنْتَ السَّلاَمُ وَمِنْكَ السَّلاَمُ تَبَارَكْتَ ذَا الْجَلاَلِ وَالإِكْرَامِ",
+    "collection": "muslim",
+    "number": "591",
+    "grade": "Sahih",
+    "meaning": {
+      "en": "O Allah, You are Peace and from You is peace. Blessed are You, Owner of majesty and honour.",
+      "de": "O Allah, Du bist der Friede, und von Dir kommt der Friede. Gesegnet bist Du, Herr der Majestät und der Ehre.",
+      "pl": "Allahu, Ty jesteś Pokojem i od Ciebie pochodzi pokój. Błogosławiony jesteś, Panie majestatu i czci.",
+      "tr": "Allah’ım, Sen selamsın, selamet Sendendir. Ey celal ve ikram sahibi, Sen yücesin."
+    },
+    "occasion": {
+      "en": "After every prayer, after asking forgiveness three times",
+      "de": "Nach jedem Gebet, nachdem man dreimal um Vergebung gebeten hat",
+      "ar": "بعد كل صلاة، بعد الاستغفار ثلاثًا",
+      "pl": "Po każdej modlitwie, po trzykrotnej prośbie o przebaczenie",
+      "tr": "Her namazdan sonra, üç kez istiğfardan sonra"
+    }
+  },
+  "subhan100": {
+    "key": "subhan100",
+    "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+    "collection": "muslim",
+    "number": "2692",
+    "grade": "Sahih",
+    "count": 100,
+    "meaning": {
+      "en": "Glory be to Allah, and praise be to Him.",
+      "de": "Gepriesen sei Allah, und Lob sei Ihm.",
+      "pl": "Chwała Allahowi i Jemu dzięki.",
+      "tr": "Allah’ı hamd ile tesbih ederim."
+    },
+    "occasion": {
+      "en": "Morning and evening, a hundred times",
+      "de": "Morgens und abends, hundertmal",
+      "ar": "حين يصبح وحين يمسي، مائة مرة",
+      "pl": "Rano i wieczorem, sto razy",
+      "tr": "Sabah ve akşam, yüz kez"
+    }
+  },
+  "tahlil100": {
+    "key": "tahlil100",
+    "arabic": "لاَ إِلَهَ إِلاَّ اللَّهُ، وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهْوَ عَلَى كُلِّ شَىْءٍ قَدِيرٌ",
+    "collection": "bukhari",
+    "number": "6403",
+    "grade": "Sahih",
+    "count": 100,
+    "meaning": {
+      "en": "There is no god but Allah alone, without partner. His is the dominion and His the praise, and He has power over all things.",
+      "de": "Es gibt keinen Gott außer Allah allein, ohne Teilhaber. Ihm gehört die Herrschaft und Ihm das Lob, und Er hat Macht über alle Dinge.",
+      "pl": "Nie ma boga poza Allahem, Jedynym, bez współtowarzysza. Do Niego należy władza i chwała, i On ma moc nad wszystkim.",
+      "tr": "Allah’tan başka ilah yoktur; O tektir, ortağı yoktur. Mülk O’nundur, hamd O’nadır; O her şeye kadirdir."
+    },
+    "occasion": {
+      "en": "A hundred times in a day",
+      "de": "Hundertmal am Tag",
+      "ar": "في يوم مائة مرة",
+      "pl": "Sto razy dziennie",
+      "tr": "Günde yüz kez"
+    }
+  },
+  "iftar": {
+    "key": "iftar",
+    "arabic": "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ",
+    "collection": "abudawud",
+    "number": "2357",
+    "grade": "Hasan",
+    "meaning": {
+      "en": "The thirst is gone, the veins are moistened, and the reward is sure, if Allah wills.",
+      "de": "Der Durst ist vergangen, die Adern sind befeuchtet, und der Lohn ist sicher, so Allah will.",
+      "pl": "Pragnienie odeszło, żyły zostały nawilżone, a nagroda jest pewna, jeśli Allah zechce.",
+      "tr": "Susuzluk gitti, damarlar ıslandı, inşallah sevap da sabit oldu."
+    },
+    "occasion": {
+      "en": "On breaking the fast",
+      "de": "Beim Fastenbrechen",
+      "ar": "عند الإفطار",
+      "pl": "Przy przerywaniu postu",
+      "tr": "İftar ederken"
+    }
+  },
+  "hilal": {
+    "key": "hilal",
+    "arabic": "اللَّهُمَّ أَهْلِلْهُ عَلَيْنَا بِالْيُمْنِ وَالإِيمَانِ وَالسَّلاَمَةِ وَالإِسْلاَمِ رَبِّي وَرَبُّكَ اللَّهُ",
+    "collection": "tirmidhi",
+    "number": "3451",
+    "grade": "Sahih",
+    "meaning": {
+      "en": "O Allah, let it rise over us with blessing and faith, with safety and Islam. My Lord and your Lord is Allah.",
+      "de": "O Allah, lass ihn über uns aufgehen mit Segen und Glauben, mit Sicherheit und Islam. Mein Herr und dein Herr ist Allah.",
+      "pl": "Allahu, spraw, by wzeszedł nad nami z błogosławieństwem i wiarą, z bezpieczeństwem i islamem. Moim Panem i twoim Panem jest Allah.",
+      "tr": "Allah’ım, onu üzerimize bereket ve imanla, esenlik ve İslam ile doğdur. Benim Rabbim de senin Rabbin de Allah’tır."
+    },
+    "occasion": {
+      "en": "On seeing the new crescent",
+      "de": "Beim Sehen der Mondsichel",
+      "ar": "عند رؤية الهلال",
+      "pl": "Na widok nowego półksiężyca",
+      "tr": "Hilali görünce"
+    }
+  },
+  "arafah": {
+    "key": "arafah",
+    "arabic": "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+    "collection": "tirmidhi",
+    "number": "3585",
+    "grade": "Hasan",
+    "meaning": {
+      "en": "There is no god but Allah alone, without partner. His is the dominion and His the praise, and He has power over all things.",
+      "de": "Es gibt keinen Gott außer Allah allein, ohne Teilhaber. Ihm gehört die Herrschaft und Ihm das Lob, und Er hat Macht über alle Dinge.",
+      "pl": "Nie ma boga poza Allahem, Jedynym, bez współtowarzysza. Do Niego należy władza i chwała, i On ma moc nad wszystkim.",
+      "tr": "Allah’tan başka ilah yoktur; O tektir, ortağı yoktur. Mülk O’nundur, hamd O’nadır; O her şeye kadirdir."
+    },
+    "occasion": {
+      "en": "The day of Arafah — the best du’a, the best that he ﷺ and the prophets before him said",
+      "de": "Der Tag von Arafah — das beste Du’a, das Beste, was er ﷺ und die Propheten vor ihm sagten",
+      "ar": "يوم عرفة — خير الدعاء، وخير ما قاله ﷺ والنبيون من قبله",
+      "pl": "Dzień Arafa — najlepsza du’a, najlepsze, co mówił ﷺ i prorocy przed nim",
+      "tr": "Arefe günü — en hayırlı dua; onun ﷺ ve önceki peygamberlerin söylediklerinin en hayırlısı"
+    }
   }
 };
 
@@ -373,22 +495,26 @@ export const DUAS_BY_PHASE: Record<DayPhase, string[]> = {
   "fajr": [
     "wake",
     "afterFajr",
-    "morning"
+    "morning",
+    "subhan100"
   ],
   "sunrise": [
     "bismillah",
+    "tahlil100",
     "worry",
     "hasana"
   ],
   "dhuhr": [
     "dhikr",
     "heart",
-    "huda"
+    "huda",
+    "hasana"
   ],
   "asr": [
     "evening",
     "eveningBi",
-    "sayyid"
+    "sayyid",
+    "subhan100"
   ],
   "maghrib": [
     "words",
@@ -401,3 +527,66 @@ export const DUAS_BY_PHASE: Record<DayPhase, string[]> = {
     "afw"
   ]
 };
+
+export type DuaRule = { key: string; months?: number[]; days?: [number, number]; phases?: DayPhase[] };
+/** Du’a placed first when the Hijri month/day and the part of the day fit (see lib/dua-pick.ts). */
+export const DUAS_SPECIAL: DuaRule[] = [
+  {
+    "key": "arafah",
+    "months": [
+      12
+    ],
+    "days": [
+      9,
+      9
+    ]
+  },
+  {
+    "key": "iftar",
+    "months": [
+      9
+    ],
+    "phases": [
+      "maghrib"
+    ]
+  },
+  {
+    "key": "afw",
+    "months": [
+      9
+    ],
+    "days": [
+      20,
+      30
+    ],
+    "phases": [
+      "maghrib",
+      "isha"
+    ]
+  },
+  {
+    "key": "hilal",
+    "days": [
+      29,
+      30
+    ],
+    "phases": [
+      "maghrib",
+      "isha"
+    ]
+  },
+  {
+    "key": "hilal",
+    "days": [
+      1,
+      2
+    ],
+    "phases": [
+      "maghrib",
+      "isha"
+    ]
+  }
+];
+
+/** Said when a prayer is finished: first in the half hour after each prayer time. */
+export const DUA_AFTER_PRAYER = "afterSalah";

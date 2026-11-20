@@ -1,5 +1,6 @@
-import json
-src = {d['key']: d for d in json.load(open('duas.json'))}
+import json, os
+HADITH_DIR = os.environ.get('HADITH_DIR', '/tmp/hadith')
+src = {d['key']: d for d in json.load(open(f'{HADITH_DIR}/duas.json'))}
 # Meaning (written for Athar, not copied from a published translation) and occasion per language.
 M = {
  'wake': ('All praise is for Allah, who gave us life after He had caused us to die, and to Him is the rising.',
@@ -63,6 +64,27 @@ M = {
           'O Allah, bewahre mich vor Deiner Strafe an dem Tag, an dem Du Deine Diener auferweckst.',
           'Allahu, uchroń mnie od Twojej kary w Dniu, w którym wskrzesisz Swoje sługi.',
           'Allah’ım, kullarını dirilttiğin gün beni azabından koru.'),
+ 'afterSalah': ('O Allah, You are Peace and from You is peace. Blessed are You, Owner of majesty and honour.',
+          'O Allah, Du bist der Friede, und von Dir kommt der Friede. Gesegnet bist Du, Herr der Majestät und der Ehre.',
+          'Allahu, Ty jesteś Pokojem i od Ciebie pochodzi pokój. Błogosławiony jesteś, Panie majestatu i czci.',
+          'Allah’ım, Sen selamsın, selamet Sendendir. Ey celal ve ikram sahibi, Sen yücesin.'),
+ 'subhan100': ('Glory be to Allah, and praise be to Him.', 'Gepriesen sei Allah, und Lob sei Ihm.', 'Chwała Allahowi i Jemu dzięki.', 'Allah’ı hamd ile tesbih ederim.'),
+ 'tahlil100': ('There is no god but Allah alone, without partner. His is the dominion and His the praise, and He has power over all things.',
+          'Es gibt keinen Gott außer Allah allein, ohne Teilhaber. Ihm gehört die Herrschaft und Ihm das Lob, und Er hat Macht über alle Dinge.',
+          'Nie ma boga poza Allahem, Jedynym, bez współtowarzysza. Do Niego należy władza i chwała, i On ma moc nad wszystkim.',
+          'Allah’tan başka ilah yoktur; O tektir, ortağı yoktur. Mülk O’nundur, hamd O’nadır; O her şeye kadirdir.'),
+ 'iftar': ('The thirst is gone, the veins are moistened, and the reward is sure, if Allah wills.',
+          'Der Durst ist vergangen, die Adern sind befeuchtet, und der Lohn ist sicher, so Allah will.',
+          'Pragnienie odeszło, żyły zostały nawilżone, a nagroda jest pewna, jeśli Allah zechce.',
+          'Susuzluk gitti, damarlar ıslandı, inşallah sevap da sabit oldu.'),
+ 'hilal': ('O Allah, let it rise over us with blessing and faith, with safety and Islam. My Lord and your Lord is Allah.',
+          'O Allah, lass ihn über uns aufgehen mit Segen und Glauben, mit Sicherheit und Islam. Mein Herr und dein Herr ist Allah.',
+          'Allahu, spraw, by wzeszedł nad nami z błogosławieństwem i wiarą, z bezpieczeństwem i islamem. Moim Panem i twoim Panem jest Allah.',
+          'Allah’ım, onu üzerimize bereket ve imanla, esenlik ve İslam ile doğdur. Benim Rabbim de senin Rabbin de Allah’tır.'),
+ 'arafah': ('There is no god but Allah alone, without partner. His is the dominion and His the praise, and He has power over all things.',
+          'Es gibt keinen Gott außer Allah allein, ohne Teilhaber. Ihm gehört die Herrschaft und Ihm das Lob, und Er hat Macht über alle Dinge.',
+          'Nie ma boga poza Allahem, Jedynym, bez współtowarzysza. Do Niego należy władza i chwała, i On ma moc nad wszystkim.',
+          'Allah’tan başka ilah yoktur; O tektir, ortağı yoktur. Mülk O’nundur, hamd O’nadır; O her şeye kadirdir.'),
  'afw': ('O Allah, You are pardoning and generous, You love to pardon, so pardon me.',
           'O Allah, Du bist vergebend und großzügig, Du liebst das Vergeben, so vergib mir.',
           'Allahu, Ty jesteś Przebaczający i Szczodry, kochasz przebaczać, więc przebacz mi.',
@@ -86,17 +108,35 @@ O = {
  'afiyaDA': ('Morning and evening — he ﷺ never left it', 'Morgens und abends — er ﷺ ließ es nie aus', 'صباحًا ومساءً — لم يكن ﷺ يدعه', 'Rano i wieczorem — nigdy jej nie pomijał ﷺ', 'Sabah ve akşam — hiç bırakmazdı ﷺ'),
  'sleep': ('Before sleeping', 'Vor dem Schlafen', 'عند النوم', 'Przed snem', 'Uyumadan önce'),
  'qini': ('Before sleeping, the right hand under the cheek', 'Vor dem Schlafen, die rechte Hand unter der Wange', 'عند النوم، واليد اليمنى تحت الخد', 'Przed snem, z prawą dłonią pod policzkiem', 'Uyumadan önce, sağ el yanağın altında'),
+ 'afterSalah': ('After every prayer, after asking forgiveness three times', 'Nach jedem Gebet, nachdem man dreimal um Vergebung gebeten hat', 'بعد كل صلاة، بعد الاستغفار ثلاثًا', 'Po każdej modlitwie, po trzykrotnej prośbie o przebaczenie', 'Her namazdan sonra, üç kez istiğfardan sonra'),
+ 'subhan100': ('Morning and evening, a hundred times', 'Morgens und abends, hundertmal', 'حين يصبح وحين يمسي، مائة مرة', 'Rano i wieczorem, sto razy', 'Sabah ve akşam, yüz kez'),
+ 'tahlil100': ('A hundred times in a day', 'Hundertmal am Tag', 'في يوم مائة مرة', 'Sto razy dziennie', 'Günde yüz kez'),
+ 'iftar': ('On breaking the fast', 'Beim Fastenbrechen', 'عند الإفطار', 'Przy przerywaniu postu', 'İftar ederken'),
+ 'hilal': ('On seeing the new crescent', 'Beim Sehen der Mondsichel', 'عند رؤية الهلال', 'Na widok nowego półksiężyca', 'Hilali görünce'),
+ 'arafah': ('The day of Arafah — the best du’a, the best that he ﷺ and the prophets before him said', 'Der Tag von Arafah — das beste Du’a, das Beste, was er ﷺ und die Propheten vor ihm sagten', 'يوم عرفة — خير الدعاء، وخير ما قاله ﷺ والنبيون من قبله', 'Dzień Arafa — najlepsza du’a, najlepsze, co mówił ﷺ i prorocy przed nim', 'Arefe günü — en hayırlı dua; onun ﷺ ve önceki peygamberlerin söylediklerinin en hayırlısı'),
  'afw': ('At night — taught for Laylat al-Qadr', 'In der Nacht — gelehrt für Laylat al-Qadr', 'في الليل — علّمه لليلة القدر', 'Nocą — nauczana na Lajlat al-Kadr', 'Gece — Kadir Gecesi için öğretildi'),
 }
-COUNT = {'bismillah': 3}
+COUNT = {'bismillah': 3, 'subhan100': 100, 'tahlil100': 100}
 PHASES = {
- 'fajr': ['wake', 'afterFajr', 'morning'],
- 'sunrise': ['bismillah', 'worry', 'hasana'],
- 'dhuhr': ['dhikr', 'heart', 'huda'],
- 'asr': ['evening', 'eveningBi', 'sayyid'],
+ 'fajr': ['wake', 'afterFajr', 'morning', 'subhan100'],
+ 'sunrise': ['bismillah', 'tahlil100', 'worry', 'hasana'],
+ 'dhuhr': ['dhikr', 'heart', 'huda', 'hasana'],
+ 'asr': ['evening', 'eveningBi', 'sayyid', 'subhan100'],
  'maghrib': ['words', 'afiyaDA', 'bismillah'],
  'isha': ['sleep', 'qini', 'afw'],
 }
+# Placed first when the Hijri date (and the part of the day) fits — the occasion the hadith names.
+# `days` is an inclusive range of the Hijri day; the Hijri date turns at midnight (Intl, Umm al-Qura),
+# so an evening belongs to the day before the night it opens.
+SPECIAL = [
+ {'key': 'arafah', 'months': [12], 'days': [9, 9]},
+ {'key': 'iftar', 'months': [9], 'phases': ['maghrib']},
+ {'key': 'afw', 'months': [9], 'days': [20, 30], 'phases': ['maghrib', 'isha']},
+ {'key': 'hilal', 'days': [29, 30], 'phases': ['maghrib', 'isha']},
+ {'key': 'hilal', 'days': [1, 2], 'phases': ['maghrib', 'isha']},
+]
+# Right after any prayer begins, the du'a the Prophet ﷺ said when he finished it comes first.
+AFTER_PRAYER = 'afterSalah'
 def grade(d):
     if d['coll'] in ('bukhari', 'muslim'): return 'Sahih'
     for g in d['grades']:
@@ -142,6 +182,13 @@ export const DUAS: Record<string, Dua> = ''' + json.dumps({d['key']: {k: v for k
 
 /** Which du\u2019a belong to which part of the day (the current prayer period). */
 export const DUAS_BY_PHASE: Record<DayPhase, string[]> = ''' + json.dumps(PHASES, indent=2) + ''';
+
+export type DuaRule = { key: string; months?: number[]; days?: [number, number]; phases?: DayPhase[] };
+/** Du\u2019a placed first when the Hijri month/day and the part of the day fit (see lib/dua-pick.ts). */
+export const DUAS_SPECIAL: DuaRule[] = ''' + json.dumps(SPECIAL, indent=2) + ''';
+
+/** Said when a prayer is finished: first in the half hour after each prayer time. */
+export const DUA_AFTER_PRAYER = ''' + json.dumps(AFTER_PRAYER) + ''';
 '''
-open('/Users/ahmad/Development/business/athar/mobile/src/data/duas.ts', 'w').write(ts)
+open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../src/data/duas.ts'), 'w').write(ts)
 print(len(out), 'duas written')

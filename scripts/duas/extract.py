@@ -1,4 +1,6 @@
-import json, re, sys
+import json, os, re, sys
+# Where the Arabic editions are (see README); /tmp/hadith by default.
+HADITH_DIR = os.environ.get('HADITH_DIR', '/tmp/hadith')
 TASHKEEL = re.compile(r'[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640\u200f\u200e]')
 def nchar(c):
     if TASHKEEL.match(c): return ''
@@ -17,7 +19,7 @@ def normmap(s):
 def norm(s): return normmap(s)[0]
 cache = {}
 def load(c):
-    if c not in cache: cache[c] = json.load(open(f'/tmp/hadith/ara-{c}.json'))['hadiths']
+    if c not in cache: cache[c] = json.load(open(f'{HADITH_DIR}/ara-{c}.json'))['hadiths']
     return cache[c]
 def extract(coll, start, end, number=None):
     S, E = norm(start), norm(end)
