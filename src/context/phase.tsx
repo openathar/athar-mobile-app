@@ -87,7 +87,8 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
   // Native chrome (iOS glass tab bar, alerts, date pickers) follows the OS appearance, not our palette:
   // a dark page with a light glass bar looked wrong. Make the OS appearance match the page tone.
   useEffect(() => {
-    Appearance.setColorScheme(value.daylight > 0.5 ? 'light' : 'dark');
+    // Not on web: react-native-web's Appearance has no setter.
+    Appearance.setColorScheme?.(value.daylight > 0.5 ? 'light' : 'dark');
   }, [value.daylight]);
 
   return <PhaseContext.Provider value={value}>{children}</PhaseContext.Provider>;

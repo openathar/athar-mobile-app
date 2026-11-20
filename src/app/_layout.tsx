@@ -14,6 +14,7 @@ import { LocationProvider } from '@/context/location';
 import { PhaseProvider } from '@/context/phase';
 import { SettingsProvider } from '@/context/settings';
 import { configureNotifications } from '@/lib/alarms';
+import { useSkiaReady } from '@/lib/skia-ready';
 import { DirectionRoot, LanguageProvider, LocaleBoundary } from '@/context/language';
 
 SplashScreen.preventAutoHideAsync();
@@ -31,12 +32,13 @@ export default function RootLayout() {
     PlusJakartaSans_600SemiBold,
   });
   const colorScheme = useColorScheme();
+  const skiaReady = useSkiaReady();
 
   useEffect(() => {
     if (loaded || error) SplashScreen.hideAsync();
   }, [loaded, error]);
 
-  if (!loaded && !error) return null;
+  if ((!loaded && !error) || !skiaReady) return null;
 
   return (
     <GestureHandlerRootView style={StyleSheet.absoluteFill}>

@@ -1,4 +1,4 @@
-import { Canvas, Fill, FilterMode, ImageShader, MipmapMode, Shader, Skia, useImage, type SkImage } from '@shopify/react-native-skia';
+import { Canvas, Fill, FilterMode, ImageShader, MipmapMode, Shader, Skia, useImage, type SkImage, type SkRuntimeEffect } from '@shopify/react-native-skia';
 import { useEffect } from 'react';
 import { Easing, useDerivedValue, useSharedValue, withRepeat, withTiming, type SharedValue } from 'react-native-reanimated';
 
@@ -126,8 +126,12 @@ half4 main(float2 xy) {
 }
 `;
 
-const earthEffect = Skia.RuntimeEffect.Make(EARTH_SRC);
-const moonEffect = Skia.RuntimeEffect.Make(MOON_SRC);
+// Compiled on first use, not at import: on web CanvasKit is only there after LoadSkiaWeb()
+// (see app/_layout.tsx), and static rendering imports this module on the server.
+let earthCache: SkRuntimeEffect | null | undefined;
+let moonCache: SkRuntimeEffect | null | undefined;
+const earthEffectOnce = () => (earthCache === undefined ? (earthCache = Skia.RuntimeEffect.Make(EARTH_SRC)) : earthCache);
+const moonEffectOnce = () => (moonCache === undefined ? (moonCache = Skia.RuntimeEffect.Make(MOON_SRC)) : moonCache);
 
 const DAY: number = require('../../assets/images/textures/2k_earth_daymap.jpg');
 const NIGHT: number = require('../../assets/images/textures/2k_earth_nightmap.jpg');
@@ -166,6 +170,7 @@ export function EarthSphere({
     sunSide: side === 'left' ? -1 : 1,
     mode: side === 'plain' ? 0 : 1,
   }));
+  const earthEffect = earthEffectOnce();
   if (!earthEffect || !day || !night) return null;
   return (
     <Canvas style={{ width: size, height: size }} pointerEvents="none">
@@ -190,10 +195,13 @@ export function MoonSphere({
   size,
   fraction,
   spin = true,
+  drag,
 }: {
   size: number;
   fraction: SharedValue<number>;
   spin?: boolean;
+  /** Extra turn in radians from a finger (BigMoon), added to the slow spin. */
+  drag?: SharedValue<number>;
 }) {
   const img = useImage(MOON);
   const reduced = useReducedMotion();
@@ -212,12 +220,13 @@ export function MoonSphere({
     return {
       texSize,
       size,
-      lon0: turn.value,
+      lon0: turn.value + (drag ? drag.value : 0),
       lat0: 0.1,
       // The sun in view space: right for the first quarter, toward the viewer for the full moon.
       sun: [Math.sin(a), 0.075, -Math.cos(a)],
     };
   });
+  const moonEffect = moonEffectOnce();
   if (!moonEffect || !img) return null;
   return (
     <Canvas style={{ width: size, height: size }} pointerEvents="none">
