@@ -359,11 +359,11 @@ export const DUAS: Record<string, Dua> = {
       "tr": "Allah’ım, Sen affedicisin, kerimsin, affetmeyi seversin; beni affet."
     },
     "occasion": {
-      "en": "At night — taught for Laylat al-Qadr",
-      "de": "In der Nacht — gelehrt für Laylat al-Qadr",
-      "ar": "في الليل — علّمه لليلة القدر",
-      "pl": "Nocą — nauczana na Lajlat al-Kadr",
-      "tr": "Gece — Kadir Gecesi için öğretildi"
+      "en": "The last ten nights of Ramadan — taught for Laylat al-Qadr",
+      "de": "Die letzten zehn Nächte des Ramadan — gelehrt für Laylat al-Qadr",
+      "ar": "العشر الأواخر من رمضان — علّمه لليلة القدر",
+      "pl": "Ostatnie dziesięć nocy ramadanu — nauczana na Lajlat al-Kadr",
+      "tr": "Ramazan’ın son on gecesi — Kadir Gecesi için öğretildi"
     }
   },
   "afterSalah": {
@@ -524,7 +524,7 @@ export const DUAS_BY_PHASE: Record<DayPhase, string[]> = {
   "isha": [
     "sleep",
     "qini",
-    "afw"
+    "sayyid"
   ]
 };
 

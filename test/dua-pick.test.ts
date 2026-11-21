@@ -27,6 +27,8 @@ test('Ramadan: iftar at Maghrib, the pardon du’a first in the last ten nights'
   assert.equal(lastTen[0], 'afw');
   assert.equal(lastTen.filter((k) => k === 'afw').length, 1, 'no duplicates');
   assert.notEqual(pickDuas({ phase: 'isha', hijri: { month: 9, day: 5 }, sincePrayer: 90 })[0], 'afw');
+  // Taught for Laylat al-Qadr: never an ordinary night's du'a.
+  for (const phase of ['maghrib', 'isha'] as const) assert.ok(!pickDuas({ phase, hijri: ordinary, sincePrayer: 90 }).includes('afw'), phase);
 });
 
 test('the new crescent around the turn of the month, Arafah on 9 Dhu l-Hijja', () => {

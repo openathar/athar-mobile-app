@@ -114,7 +114,7 @@ O = {
  'iftar': ('On breaking the fast', 'Beim Fastenbrechen', 'عند الإفطار', 'Przy przerywaniu postu', 'İftar ederken'),
  'hilal': ('On seeing the new crescent', 'Beim Sehen der Mondsichel', 'عند رؤية الهلال', 'Na widok nowego półksiężyca', 'Hilali görünce'),
  'arafah': ('The day of Arafah — the best du’a, the best that he ﷺ and the prophets before him said', 'Der Tag von Arafah — das beste Du’a, das Beste, was er ﷺ und die Propheten vor ihm sagten', 'يوم عرفة — خير الدعاء، وخير ما قاله ﷺ والنبيون من قبله', 'Dzień Arafa — najlepsza du’a, najlepsze, co mówił ﷺ i prorocy przed nim', 'Arefe günü — en hayırlı dua; onun ﷺ ve önceki peygamberlerin söylediklerinin en hayırlısı'),
- 'afw': ('At night — taught for Laylat al-Qadr', 'In der Nacht — gelehrt für Laylat al-Qadr', 'في الليل — علّمه لليلة القدر', 'Nocą — nauczana na Lajlat al-Kadr', 'Gece — Kadir Gecesi için öğretildi'),
+ 'afw': ('The last ten nights of Ramadan — taught for Laylat al-Qadr', 'Die letzten zehn Nächte des Ramadan — gelehrt für Laylat al-Qadr', 'العشر الأواخر من رمضان — علّمه لليلة القدر', 'Ostatnie dziesięć nocy ramadanu — nauczana na Lajlat al-Kadr', 'Ramazan’ın son on gecesi — Kadir Gecesi için öğretildi'),
 }
 COUNT = {'bismillah': 3, 'subhan100': 100, 'tahlil100': 100}
 PHASES = {
@@ -123,7 +123,9 @@ PHASES = {
  'dhuhr': ['dhikr', 'heart', 'huda', 'hasana'],
  'asr': ['evening', 'eveningBi', 'sayyid', 'subhan100'],
  'maghrib': ['words', 'afiyaDA', 'bismillah'],
- 'isha': ['sleep', 'qini', 'afw'],
+ # 'afw' is not here: it was taught for Laylat al-Qadr, so only DUAS_SPECIAL brings it (Ramadan 20–30).
+ # Sayyid al-istighfar: the hadith names the night too ("ومن قالها من الليل").
+ 'isha': ['sleep', 'qini', 'sayyid'],
 }
 # Placed first when the Hijri date (and the part of the day) fits — the occasion the hadith names.
 # `days` is an inclusive range of the Hijri day; the Hijri date turns at midnight (Intl, Umm al-Qura),
